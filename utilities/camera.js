@@ -1,8 +1,4 @@
 "use strict"
-var mat4 = glMatrix.mat4;
-var vec3 = glMatrix.vec3;
-var quat = glMatrix.quat;
-var toRadian = glMatrix.glMatrix.toRadian;
 
 class camera{
 

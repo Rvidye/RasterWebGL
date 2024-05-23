@@ -11,12 +11,13 @@ uniform mat4 vMat;
 uniform mat4 mMat;
 uniform mat4 bMat[100];
 
-out vec2 Tex;
-out vec3 N;
-out vec3 P;
-out vec3 viewPos;
+out vec3 v_pos;
+out vec3 v_normal;
+out vec2 v_tex;
 
 void main(void) {
+
+	gl_PointSize = 1.0;
 	vec4 totalPosition = vec4(0.0);
 	vec3 totalNormal = vec3(0.0);
 	for(int i = 0 ; i < 4; i++) {
@@ -28,10 +29,10 @@ void main(void) {
 		vec3 localNormal = mat3(bMat[vBoneIds[i]]) * vNor;
 		totalNormal += localNormal;
 	}
-	gl_Position = pMat * vMat * mMat * totalPosition;
-	Tex = vTex;
-	N = mat3(mMat) * totalNormal;
-	P = vec3(mMat * totalPosition);
-	viewPos = vMat[3].xyz;
+    vec4 pos = mMat * totalPosition;
+    v_pos = vec3(pos.xyz) / pos.w;
+	gl_Position = pMat * vMat * pos;
+    v_tex = vTex;
+    v_normal = mat3(mMat) * vNor;
 }
 

@@ -7,7 +7,7 @@ var modelList = [
 
 var scenes = [];
 var currentSceneIndex = 0;
-
+var modelLoader;
 var debugCamera;
 
 assimpjs().then (function (ajs) {
@@ -68,6 +68,10 @@ function main(){
     gl.enable(gl.DEPTH_TEST);           // Enable depth testing
     gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
 
+	modelLoader = new MinimalGLTFLoader.glTFLoader(gl);
+	modelLoader.loadGLTF("https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf",function(glTF) {
+		console.log(glTF);
+	});
 	debugCamera = new DebugCamera();
 	currentCamera = debugCamera;
 

@@ -17,6 +17,7 @@ class ShaderProgram{
         this.queryUniforms();
     }
 
+    
     compileShader(source){
         console.log("Loading ", source);
         const shaderType = this.getShaderType(source);
@@ -25,12 +26,30 @@ class ShaderProgram{
         xhr.open("GET", source, false);
         xhr.overrideMimeType("text/plain");
         xhr.send();
-        gl.shaderSource(shader, xhr.responseText);
+        const finalsrc = this.resolveIncludes(xhr.responseText);
+        gl.shaderSource(shader, finalsrc);
         gl.compileShader(shader);
         if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
             console.log(gl.getShaderInfoLog(shader));
         }
         return shader;
+    }
+    
+    resolveIncludes(src)
+    {
+        const includePattern = /#include\s*<(.+?)>/g;
+        let match;
+        while ((match = includePattern.exec(src)) !== null) {
+            const includePath = match[1];
+            console.log(`Found include directive: ${match[0]}, Path: ${includePath}`);
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", includePath, false);
+            xhr.overrideMimeType("text/plain");
+            xhr.send();
+            const includeSrc = xhr.responseText;
+            src = src.replace(match[0], this.resolveIncludes(includeSrc));
+        }
+        return src;
     }
 
     getShaderType(filePath) {

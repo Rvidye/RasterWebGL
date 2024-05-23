@@ -72,7 +72,7 @@ class tutorial extends Scene
         //if(tutorialScene.mytimer.isEventComplete(eventIDS.END_T)){
             //this.isComplete = true;
         //}
-        console.log(tutorialScene.mytimer.getT());
+        //console.log(tutorialScene.mytimer.getT());
     }
 
     reset() 
