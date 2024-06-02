@@ -3,6 +3,11 @@
 var loadedTextures = {}
 var modelList = [
 	{ name: "test2", files:[ 'models/cube.glb'], flipTex:true },
+	{ name: "test1", files:[ 'models/cube/AnimatedCube.gltf', 'models/cube/AnimatedCube.bin'], flipTex:true },
+	{ name: "test3", files:[ 'models/cesiumman/CesiumMan.gltf', 'models/cesiumman/CesiumMan_data.bin'], flipTex:true },
+	{ name: "arrow", files:[ 'models/lightmesh/arrow.obj'], flipTex:false },
+	{ name: "cone", files:[ 'models/lightmesh/cone.obj'], flipTex:false },
+	{ name: "point", files:[ 'models/lightmesh/point.obj'], flipTex:false }
 ]
 
 var scenes = [];
@@ -38,6 +43,7 @@ assimpjs().then (function (ajs) {
 				console.log("Parsed JSON");
 				modelList[i].json = resultJson;
 				modelList[i].directory = modelList[i].files[0].substring(0, modelList[i].files[0].lastIndexOf('/'));
+				console.log(resultJson);
 			}
 			main();
 		})
@@ -68,18 +74,14 @@ function main(){
     gl.enable(gl.DEPTH_TEST);           // Enable depth testing
     gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
 
-	modelLoader = new MinimalGLTFLoader.glTFLoader(gl);
-	modelLoader.loadGLTF("https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf",function(glTF) {
-		console.log(glTF);
-	});
 	debugCamera = new DebugCamera();
 	currentCamera = debugCamera;
 
+	lightRenderer = new LightRenderer();
 	// scene setup
 
 	addScene(new tutorial());
 	initScenes();
-
     window.requestAnimationFrame(renderFrame);
 }
 

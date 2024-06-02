@@ -1,0 +1,13 @@
+#version 300 es
+
+layout(location = 0)in vec4 vPos;
+
+uniform mat4 pMat;
+uniform mat4 vMat;
+uniform mat4 mMat;
+uniform mat4 nMat; // node matrix
+
+void main(void){
+    gl_PointSize = 1.0;
+    gl_Position = pMat * vMat * mMat * nMat * vPos;
+}

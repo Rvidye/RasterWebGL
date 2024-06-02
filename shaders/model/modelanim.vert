@@ -9,6 +9,7 @@ layout(location = 4)in vec4 vWeights;
 uniform mat4 pMat;
 uniform mat4 vMat;
 uniform mat4 mMat;
+uniform mat4 nMat; //node matrix not normal matrix
 uniform mat4 bMat[100];
 
 out vec3 v_pos;
@@ -29,7 +30,7 @@ void main(void) {
 		vec3 localNormal = mat3(bMat[vBoneIds[i]]) * vNor;
 		totalNormal += localNormal;
 	}
-    vec4 pos = mMat * totalPosition;
+    vec4 pos = mMat * nMat * totalPosition;
     v_pos = vec3(pos.xyz) / pos.w;
 	gl_Position = pMat * vMat * pos;
     v_tex = vTex;

@@ -7,6 +7,7 @@ layout(location = 2)in vec2 vTex;
 uniform mat4 pMat;
 uniform mat4 vMat;
 uniform mat4 mMat;
+uniform mat4 nMat; // node matrix
 
 out vec3 v_pos;
 out vec3 v_normal;
@@ -14,7 +15,7 @@ out vec2 v_tex;
 
 void main(void){
     gl_PointSize = 1.0;
-    vec4 pos = mMat * vPos;
+    vec4 pos = mMat * nMat * vPos;
     v_pos = vec3(pos.xyz) / pos.w;
     v_normal = mat3(mMat) * vNor;
     v_tex = vTex;
