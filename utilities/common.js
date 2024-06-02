@@ -7,8 +7,9 @@ var GLOBAL = {
 var currentCamera = null;
 var canvas = null;
 var gl = null;
+var lightRenderer = null;
+
 const mat4 = glMatrix.mat4;
 const vec3 = glMatrix.vec3;
 const quat = glMatrix.quat;
 const toRadian = glMatrix.glMatrix.toRadian;
-const loader = MinimalGLTFLoader;
