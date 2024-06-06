@@ -1,13 +1,12 @@
 "use strict"
 
-class camera{
+class camera {
 
     constructor(
-        position = vec3.fromValues(0.0,0.0,5.0),
-        front = vec3.fromValues(0.0,0.0,-1.0),
-        up = vec3.fromValues(0.0,1.0,0.0)
-        )
-    {
+        position = vec3.fromValues(0.0, 0.0, 5.0),
+        front = vec3.fromValues(0.0, 0.0, -1.0),
+        up = vec3.fromValues(0.0, 1.0, 0.0)
+    ) {
         this.position = position;
         this.front = front;
         this.up = up;
@@ -17,51 +16,43 @@ class camera{
         this.height = 1080;
     }
 
-    setProjectionMatrix(projMat)
-    {
+    setProjectionMatrix(projMat) {
         this.projection = projMat;
     }
 
-    getProjectionMatrix()
-    {
-        mat4.perspective(this.projection,Math.PI/4,this.width / this.height,0.1,1000.0);
+    getProjectionMatrix() {
+        mat4.perspective(this.projection, Math.PI / 4, this.width / this.height, 0.1, 1000.0);
         return this.projection;
     }
 
-    getViewMatrix()
-    {
-        mat4.lookAt(this.view,this.position,this.front,this.up);
+    getViewMatrix() {
+        mat4.lookAt(this.view, this.position, this.front, this.up);
         return this.view;
     }
 
-    getPosition()
-    {
+    getPosition() {
         return this.position;
     }
 
-    getFront()
-    {
+    getFront() {
         return this.front;
     }
 
-    resizeCamera(width, height)
-    {
+    resizeCamera(width, height) {
         this.width = width;
         this.height = height;
     }
 
-    keyboard(event){}
-    mouseMove(event){}
-    mouseDown(event){}
-    mouseUp(event){}
+    keyboard(event) { }
+    mouseMove(event) { }
+    mouseDown(event) { }
+    mouseUp(event) { }
 };
 
-class DebugCamera extends camera
-{
-    constructor(position,front,up)
-    {
-        super(position,front,up);
-        
+class DebugCamera extends camera {
+    constructor(position, front, up) {
+        super(position, front, up);
+
         this.px = this.position[0];
         this.py = this.position[1];
         this.pz = this.position[2];
@@ -74,42 +65,45 @@ class DebugCamera extends camera
         this.speed = 5.0;
     }
 
-    keyboard(event)
-    {
-        switch(event.code)
-        {
+    keyboard(event) {
+        switch (event.code) {
             case 'KeyW':
             case 'KeyS':
                 var direction = (event.code === 'KeyW') ? 1 : -1;
                 this.px -= Math.sin(toRadian(this.ang)) * GLOBAL.deltaTime * this.speed * direction;
                 this.py -= Math.sin(toRadian(this.elev)) * GLOBAL.deltaTime * this.speed * direction;
                 this.pz -= Math.cos(toRadian(this.ang)) * GLOBAL.deltaTime * this.speed * direction;
-            break;
+                break;
             case 'KeyA':
             case 'KeyD':
                 var direction = (event.code === 'KeyA') ? -1 : 1;
                 this.ang += GLOBAL.deltaTime * this.turnSpeed * direction;
-            break;
+                break;
             case 'KeyQ':
             case 'KeyE':
                 var direction = (event.code === 'KeyQ') ? -1 : 1;
                 this.roll += GLOBAL.deltaTime * this.turnSpeed * direction;
-            break;
+                break;
+
+            case 'KeyR':
+            case 'KeyT':
+                this.py += (event.code === 'KeyR') ? 0.5 : -0.5;
+                break;
+
             case 'ArrowUp':
             case 'ArrowDown':
                 console.log("here");
                 var direction = (event.code === 'ArrowUp') ? 1 : -1;
                 this.elev += GLOBAL.deltaTime * this.turnSpeed * direction;
-            break;
+                break;
             case 'Space':
-            break;
+                break;
             case 'ShiftLeft':
-            break;
+                break;
         }
     }
 
-    getViewMatrix()
-    {
+    getViewMatrix() {
         mat4.identity(this.view);
         mat4.translate(this.view, this.view, [this.px, this.py, this.pz]);
         mat4.rotateX(this.view, this.view, toRadian(this.elev));
@@ -119,15 +113,12 @@ class DebugCamera extends camera
         return this.view;
     }
 
-    mouseDown(event)
-    {
+    mouseDown(event) {
     }
 
-    mouseMove(event)
-    {
+    mouseMove(event) {
     }
 
-    mouseUp(event)
-    {
+    mouseUp(event) {
     }
 };
