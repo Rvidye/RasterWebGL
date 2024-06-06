@@ -1,26 +1,33 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Raster WebGL</title>
-        <!--Utilities-->
-        <script type="text/javascript" src="utilities/assimpjs.js"></script>
-        <script type="text/javascript" src="utilities/gl-matrix-min.js"></script>
-        <script type="text/javascript" src="utilities/minimal-gltf-loader.js"></script>
-        <script type="text/javascript" src="utilities/common.js"></script>
-        <script type="text/javascript" src="utilities/camera.js"></script>
-        <script type="text/javascript" src="utilities/newmodel.js"></script>
-        <script type="text/javascript" src="utilities/shader.js"></script>
-        <script type="text/javascript" src="utilities/scene.js"></script>
-        <script type="text/javascript" src="utilities/timer.js"></script>
-        <script type="text/javascript" src="utilities/lights.js"></script>
 
-        <!--Effects-->
+<head>
+    <title>Raster WebGL</title>
+    <!--Utilities-->
+    <script type="text/javascript" src="utilities/assimpjs.js"></script>
+    <script type="text/javascript" src="utilities/gl-matrix-min.js"></script>
+    <script type="text/javascript" src="utilities/minimal-gltf-loader.js"></script>
+    <script type="text/javascript" src="utilities/common.js"></script>
+    <script type="text/javascript" src="utilities/camera.js"></script>
+    <script type="text/javascript" src="utilities/newmodel.js"></script>
+    <script type="text/javascript" src="utilities/shader.js"></script>
+    <script type="text/javascript" src="utilities/scene.js"></script>
+    <script type="text/javascript" src="utilities/timer.js"></script>
+    <script type="text/javascript" src="utilities/lights.js"></script>
 
-        <!--Scenes-->
-        <script type="text/javascript" src="scenes/tutorial.js"></script>
-        <script type="text/javascript" src="main.js"></script>
-    </head>
-    <pre style="position: absolute; left: 1em; top: 0;">
+    <!--Effects-->
+    <!--Ganesh-->
+    <script type="text/javascript" src="effects/grass.js"></script>
+
+    <!--Scenes-->
+    <!--Ganesh-->
+    <script type="text/javascript" src="scenes/renderGrass.js"></script>
+
+    <script type="text/javascript" src="scenes/tutorial.js"></script>
+    <script type="text/javascript" src="main.js"></script>
+
+</head>
+<pre style="position: absolute; left: 1em; top: 0;">
         A = left
         D = right
         W = forward
@@ -29,7 +36,13 @@
         E = roll right
         UP = look up
         DN = look down
+
+        R = Move Camera Up
+        T = Move Camera Down
     </pre>
-    <body style="margin:0;">
-    </body>
+
+<body style="margin:0;">
+    <div>fps: <span id="fps"></span></div>
+</body>
+
 </html>
