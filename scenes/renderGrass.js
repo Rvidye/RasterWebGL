@@ -36,8 +36,7 @@ class renderGrass extends Scene {
             const x = (i / this.myGrass.NUM_GRASS_BLADES_X) - 0.5;
             for (let j = 0; j < this.myGrass.NUM_GRASS_BLADES_Y; j++) {
                 const y = (j / this.myGrass.NUM_GRASS_BLADES_Y) - 0.5;
-
-                console.log(x * this.myGrass.GRASS_PATCH_SIZE + " " + y * this.myGrass.GRASS_PATCH_SIZE);
+                //console.log(x * this.myGrass.GRASS_PATCH_SIZE + " " + y * this.myGrass.GRASS_PATCH_SIZE);
                 bladePos1.push(x * this.myGrass.GRASS_PATCH_SIZE + Math.random() * 0.8 - 0.4);
                 bladePos1.push(0);
                 bladePos1.push(y * this.myGrass.GRASS_PATCH_SIZE + Math.random() * 0.8 - 0.4);

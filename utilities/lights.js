@@ -1,15 +1,15 @@
 "use strict"
 
 class Light {
-    constructor(type, color = [1,1,1], intensity, position = [0, 0, 0], direction = [0, 0, 0], range = 0, innerConeCos = 0, outerConeCos = 0) {
+    constructor(type, color = [1, 1, 1], intensity = 1.0, position = [0, 0, 0], direction = [0, 0, 0], range = 0.0, spotAngle = 0.0, spotExponent = 0.0) {
         this.type = type;
         this.color = color;
         this.intensity = intensity;
         this.position = position;
         this.direction = direction;
         this.range = range;
-        this.innerConeCos = innerConeCos;
-        this.outerConeCos = outerConeCos;
+        this.spotAngle = spotAngle;
+        this.spotExponent = spotExponent;
     }
 }
 
@@ -29,13 +29,13 @@ class LightManager {
 
     updateLights(program) {
         this.lights.forEach((light, index) => {
+            gl.uniform3fv(gl.getUniformLocation(program, `u_Lights[${index}].position`), light.position);
             gl.uniform3fv(gl.getUniformLocation(program, `u_Lights[${index}].direction`), light.direction);
-            gl.uniform1f(gl.getUniformLocation(program, `u_Lights[${index}].range`), light.range);
             gl.uniform3fv(gl.getUniformLocation(program, `u_Lights[${index}].color`), light.color);
             gl.uniform1f(gl.getUniformLocation(program, `u_Lights[${index}].intensity`), light.intensity);
-            gl.uniform3fv(gl.getUniformLocation(program, `u_Lights[${index}].position`), light.position);
-            gl.uniform1f(gl.getUniformLocation(program, `u_Lights[${index}].innerConeCos`), light.innerConeCos);
-            gl.uniform1f(gl.getUniformLocation(program, `u_Lights[${index}].outerConeCos`), light.outerConeCos);
+            gl.uniform1f(gl.getUniformLocation(program, `u_Lights[${index}].range`), light.range);
+            gl.uniform1f(gl.getUniformLocation(program, `u_Lights[${index}].spotAngle`), light.spotAngle);
+            gl.uniform1f(gl.getUniformLocation(program, `u_Lights[${index}].spotExponent`), light.spotExponent);
             gl.uniform1i(gl.getUniformLocation(program, `u_Lights[${index}].type`), light.type);
         });
         gl.uniform1i(gl.getUniformLocation(program, 'u_LightCount'), this.lights.length);

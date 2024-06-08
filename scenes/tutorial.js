@@ -25,8 +25,8 @@ class tutorial extends Scene
     setupProgram() 
     {
         // Load All Shaders here
-        tutorialScene.programNodeAnimatedModel = new ShaderProgram(gl,['shaders/model/model.vert','shaders/model/model.frag']);
-        tutorialScene.programSkeletalAnimatedModel = new ShaderProgram(gl,['shaders/model/modelanim.vert','shaders/model/model.frag']);
+        tutorialScene.programNodeAnimatedModel = new ShaderProgram(gl,['shaders/model/model.vert','shaders/model/celShader.frag']);
+        tutorialScene.programSkeletalAnimatedModel = new ShaderProgram(gl,['shaders/model/modelanim.vert','shaders/model/celShader.frag']);
     }
 
     setupCamera() 
@@ -37,11 +37,8 @@ class tutorial extends Scene
     init() 
     {
         // init all resouces models, texures, buffers etc
-        tutorialScene.modelNodeBased = setupModel("test1",false);
+        tutorialScene.modelNodeBased = setupModel("test2",false);
         tutorialScene.modelSkeletalBased = setupModel("test3",true);
-
-        console.log(tutorialScene.modelNodeBased);
-        console.log(tutorialScene.modelSkeletalBased);
 
         tutorialScene.mytimer = new timer([
             [eventIDS.START_T,[0.0,1.0]],
@@ -50,10 +47,10 @@ class tutorial extends Scene
         ]);
 
         tutorialScene.lightManager = new LightManager();
-        const directionalLight = new Light(0, [1.0, 1.0, 1.0], 5.0, [0, 0, 0], [0.0, 0.0, 1.0]);
-        const pointLight = new Light(1, [1.0, 0.0, 0.0], 5.0, [0.0, 0.0, 0.0],[0.0, 0.0, 0.0],20.0);
-        const spotLight = new Light(2, [0.0, 1.0, 0.0], 5.0, [1.0, 0.0, -3.0], [0.0, 0.0, -1.0], 20.0, Math.cos(Math.PI / 8), Math.cos(Math.PI / 4));
-        
+        const directionalLight = new Light(0, [1.0, 1.0, 1.0], 1.0, [0, 0, 0], [-1.0, 1.0, -1.0],0.0,0.0,0.0);
+        const pointLight = new Light(1, [1.0, 0.0, 0.0], 2.0, [0.0, 0.0, 0.0],[0.0, 0.0, 0.0],5.0,0.0,0.0);
+        const spotLight = new Light(2, [0.0, 1.0, 0.0], 1.0, [1.0, 0.0, -3.0], [0.0, 0.0, -1.0], 5.0, Math.cos(Math.PI / 16), 64);
+
         tutorialScene.lightManager.addLight(directionalLight);
         tutorialScene.lightManager.addLight(pointLight);
         tutorialScene.lightManager.addLight(spotLight);
@@ -68,6 +65,7 @@ class tutorial extends Scene
         gl.uniformMatrix4fv(tutorialScene.programNodeAnimatedModel.getUniformLocation("pMat"),false, currentCamera.getProjectionMatrix());
         gl.uniformMatrix4fv(tutorialScene.programNodeAnimatedModel.getUniformLocation("vMat"),false, currentCamera.getViewMatrix());
         gl.uniformMatrix4fv(tutorialScene.programNodeAnimatedModel.getUniformLocation("mMat"),false, mMat);
+        gl.uniform3fv(tutorialScene.programNodeAnimatedModel.getUniformLocation("viewPos"), currentCamera.getPosition());
         tutorialScene.lightManager.updateLights(tutorialScene.programNodeAnimatedModel.programObject);
         renderModel(tutorialScene.modelNodeBased, tutorialScene.programNodeAnimatedModel, true);
 
@@ -76,6 +74,7 @@ class tutorial extends Scene
         gl.uniformMatrix4fv(tutorialScene.programSkeletalAnimatedModel.getUniformLocation("pMat"),false, currentCamera.getProjectionMatrix());
         gl.uniformMatrix4fv(tutorialScene.programSkeletalAnimatedModel.getUniformLocation("vMat"),false, currentCamera.getViewMatrix());
         gl.uniformMatrix4fv(tutorialScene.programSkeletalAnimatedModel.getUniformLocation("mMat"),false, mMat);
+        gl.uniform3fv(tutorialScene.programNodeAnimatedModel.getUniformLocation("viewPos"), currentCamera.getPosition());
         tutorialScene.lightManager.updateLights(tutorialScene.programSkeletalAnimatedModel.programObject);
         uploadBoneMatrices(tutorialScene.modelSkeletalBased,tutorialScene.programSkeletalAnimatedModel,0);
         renderModel(tutorialScene.modelSkeletalBased, tutorialScene.programSkeletalAnimatedModel, true);
@@ -85,7 +84,7 @@ class tutorial extends Scene
 
     update() 
     {
-        updateModel(tutorialScene.modelNodeBased,0,GLOBAL.deltaTime);
+        //updateModel(tutorialScene.modelNodeBased,0,GLOBAL.deltaTime);
         updateModel(tutorialScene.modelSkeletalBased,0,GLOBAL.deltaTime);
         //tutorialScene.mytimer.increment();
         //if(tutorialScene.mytimer.isEventComplete(eventIDS.END_T)){
