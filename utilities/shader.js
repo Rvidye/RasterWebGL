@@ -86,7 +86,7 @@ class ShaderProgram{
         if (name in this.uniforms) {
             return this.uniforms[name];
         } else {
-            console.error(`Uniform '${name}' not found.`);
+           // console.error(`Uniform '${name}' not found.`);
             return null;
         }
     }

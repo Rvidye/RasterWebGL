@@ -2,12 +2,12 @@
 
 var loadedTextures = {}
 var modelList = [
-	{ name: "test2", files: ['models/cube.glb'], flipTex: true },
-	{ name: "test1", files: ['models/cube/AnimatedCube.gltf', 'models/cube/AnimatedCube.bin'], flipTex: true },
-	{ name: "test3", files: ['models/cesiumman/CesiumMan.gltf', 'models/cesiumman/CesiumMan_data.bin'], flipTex: true },
-	{ name: "arrow", files: ['models/lightmesh/arrow.obj'], flipTex: false },
-	{ name: "cone", files: ['models/lightmesh/cone.obj'], flipTex: false },
-	{ name: "point", files: ['models/lightmesh/point.obj'], flipTex: false }
+	{ name: "test2", files:[ 'models/cube.glb'], flipTex:true },
+	{ name: "test1", files:[ 'models/cube/AnimatedCube.gltf', 'models/cube/AnimatedCube.bin'], flipTex:true },
+	{ name: "test3", files:[ 'models/cesiumman/CesiumMan.gltf', 'models/cesiumman/CesiumMan_data.bin'], flipTex:true },
+	{ name: "arrow", files:[ 'models/lightmesh/arrow.obj'], flipTex:false },
+	{ name: "cone", files:[ 'models/lightmesh/cone.obj'], flipTex:false },
+	{ name: "point", files:[ 'models/lightmesh/point.obj'], flipTex:false },
 ]
 
 var scenes = [];
@@ -81,8 +81,7 @@ function main() {
 	lightRenderer = new LightRenderer();
 	// scene setup
 
-	//addScene(new tutorial());
-
+	addScene(new tutorial());
 	addScene(new renderGrass());
 
 	fpsElem = document.querySelector("#fps");
@@ -92,7 +91,7 @@ function main() {
 }
 
 function onMyResize() {
-	console.log("In Resize");
+	//console.log("In Resize");
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 	gl.viewport(0, 0, canvas.width, canvas.height);
@@ -100,7 +99,7 @@ function onMyResize() {
 }
 
 function onMyKeyPress(event) {
-	console.log("In Keypress");
+	//console.log("In Keypress");
 	if (event.code == "KeyF") {
 		canvas.requestFullscreen();
 	}
@@ -108,16 +107,16 @@ function onMyKeyPress(event) {
 	scenes[currentSceneIndex].keyboardfunc(event.code);
 }
 
-function onMyMouseDown(event) {
-	console.log("In Down");
+function onMyMouseDown(event){
+	debugCamera.mouseDown(event);
 }
 
-function onMyMouseMove(event) {
-	console.log("In Move");
+function onMyMouseMove(event){
+	debugCamera.mouseMove(event);
 }
 
-function onMyMouseUp(event) {
-	console.log("In Up");
+function onMyMouseUp(event){
+	debugCamera.mouseUp(event);
 }
 
 function onClose(event) {
