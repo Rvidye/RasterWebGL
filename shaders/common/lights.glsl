@@ -112,11 +112,3 @@ vec3 calculateSpotLightSpecular(Light light, vec3 fragPos, vec3 normal, vec3 vie
     return spec * light.color * light.intensity * attenuation * intensity;
 }
 
-float CalculateRimFactor(vec3 V, vec3 N){
-    float rimFactor = dot(V,N);
-    rimFactor = 1.0 - rimFactor;
-    rimFactor = max(0.0,rimFactor);
-    rimFactor = pow(rimFactor, 1.0);
-    return rimFactor;
-}
-

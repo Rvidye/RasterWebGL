@@ -17,8 +17,10 @@ struct material_t {
 uniform material_t material;
 uniform sampler2D samplerDiffuse;
 uniform vec3 viewPos;
+uniform vec4 objectID;
 
-out vec4 color;
+#include<shaders/common/outputs.glsl>
+
 void main(void){
 
     vec3 normal = normalize(v_normal);
@@ -36,10 +38,9 @@ void main(void){
     }
     vec3 baseColor = material.diffuse * texture(samplerDiffuse,v_tex).rgb;
     diffuseColor *= baseColor;
-    vec3 rimColor = vec3(0.0);
-    rimColor = vec3(1.0-max(0.0,dot(normalize(V),normalize(normal))));
-    rimColor = smoothstep(0.3,0.4,rimColor);
-    rimColor *= baseColor;
-    color = vec4(diffuseColor+ rimColor, material.opacity);
+    gColor = vec4(diffuseColor, material.opacity);
+    gEmission = vec4(material.emissive,material.opacity);
+    gNormal = vec4(normal,1.0);
+    gObjectID = objectID;
 }
 

@@ -34,10 +34,11 @@ class dmodel {
 }
 
 class dmesh {
-	constructor(vao, count, materialIndex) {
+	constructor(vao, count, materialIndex, meshID) {
 		this.vao = vao;
 		this.count = count;
         this.materialIndex = materialIndex;
+        this.meshID = meshID;
 	}
 }
 
@@ -336,7 +337,7 @@ function setupMesh(model, json, skin)
         }
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, EBO);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, faceArray, gl.STATIC_DRAW);
-        model.meshes.push(new dmesh(VAO,faceArray.length,mesh.materialindex));
+        model.meshes.push(new dmesh(VAO,faceArray.length,mesh.materialindex,vec4.fromValues(getRandomInRange(0.0,1.0),getRandomInRange(0.0,1.0),getRandomInRange(0.0,1.0),1.0)));
     });
 }
 
@@ -665,6 +666,7 @@ function renderModel(model, program, useMaterial) {
             }
 
             gl.uniformMatrix4fv(program.getUniformLocation("nMat"), false, globalTransform);
+            gl.uniform4fv(program.getUniformLocation("objectID"),mesh.meshID);
             gl.bindVertexArray(mesh.vao);
             gl.drawElements(gl.TRIANGLES, mesh.count, gl.UNSIGNED_SHORT, 0);
         });

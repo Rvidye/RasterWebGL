@@ -17,8 +17,9 @@ struct material_t {
 uniform material_t material;
 uniform sampler2D samplerDiffuse;
 uniform vec3 viewPos;
+uniform vec4 objectID;
 
-out vec4 color;
+#include<shaders/common/outputs.glsl>
 void main(void){
 
     vec3 normal = normalize(v_normal);
@@ -40,5 +41,8 @@ void main(void){
     }
 
     vec3 baseColor = material.diffuse * texture(samplerDiffuse,v_tex).rgb;
-    color = vec4( baseColor * diffuseColor + specularColor, material.opacity);
+    gColor = vec4( baseColor * diffuseColor + specularColor, material.opacity);
+    gEmission = vec4(material.emissive,material.opacity);
+    gNormal = vec4(normal,1.0);
+    gObjectID = objectID;
 }
