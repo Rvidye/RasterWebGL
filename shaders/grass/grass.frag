@@ -2,10 +2,11 @@
 precision highp float;
 
 in vec3 difffuseColor;
-out vec4 FragColor;
+#include<shaders/common/outputs.glsl>
 
 void main(void) {
-
-    FragColor = vec4(difffuseColor, 1.0f);
-
+    gColor = vec4(difffuseColor, 1.0);
+    gEmission = vec4(0.0);
+    gNormal = vec4(0.0);
+    gObjectID = vec4(0.0);
 }

@@ -12,9 +12,16 @@ var modelList = [
 
 var scenes = [];
 var currentSceneIndex = 0;
-var modelLoader;
 var debugCamera;
 var fpsElem;
+
+// global in main.js
+var emptyVao;
+var programFSQ;
+
+var bloom;
+var composite;
+var tonemap;
 
 assimpjs().then(function (ajs) {
 	if (true) {
@@ -57,6 +64,13 @@ function main() {
 
 	canvas = document.createElement("canvas");
 	gl = canvas.getContext("webgl2");
+	const extColorBufferFloat = gl.getExtension("EXT_color_buffer_float");
+	const extFloatBlend = gl.getExtension("EXT_float_blend");
+	const oesTextureFloatLinear = gl.getExtension("OES_texture_float_linear");
+	
+	if (!extColorBufferFloat || !extFloatBlend || !oesTextureFloatLinear) {
+		console.error("Required WebGL extensions are not supported by this browser.");
+	}
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 	//document.body.style.margin = "0";
@@ -70,21 +84,33 @@ function main() {
 	window.addEventListener('mouseup', (e) => onMyMouseUp(e));
 	window.addEventListener('close', (e) => onClose(e));
 
-	gl.clearColor(0.0, 0.0, 1.0, 1.0);  // Clear to black, fully opaque
-	gl.clearDepth(1.0);                 // Clear everything
-	gl.enable(gl.DEPTH_TEST);           // Enable depth testing
-	gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
+	gl.clearColor(0.0, 0.0, 1.0, 1.0);
+	gl.colorMask(true, true, true, true);
+	gl.clearDepth(1.0);
+	gl.enable(gl.DEPTH_TEST);
+	gl.depthFunc(gl.LEQUAL);
+
+	// create a G Buffer To store all necessary data
+	gBuffer = createGBuffer(gl, 2048,2048);
+
+	emptyVao = gl.createVertexArray();
 
 	debugCamera = new DebugCamera();
 	currentCamera = debugCamera;
 
 	lightRenderer = new LightRenderer();
+
+	programFSQ = new ShaderProgram(gl,['shaders/common/FSQ.vert','shaders/common/FSQ.frag']);
+
+	tonemap = new ToneMap(gl,"shaders/hdr.vert","shaders/hdr.frag",2048,2048);
+	bloom = new Bloom(gl,"shaders/common/FSQ.vert","shaders/bloom/downsample.frag",2048,2048);
+	composite = new PostProcessCompositor(gl,"shaders/common/FSQ.vert","shaders/composite.frag",2048,2048);
+
 	// scene setup
-
 	addScene(new tutorial());
-	addScene(new renderGrass());
+	//addScene(new renderGrass());
 
-	fpsElem = document.querySelector("#fps");
+	fpsElem = document.getElementById('fps');
 
 	initScenes();
 	window.requestAnimationFrame(renderFrame);
@@ -94,7 +120,7 @@ function onMyResize() {
 	//console.log("In Resize");
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
-	gl.viewport(0, 0, canvas.width, canvas.height);
+	//gl.viewport(0, 0, canvas.width, canvas.height);
 	debugCamera.resizeCamera(window.innerWidth, window.innerHeight);
 }
 
@@ -147,7 +173,7 @@ function renderFrame(timeStamp) {
 	GLOBAL.deltaTime = (timeStamp - GLOBAL.lastFrameTime) * 0.001;
 	GLOBAL.lastFrameTime = timeStamp;
 	const fps = 1 / GLOBAL.deltaTime;
-	fpsElem.textContent = fps.toFixed(1);
+	fpsElem.textContent = "FPS : " + fps.toFixed(1);
 	//console.log("Rendering frame with delta time:", GLOBAL.deltaTime);
 
 	render();
@@ -156,11 +182,57 @@ function renderFrame(timeStamp) {
 }
 
 function render() {
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+	// Render To G Buffer
+	gl.bindFramebuffer(gl.FRAMEBUFFER,gBuffer.fbo);
+	const drawBuffers = [
+	gl.COLOR_ATTACHMENT0, // color
+	gl.COLOR_ATTACHMENT1, // emission
+	gl.COLOR_ATTACHMENT2, // normals
+	gl.COLOR_ATTACHMENT3, // object ID
+	];
+	gl.drawBuffers(drawBuffers);
+	gl.viewport(0, 0, 2048, 2048);
+	gl.clearBufferfv(gl.COLOR, 0, [0.1, 0.1, 0.1, 1.0]);
+	gl.clearBufferfv(gl.COLOR, 1, [0.0, 0.0, 0.0, 1.0]);
+	gl.clearBufferfv(gl.COLOR, 2, [0.0, 0.0, 0.0, 1.0]);
+	gl.clearBufferfv(gl.COLOR, 3, [0.0, 0.0, 0.0, 1.0]);
+	gl.clearBufferfv(gl.DEPTH, 0, [1.0]);
 
 	if (currentSceneIndex < scenes.length) {
 		scenes[currentSceneIndex].render();
 	}
+
+	// Apply All Post Process Effect
+	let textures = [gBuffer.colorTexture];
+
+	if(postProcessingSettings.enableBloom){
+		const bloomTex = bloom.apply(gBuffer.emissionTexture);
+		textures.push(bloomTex);
+	}
+
+	let finalTexture;
+	if(textures.length > 1){
+		finalTexture = composite.apply(textures);
+	}else{
+		finalTexture = gBuffer.colorTexture;
+	}
+	const hdrTex = tonemap.apply(finalTexture);
+
+	// Render Final Texture To Screen
+	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+	gl.viewport(0, 0, canvas.width, canvas.height);
+	gl.clearBufferfv(gl.COLOR, 0, [0.1, 0.1, 0.1, 1.0]);
+	gl.clearBufferfv(gl.DEPTH, 0, [1.0]);
+	programFSQ.use();
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, hdrTex);
+	gl.uniform1i(programFSQ.getUniformLocation("screenTex"), 0);
+	gl.bindVertexArray(emptyVao);
+	gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+	gl.bindVertexArray(null);
+	gl.bindTexture(gl.TEXTURE_2D, null);
+	gl.useProgram(null);
 }
 
 function update() {
@@ -306,4 +378,54 @@ function loadTextureCubemap(path, isTexFlipped) {
 		gl.bindTexture(gl.TEXTURE_CUBE_MAP, null)
 	}
 	return tbo
+}
+
+function createGBuffer(gl, width, height) {
+	const fbo = gl.createFramebuffer();
+	gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+
+	// Create textures for each buffer
+	const colorTexture = createTexture(gl, width, height, gl.RGBA, gl.FLOAT, gl.RGBA16F);
+	const depthTexture = createTexture(gl, width, height, gl.DEPTH_COMPONENT, gl.FLOAT, gl.DEPTH_COMPONENT32F);
+	const emissionTexture = createTexture(gl, width, height, gl.RGBA, gl.FLOAT, gl.RGBA16F);
+	const normalsTexture = createTexture(gl, width, height, gl.RGBA);
+	const objectIdTexture = createTexture(gl, width, height, gl.RGBA);
+
+	gl.bindTexture(gl.TEXTURE_2D, emissionTexture);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+	gl.bindTexture(gl.TEXTURE_2D, null);
+
+	// Attach textures to the FBO
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, colorTexture, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT1, gl.TEXTURE_2D, emissionTexture, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT2, gl.TEXTURE_2D, normalsTexture, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT3, gl.TEXTURE_2D, objectIdTexture, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, depthTexture, 0);
+
+	// Specify the list of draw buffers
+	const drawBuffers = [
+	  gl.COLOR_ATTACHMENT0, // color
+	  gl.COLOR_ATTACHMENT1, // emission
+	  gl.COLOR_ATTACHMENT2, // normals
+	  gl.COLOR_ATTACHMENT3, // object ID
+	];
+	gl.drawBuffers(drawBuffers);
+
+	// Check FBO status
+	if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
+		console.error('Framebuffer is not complete');
+	}
+	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+	return { fbo, colorTexture, depthTexture, emissionTexture, normalsTexture, objectIdTexture };
+}
+
+function createTexture(gl, width, height, format, type = gl.UNSIGNED_BYTE, internalFormat = format) {
+	const texture = gl.createTexture();
+	gl.bindTexture(gl.TEXTURE_2D, texture);
+	gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, null);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+	gl.bindTexture(gl.TEXTURE_2D, null);
+	return texture;
 }

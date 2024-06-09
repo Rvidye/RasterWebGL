@@ -10,10 +10,12 @@
     <script type="text/javascript" src="utilities/common.js"></script>
     <script type="text/javascript" src="utilities/camera.js"></script>
     <script type="text/javascript" src="utilities/newmodel.js"></script>
+    <script type="text/javascript" src="utilities/modelPlacer.js"></script>
     <script type="text/javascript" src="utilities/shader.js"></script>
     <script type="text/javascript" src="utilities/scene.js"></script>
     <script type="text/javascript" src="utilities/timer.js"></script>
     <script type="text/javascript" src="utilities/lights.js"></script>
+    <script type="text/javascript" src="utilities/postprocess.js"></script>
 
     <!--Effects-->
     <!--Ganesh-->
@@ -22,21 +24,29 @@
     <!--Scenes-->
     <!--Ganesh-->
     <script type="text/javascript" src="scenes/renderGrass.js"></script>
-
     <script type="text/javascript" src="scenes/tutorial.js"></script>
     <script type="text/javascript" src="main.js"></script>
 
 </head>
-<pre style="position: absolute; left: 1em; top: 0;">
+<pre style="position: absolute; left: 0em; top: 0; color: white;">
+        Camera Controls
         W = forward
         A = left
         S = back
         D = right
         mouse click = look around
-    </pre>
 
+        Model Controls
+        B = TRANSLATE Mode
+        N = ROTATE Mode
+        M = Scale Mode
+        I/K = Z Axis (translate/rotate)
+        J/L = X Axis (translate/rotate)
+        U/O = Y Axis (translate/rotate)
+</pre>
+<pre style="position: absolute; left:50%; top: 0; color: white; border: 1px solid black;" id="fps">
+</pre>
 <body style="margin:0;">
-    <div>fps: <span id="fps"></span></div>
 </body>
 
 </html>

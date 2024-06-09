@@ -5,6 +5,7 @@ var tutorialScene ={
     programSkeletalAnimatedModel : null,
     modelNodeBased : null,
     modelSkeletalBased : null,
+    modelPlacer : null,
     mytimer : null,
     lightManager : null
 };
@@ -25,7 +26,7 @@ class tutorial extends Scene
     setupProgram() 
     {
         // Load All Shaders here
-        tutorialScene.programNodeAnimatedModel = new ShaderProgram(gl,['shaders/model/model.vert','shaders/model/celShader.frag']);
+        tutorialScene.programNodeAnimatedModel = new ShaderProgram(gl,['shaders/model/modelanim.vert','shaders/model/model.frag']);
         tutorialScene.programSkeletalAnimatedModel = new ShaderProgram(gl,['shaders/model/modelanim.vert','shaders/model/celShader.frag']);
     }
 
@@ -54,12 +55,27 @@ class tutorial extends Scene
         tutorialScene.lightManager.addLight(directionalLight);
         tutorialScene.lightManager.addLight(pointLight);
         tutorialScene.lightManager.addLight(spotLight);
+
+        tutorialScene.modelPlacer = new ModelPlacer();
+        // Set initial position, rotation, and scale for the model (if needed)
+        // tutorialScene.modelPlacer.setPosition(-1.0, 0.0, -5.0);
+        // tutorialScene.modelPlacer.setRotation(0.0, 0.0, 0.0);
+        // tutorialScene.modelPlacer.setScale(1.0, 1.0, 1.0);
     }
 
     render() 
     {
+
+        //Shadow pass
+
         var mMat = mat4.create();
-        mat4.translate(mMat, mat4.create(), vec3.fromValues(-1.0, 0.0, -5.0));
+        mat4.identity(mMat);
+        mat4.translate(mMat, mMat, vec3.fromValues(-2.00, 0.00, -4.00));
+        mat4.rotateX(mMat, mMat, 0.00);
+        mat4.rotateY(mMat, mMat, 7.00);
+        mat4.rotateZ(mMat, mMat, -6.00);
+        mat4.scale(mMat, mMat, vec3.fromValues(1.00, 1.00, 1.00));
+        //mat4.translate(mMat, mat4.create(), vec3.fromValues(-1.0, 0.0, -5.0));
 
         tutorialScene.programNodeAnimatedModel.use();
         gl.uniformMatrix4fv(tutorialScene.programNodeAnimatedModel.getUniformLocation("pMat"),false, currentCamera.getProjectionMatrix());
@@ -67,14 +83,15 @@ class tutorial extends Scene
         gl.uniformMatrix4fv(tutorialScene.programNodeAnimatedModel.getUniformLocation("mMat"),false, mMat);
         gl.uniform3fv(tutorialScene.programNodeAnimatedModel.getUniformLocation("viewPos"), currentCamera.getPosition());
         tutorialScene.lightManager.updateLights(tutorialScene.programNodeAnimatedModel.programObject);
-        renderModel(tutorialScene.modelNodeBased, tutorialScene.programNodeAnimatedModel, true);
+        uploadBoneMatrices(tutorialScene.modelSkeletalBased,tutorialScene.programNodeAnimatedModel,0);
+        renderModel(tutorialScene.modelSkeletalBased, tutorialScene.programNodeAnimatedModel, true);
 
         mat4.translate(mMat, mat4.create(), vec3.fromValues(1.0, 0.0, -5.0));
         tutorialScene.programSkeletalAnimatedModel.use();
         gl.uniformMatrix4fv(tutorialScene.programSkeletalAnimatedModel.getUniformLocation("pMat"),false, currentCamera.getProjectionMatrix());
         gl.uniformMatrix4fv(tutorialScene.programSkeletalAnimatedModel.getUniformLocation("vMat"),false, currentCamera.getViewMatrix());
-        gl.uniformMatrix4fv(tutorialScene.programSkeletalAnimatedModel.getUniformLocation("mMat"),false, mMat);
-        gl.uniform3fv(tutorialScene.programNodeAnimatedModel.getUniformLocation("viewPos"), currentCamera.getPosition());
+        gl.uniformMatrix4fv(tutorialScene.programSkeletalAnimatedModel.getUniformLocation("mMat"),false, tutorialScene.modelPlacer.getTransformationMatrix());
+        gl.uniform3fv(tutorialScene.programSkeletalAnimatedModel.getUniformLocation("viewPos"), currentCamera.getPosition());
         tutorialScene.lightManager.updateLights(tutorialScene.programSkeletalAnimatedModel.programObject);
         uploadBoneMatrices(tutorialScene.modelSkeletalBased,tutorialScene.programSkeletalAnimatedModel,0);
         renderModel(tutorialScene.modelSkeletalBased, tutorialScene.programSkeletalAnimatedModel, true);
@@ -111,19 +128,11 @@ class tutorial extends Scene
         }
 
         switch(key){
-            case 'KeyI':
-                tutorialScene.lightManager.getLight(1).position[2] += 1.0;
-            break;
-            case 'KeyK':
-                tutorialScene.lightManager.getLight(1).position[2] -= 1.0;
-            break;
-            case 'KeyJ':
-                tutorialScene.lightManager.getLight(1).position[0] += 1.0;
-            break;
-            case 'KeyL':
-                tutorialScene.lightManager.getLight(1).position[0] -= 1.0;
+            case 'KeyP':
+                console.log(tutorialScene.modelPlacer.generateTransformationCode());
             break;
         }
+        tutorialScene.modelPlacer.handleKeyboardInput(key);
     }
 
     getCamera() 

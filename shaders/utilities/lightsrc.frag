@@ -2,7 +2,12 @@
 
 precision highp float;
 uniform vec3 lightcolor;
-out vec4 color;
+
+#include<shaders/common/outputs.glsl>
+
 void main(void){
-    color = vec4(lightcolor,1.0);
+    gColor = vec4(lightcolor,1.0);
+    gEmission = vec4(lightcolor,1.0);
+    gNormal = vec4(0.0);
+    gObjectID = vec4(0.0);
 }
