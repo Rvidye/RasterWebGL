@@ -16,7 +16,12 @@ class renderGrass extends Scene {
         super();
         this.isComplete = false;
 
-        this.myGrass = new grass(500, 500, 500);
+        //Grass Rendering class object
+        this.myGrass = new grass(500, 500, 600);
+
+        //Atmospheric Scattering Class Object
+        this.myAtmScat = new atmScattering();
+
     }
     setupProgram() {
 
@@ -45,16 +50,22 @@ class renderGrass extends Scene {
 
         this.myGrass.init(bladePos1);
 
+        this.myAtmScat.initAtmScattering();
+
 
     }
 
     render() {
 
+        gl.depthMask(false);
+        this.myAtmScat.renderAtmScattering();
+        gl.depthMask(true);
         this.myGrass.render();
     }
 
     update() {
 
+        this.myAtmScat.updateAtmScattering();
         this.myGrass.update();
     }
 

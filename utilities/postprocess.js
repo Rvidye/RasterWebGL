@@ -18,7 +18,7 @@ function createFramebufferWithTexture(gl, width, height, internalFormat, format,
 class PostProcessingEffect {
     constructor(gl, vertexShaderSrc, fragmentShaderSrc, width, height) {
         this.gl = gl;
-        this.program = new ShaderProgram(gl,[vertexShaderSrc,fragmentShaderSrc]);
+        this.program = new ShaderProgram(gl, [vertexShaderSrc, fragmentShaderSrc]);
         this.fbo = createFramebufferWithTexture(gl, width, height, gl.RGBA16F, gl.RGBA, gl.FLOAT);
         this.width = width;
         this.height = height;
@@ -29,23 +29,23 @@ class PostProcessingEffect {
     }
 }
 
-class PostProcessCompositor extends PostProcessingEffect{
+class PostProcessCompositor extends PostProcessingEffect {
 
-    constructor(gl,vert,frag,width,height){
-        super(gl,vert,frag,width,height);
+    constructor(gl, vert, frag, width, height) {
+        super(gl, vert, frag, width, height);
     }
 
-    apply(inputTextures){
+    apply(inputTextures) {
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo.fbo);
         gl.viewport(0, 0, this.width, this.height);
         gl.clear(gl.COLOR_BUFFER_BIT);
         this.program.use();
         // Bind the input textures and set uniform values
         inputTextures.forEach((texture, index) => {
-        gl.activeTexture(gl.TEXTURE0 + index);
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.uniform1i(this.program.getUniformLocation(`uTexture${index}`), index);
-        //console.log(`uTextures${index}`);
+            gl.activeTexture(gl.TEXTURE0 + index);
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.uniform1i(this.program.getUniformLocation(`uTexture${index}`), index);
+            //console.log(`uTextures${index}`);
         });
         gl.uniform1i(this.program.getUniformLocation("uTextureCount"), inputTextures.length);
         // Draw a full-screen quad
@@ -54,12 +54,12 @@ class PostProcessCompositor extends PostProcessingEffect{
     }
 }
 
-class ToneMap extends PostProcessingEffect{
-    constructor(gl,vert,frag,width,height){
-        super(gl,vert,frag,width,height);
+class ToneMap extends PostProcessingEffect {
+    constructor(gl, vert, frag, width, height) {
+        super(gl, vert, frag, width, height);
     }
 
-    apply(inputTexture){
+    apply(inputTexture) {
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo.fbo);
         gl.clear(gl.COLOR_BUFFER_BIT);
         this.program.use();
@@ -73,12 +73,12 @@ class ToneMap extends PostProcessingEffect{
     }
 }
 
-class Bloom extends PostProcessingEffect{
+class Bloom extends PostProcessingEffect {
 
-    constructor(gl,vert,frag,width,height){
-        super(gl,vert,frag,width,height);
-        this.upsample = new ShaderProgram(gl,[vert,"shaders/bloom/upsample.frag"]);
-        this.mipChain = this.createMipChain(gl,width,height,6);
+    constructor(gl, vert, frag, width, height) {
+        super(gl, vert, frag, width, height);
+        this.upsample = new ShaderProgram(gl, [vert, "shaders/bloom/upsample.frag"]);
+        this.mipChain = this.createMipChain(gl, width, height, 6);
         gl.bindTexture(gl.TEXTURE_2D, this.fbo.texture);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -100,7 +100,7 @@ class Bloom extends PostProcessingEffect{
         return mipChain;
     }
 
-    apply(inputTextures){
+    apply(inputTextures) {
 
         // Generate mipmaps for the brightness texture
         gl.bindTexture(gl.TEXTURE_2D, inputTextures);
@@ -152,3 +152,31 @@ class Bloom extends PostProcessingEffect{
         return this.mipChain[0].texture;
     }
 }
+
+
+class Fog extends PostProcessingEffect {
+    constructor(gl, vert, frag, width, height) {
+        super(gl, vert, frag, width, height);
+    }
+
+    apply(inputColorTexture, inputDepthTexture) {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo.fbo);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        this.program.use();
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, inputColorTexture);
+        gl.uniform1i(this.program.getUniformLocation("colorTexture"), 0);
+
+
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, inputDepthTexture);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+        gl.uniform1i(this.program.getUniformLocation("depthTexture"), 1);
+        // Draw a full-screen quad
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        return this.fbo.texture;
+    }
+}
+

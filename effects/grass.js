@@ -190,7 +190,6 @@ class grass {
     render() {
 
         //code
-        // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         //Transform Feedback To CalCulate Per Blade Instance Attributes
         this.programTransformFeedbackGrass.use();
