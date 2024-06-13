@@ -2,12 +2,16 @@
 
 var loadedTextures = {}
 var modelList = [
-	{ name: "test2", files:[ 'models/cube.glb'], flipTex:true },
-	{ name: "test1", files:[ 'models/cube/AnimatedCube.gltf', 'models/cube/AnimatedCube.bin'], flipTex:true },
-	{ name: "test3", files:[ 'models/cesiumman/CesiumMan.gltf', 'models/cesiumman/CesiumMan_data.bin'], flipTex:true },
-	{ name: "arrow", files:[ 'models/lightmesh/arrow.obj'], flipTex:false },
-	{ name: "cone", files:[ 'models/lightmesh/cone.obj'], flipTex:false },
-	{ name: "point", files:[ 'models/lightmesh/point.obj'], flipTex:false },
+	{ name: "test2", files: ['models/cube.glb'], flipTex: true },
+	{ name: "test1", files: ['models/cube/AnimatedCube.gltf', 'models/cube/AnimatedCube.bin'], flipTex: true },
+	{ name: "test3", files: ['models/cesiumman/CesiumMan.gltf', 'models/cesiumman/CesiumMan_data.bin'], flipTex: true },
+	{ name: "arrow", files: ['models/lightmesh/arrow.obj'], flipTex: false },
+	{ name: "cone", files: ['models/lightmesh/cone.obj'], flipTex: false },
+	{ name: "point", files: ['models/lightmesh/point.obj'], flipTex: false },
+	//{ name: "sphere", files: ['models/sphere.glb'], flipTex: true },
+	//{ name: "test4", files: ['models/Avocado.glb'], flipTex: true },
+
+
 ]
 
 var scenes = [];
@@ -22,6 +26,8 @@ var programFSQ;
 var bloom;
 var composite;
 var tonemap;
+
+var fog;
 
 assimpjs().then(function (ajs) {
 	if (true) {
@@ -67,7 +73,7 @@ function main() {
 	const extColorBufferFloat = gl.getExtension("EXT_color_buffer_float");
 	const extFloatBlend = gl.getExtension("EXT_float_blend");
 	const oesTextureFloatLinear = gl.getExtension("OES_texture_float_linear");
-	
+
 	if (!extColorBufferFloat || !extFloatBlend || !oesTextureFloatLinear) {
 		console.error("Required WebGL extensions are not supported by this browser.");
 	}
@@ -86,12 +92,13 @@ function main() {
 
 	gl.clearColor(0.0, 0.0, 1.0, 1.0);
 	gl.colorMask(true, true, true, true);
+
 	gl.clearDepth(1.0);
 	gl.enable(gl.DEPTH_TEST);
 	gl.depthFunc(gl.LEQUAL);
 
 	// create a G Buffer To store all necessary data
-	gBuffer = createGBuffer(gl, 2048,2048);
+	gBuffer = createGBuffer(gl, 2048, 2048);
 
 	emptyVao = gl.createVertexArray();
 
@@ -100,15 +107,19 @@ function main() {
 
 	lightRenderer = new LightRenderer();
 
-	programFSQ = new ShaderProgram(gl,['shaders/common/FSQ.vert','shaders/common/FSQ.frag']);
+	programFSQ = new ShaderProgram(gl, ['shaders/common/FSQ.vert', 'shaders/common/FSQ.frag']);
 
-	tonemap = new ToneMap(gl,"shaders/hdr.vert","shaders/hdr.frag",2048,2048);
-	bloom = new Bloom(gl,"shaders/common/FSQ.vert","shaders/bloom/downsample.frag",2048,2048);
-	composite = new PostProcessCompositor(gl,"shaders/common/FSQ.vert","shaders/composite.frag",2048,2048);
+	tonemap = new ToneMap(gl, "shaders/hdr.vert", "shaders/hdr.frag", 2048, 2048);
+	bloom = new Bloom(gl, "shaders/common/FSQ.vert", "shaders/bloom/downsample.frag", 2048, 2048);
+
+	fog = new Fog(gl, "shaders/common/FSQ.vert", "shaders/fog/fog.frag", 2048, 2048);
+
+	composite = new PostProcessCompositor(gl, "shaders/common/FSQ.vert", "shaders/composite.frag", 2048, 2048);
+
 
 	// scene setup
-	addScene(new tutorial());
-	//addScene(new renderGrass());
+	//addScene(new tutorial());
+	addScene(new renderGrass());
 
 	fpsElem = document.getElementById('fps');
 
@@ -133,15 +144,15 @@ function onMyKeyPress(event) {
 	scenes[currentSceneIndex].keyboardfunc(event.code);
 }
 
-function onMyMouseDown(event){
+function onMyMouseDown(event) {
 	debugCamera.mouseDown(event);
 }
 
-function onMyMouseMove(event){
+function onMyMouseMove(event) {
 	debugCamera.mouseMove(event);
 }
 
-function onMyMouseUp(event){
+function onMyMouseUp(event) {
 	debugCamera.mouseUp(event);
 }
 
@@ -184,13 +195,14 @@ function renderFrame(timeStamp) {
 function render() {
 
 	// Render To G Buffer
-	gl.bindFramebuffer(gl.FRAMEBUFFER,gBuffer.fbo);
+	gl.bindFramebuffer(gl.FRAMEBUFFER, gBuffer.fbo);
 	const drawBuffers = [
-	gl.COLOR_ATTACHMENT0, // color
-	gl.COLOR_ATTACHMENT1, // emission
-	gl.COLOR_ATTACHMENT2, // normals
-	gl.COLOR_ATTACHMENT3, // object ID
+		gl.COLOR_ATTACHMENT0, // color
+		gl.COLOR_ATTACHMENT1, // emission
+		gl.COLOR_ATTACHMENT2, // normals
+		gl.COLOR_ATTACHMENT3 // object ID
 	];
+
 	gl.drawBuffers(drawBuffers);
 	gl.viewport(0, 0, 2048, 2048);
 	gl.clearBufferfv(gl.COLOR, 0, [0.1, 0.1, 0.1, 1.0]);
@@ -204,17 +216,30 @@ function render() {
 	}
 
 	// Apply All Post Process Effect
-	let textures = [gBuffer.colorTexture];
 
-	if(postProcessingSettings.enableBloom){
+	let textures = [];
+
+	//Fog
+	if (postProcessingSettings.enableFog) {
+		const myfogTexture = fog.apply(gBuffer.colorTexture, gBuffer.depthTexture);
+		textures.push(myfogTexture);
+	}
+	else {
+		textures.push(gBuffer.colorTexture);
+	}
+
+
+
+	if (postProcessingSettings.enableBloom) {
 		const bloomTex = bloom.apply(gBuffer.emissionTexture);
 		textures.push(bloomTex);
 	}
 
+
 	let finalTexture;
-	if(textures.length > 1){
+	if (textures.length >= 1) {
 		finalTexture = composite.apply(textures);
-	}else{
+	} else {
 		finalTexture = gBuffer.colorTexture;
 	}
 	const hdrTex = tonemap.apply(finalTexture);
@@ -405,11 +430,12 @@ function createGBuffer(gl, width, height) {
 
 	// Specify the list of draw buffers
 	const drawBuffers = [
-	  gl.COLOR_ATTACHMENT0, // color
-	  gl.COLOR_ATTACHMENT1, // emission
-	  gl.COLOR_ATTACHMENT2, // normals
-	  gl.COLOR_ATTACHMENT3, // object ID
+		gl.COLOR_ATTACHMENT0, // color
+		gl.COLOR_ATTACHMENT1, // emission
+		gl.COLOR_ATTACHMENT2, // normals
+		gl.COLOR_ATTACHMENT3 // object ID
 	];
+
 	gl.drawBuffers(drawBuffers);
 
 	// Check FBO status
