@@ -59,8 +59,11 @@ assimpjs().then(function (ajs) {
 				modelList[i].directory = modelList[i].files[0].substring(0, modelList[i].files[0].lastIndexOf('/'));
 				console.log(resultJson);
 			}
+		}).then(() => {
+			return eigen.ready;
+		}).then(() => {
 			main();
-		})
+		});
 	} else {
 		main()
 	}
@@ -118,10 +121,37 @@ function main() {
 
 
 	// scene setup
-	//addScene(new tutorial());
-	addScene(new renderGrass());
+	addScene(new tutorial());
+	// addScene(new renderGrass());
 
 	fpsElem = document.getElementById('fps');
+
+	// test bspline interpolator
+	// const bspline = new BsplineInterpolator();
+	// /**
+	//  * eigen-js can only invert a max. of 66x66 matrix.
+	//  * So the max. number of points in a bspline is limited to 68 (= 66 + 2).
+	//  * Cross that and you have exceeded memory bounds.
+	//  * On the same lines, if a point's dimension exceeds 67, you exceed the bounds.
+	//  */
+	// const npoints = 68;
+	// const ndims = 3;
+	// let points = new Array(npoints);
+	// for(let i = 0; i < npoints; i++) {
+	// 	points[i] = new Array(ndims).fill(0);
+	// 	for(let j = 0; j < ndims; j++) {
+	// 		points[i][j] = 100 * Math.random();
+	// 	}
+	// }
+	// bspline.updatePoints(points);
+	// console.time('Spline Recalculation Time');
+	// bspline.recalculateSpline();
+	// console.timeEnd('Spline Recalculation Time');
+	// const samples = [];
+	// for(let i = 0; i <= 100; i++) {
+	// 	samples.push(bspline.interpolateSpline(i / 100));
+	// }
+	// console.log(samples);
 
 	initScenes();
 	window.requestAnimationFrame(renderFrame);
@@ -137,9 +167,43 @@ function onMyResize() {
 
 function onMyKeyPress(event) {
 	//console.log("In Keypress");
-	if (event.code == "KeyF") {
-		canvas.requestFullscreen();
+	switch(event.code){
+		case "Tab":
+		break;
+		case "Space":
+			isAnimating = !isAnimating;
+			break;
+		case "F1":
+			canvas.requestFullscreen();
+		break;
+		case "F2":
+			isDebugCameraOn = !isDebugCameraOn;
+		break;
+		case "F3":
+			DEBUGMODE = NONE;
+		break;
+		case "F4":
+			resetScene();
+		break;
+		case "F6":
+			DEBUGMODE = CAMERA;
+		break;
+		case "F7":
+			DEBUGMODE = MODEL;
+		break;
+		case "F8":
+			DEBUGMODE = SPLINE;
+		break;
+		case "F9":
+			DEBUGMODE = LIGHT;
+		break;
+		case "F10":
+			debugCamera.position = scenes[currentSceneIndex].getCamera().getPosition();
+			debugCamera.cameraYaw = -90.0;
+			debugCamera.cameraPitch = 0.0;
+		break;
 	}
+
 	debugCamera.keyboard(event);
 	scenes[currentSceneIndex].keyboardfunc(event.code);
 }
@@ -184,15 +248,18 @@ function renderFrame(timeStamp) {
 	GLOBAL.deltaTime = (timeStamp - GLOBAL.lastFrameTime) * 0.001;
 	GLOBAL.lastFrameTime = timeStamp;
 	const fps = 1 / GLOBAL.deltaTime;
-	fpsElem.textContent = "FPS : " + fps.toFixed(1);
+	fpsElem.textContent = "Debug Mode :"+DEBUGMODE+" FPS : " + fps.toFixed(1);
 	//console.log("Rendering frame with delta time:", GLOBAL.deltaTime);
-
 	render();
 	update();
 	requestAnimationFrame(renderFrame);
 }
 
 function render() {
+
+	if (currentSceneIndex < scenes.length) {
+		currentCamera = isDebugCameraOn ? debugCamera : scenes[currentSceneIndex].getCamera();
+	}
 
 	// Render To G Buffer
 	gl.bindFramebuffer(gl.FRAMEBUFFER, gBuffer.fbo);
@@ -234,7 +301,6 @@ function render() {
 		const bloomTex = bloom.apply(gBuffer.emissionTexture);
 		textures.push(bloomTex);
 	}
-
 
 	let finalTexture;
 	if (textures.length >= 1) {

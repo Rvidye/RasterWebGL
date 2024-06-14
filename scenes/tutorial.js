@@ -15,7 +15,10 @@ const eventIDS = {
     MOVE_T:1,
     END_T:2
 };
-
+var scenecamera;
+var bspline;
+var splinerenderer;
+var cameraRig;
 class tutorial extends Scene
 {
     constructor()
@@ -33,6 +36,31 @@ class tutorial extends Scene
     setupCamera() 
     {
         // Setup All Cameras here
+        const positionKeyFrames = [
+            [0.0,0.0,5.0],   
+            [0.0,0.0,4.0],   
+            [0.0,0.0,3.0],   
+            [0.0,0.0,2.0],   
+            [0.0,0.0,1.0]
+        ];
+
+        const frontKeyFrames = [
+            [0, 0, -1],    // Look forward
+            [0, 0, -1],    // Look forward
+            [0, 0, -1],    // Look forward
+            [0, 0, -1],    // Look forward
+            [0, 0, -1]     // Look forward
+        ];
+        //bspline = new BsplineInterpolator(positionKeyFrames);
+        //splinerenderer = new SplineRenderer(gl,bspline,0.01);
+        scenecamera = new SceneCamera(positionKeyFrames, frontKeyFrames);
+        cameraRig = new SceneCameraRig(scenecamera);
+        cameraRig.setRenderFront(true);
+        cameraRig.setRenderFrontPoints(true);
+        cameraRig.setRenderPath(true);
+        cameraRig.setRenderPathPoints(true);
+        cameraRig.setRenderPathToFront(false);
+        cameraRig.setScalingFactor(0.1);
     }
 
     init() 
@@ -66,7 +94,8 @@ class tutorial extends Scene
     render() 
     {
 
-        //Shadow pass
+        //splinerenderer.render([1.0, 1.0, 1.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0], -1, 0.1);
+        cameraRig.render();
 
         var mMat = mat4.create();
         mat4.identity(mMat);
@@ -101,18 +130,20 @@ class tutorial extends Scene
 
     update() 
     {
+        scenecamera.setT(tutorialScene.mytimer.getEventTime(eventIDS.MOVE_T));
         //updateModel(tutorialScene.modelNodeBased,0,GLOBAL.deltaTime);
         updateModel(tutorialScene.modelSkeletalBased,0,GLOBAL.deltaTime);
-        //tutorialScene.mytimer.increment();
-        //if(tutorialScene.mytimer.isEventComplete(eventIDS.END_T)){
+        tutorialScene.mytimer.increment();
+        if(tutorialScene.mytimer.isEventComplete(eventIDS.END_T)){
             //this.isComplete = true;
-        //}
+        }
         //console.log(tutorialScene.mytimer.getT());
     }
 
     reset() 
     {
         // reset stuff like timers and events
+        tutorialScene.mytimer.reset();
     }
 
     unint() 
@@ -122,22 +153,43 @@ class tutorial extends Scene
 
     keyboardfunc(key) 
     {
+        switch(DEBUGMODE){
+            case MODEL:
+                tutorialScene.modelPlacer.handleKeyboardInput(key);
+            break;
+            case CAMERA:
+                cameraRig.keyboardFunc(key);
+            break;
+            case SPLINE:
+            break;
+            case LIGHT:
+            break;
+            case NONE:
+            break;
+        }
         if(key == 'Space')
         {
-            this.isComplete = true;
+            //this.isComplete = true;
         }
 
         switch(key){
             case 'KeyP':
-                console.log(tutorialScene.modelPlacer.generateTransformationCode());
+            break;
+            case 'ArrowUp':
+                tutorialScene.mytimer.addTime(0.4);
+            break;
+            case 'ArrowDown':
+                tutorialScene.mytimer.subtractTime(0.4);
+            break;
+            case 'Tab':
             break;
         }
-        tutorialScene.modelPlacer.handleKeyboardInput(key);
     }
 
     getCamera() 
     {
         // return camera created in setupCameras;
+        return scenecamera;
     }
 
     isCompleted() 
