@@ -27,8 +27,10 @@ class timer{
     }
 
     increment(){
-        this.currentTime += GLOBAL.deltaTime;
-        this.recalculateAllT();
+        if(isAnimating){
+            this.currentTime += GLOBAL.deltaTime;
+            this.recalculateAllT();
+        }
     }
 
     getT(){
@@ -57,7 +59,7 @@ class timer{
     }
 
     subtractTime(t){
-        this.currentTime += t;
+        this.currentTime -= t;
         this.recalculateAllT();
     }
 }

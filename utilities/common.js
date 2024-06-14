@@ -4,13 +4,15 @@ var GLOBAL = {
 	lastFrameTime : performance.now()
 };
 
+var isAnimating = false;
+
 var currentCamera = null;
+var isDebugCameraOn = true;
+
 var canvas = null;
 var gl = null;
 var lightRenderer = null;
-
 var gBuffer = null;
-
 var exposure = 0.9;
 
 const postProcessingSettings = {
@@ -19,6 +21,14 @@ const postProcessingSettings = {
 	enableGodRays: true,
 	enableFog: true,
 };
+
+const NONE = 0;
+const CAMERA = 1;
+const MODEL = 2;
+const SPLINE = 3;
+const LIGHT = 4;
+
+var DEBUGMODE = NONE;
 
 const mat4 = glMatrix.mat4;
 const vec3 = glMatrix.vec3;

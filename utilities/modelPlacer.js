@@ -108,12 +108,15 @@ class ModelPlacer {
                     this.applyScale(key);
                 }
                 break;
-            case ',':
+            case 'Comma':
                 this.multiplier /= 10.0;
-                break;
-            case '.':
+            break;
+            case 'Period':
                 this.multiplier *= 10.0;
-                break;
+            break;
+            case 'Tab':
+                console.log(this.generateTransformationCode());
+            break;
         }
     }
 

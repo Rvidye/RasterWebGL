@@ -17,6 +17,20 @@
     <script type="text/javascript" src="utilities/lights.js"></script>
     <script type="text/javascript" src="utilities/postprocess.js"></script>
 
+    <!--Spline Interpolators-->
+    <script type="text/javascript" src="utilities/eigen/hashmap/hashmap.js"></script>
+    <script type="text/javascript" src="utilities/eigen/GC.mjs"></script>
+    <script type="text/javascript" src="utilities/eigen/eigen.js"></script>
+    <script type="text/javascript" src="utilities/eigen/eigen.mjs"></script>
+    <script type="text/javascript" src="utilities/bsplinecam/config.js"></script>
+    <script type="text/javascript" src="utilities/bsplinecam/assert.js"></script>
+    <script type="text/javascript" src="utilities/bsplinecam/mathutils.js"></script>
+    <script type="text/javascript" src="utilities/bsplinecam/interpolators/CsplineInterpolator.js"></script>
+    <script type="text/javascript" src="utilities/bsplinecam/interpolators/BsplineInterpolator.js"></script>
+    <script type="text/javascript" src="utilities/bsplinecam/sceneCamera.js"></script>
+    <script type="text/javascript" src="utilities/bsplinecam/splineRenderer.js"></script>
+    <script type="text/javascript" src="utilities/bsplinecam/sceneCameraRig.js"></script>
+
     <!--For Sphere-->
     <script type="text/javascript" src="utilities/Mesh.js"></script>
     <script type="text/javascript" src="utilities/Sphere.js"></script>
@@ -34,20 +48,56 @@
 
 </head>
 <pre style="position: absolute; left: 0em; top: 0; color: white;">
-        Camera Controls
-        W = forward
-        A = left
-        S = back
-        D = right
-        mouse click = look around
 
-        Model Controls
-        B = TRANSLATE Mode
-        N = ROTATE Mode
-        M = Scale Mode
-        I/K = Z Axis (translate/rotate)
-        J/L = X Axis (translate/rotate)
-        U/O = Y Axis (translate/rotate)
+    General Controls
+    Tab = Prints Debug Info based on Debug Mode
+    Space = Toggle Animation (start/stop animation)
+    F1 = Enter Fullscreen Mode
+    F2 = Toggle Debug Camera
+    F3 = Disable Debug Mode (0)
+    F4 = Reset Scene 
+    F6 = Set Debug Mode to Camera (1)
+    F7 = Set Debug Mode to Model (2)
+    F8 = Set Debug Mode to Spline (3)
+    F9 = Set Debug Mode to Light (4)
+    F10 = Reset Debug Camera Position and Orientation
+
+    Debug Camera Controls
+    W = forward
+    A = left
+    S = back
+    D = right
+    mouse click = look around
+
+    Scene Camera Rig Controls
+    ArrowLeft = Update mount camera T by -0.01
+    ArrowRight = Update mount camera T by 0.01
+    V = Select previous front point
+    B = Select next front point
+    N = Select previous path point
+    M = Select next path point
+    T/G = Z front point
+    H/F = X front point
+    Y/R = Y front point
+    R/I = Y front point
+    I/K = Z path point
+    L/J = X path point
+    O/U = Y path point
+    BracketRight = Add/duplicate selected path point
+    BracketLeft = Remove selected path point
+    Period = Add/duplicate selected front point
+    Comma = Remove selected front point
+
+    Scene-Specific Controls
+    [Defined within scenes[currentSceneIndex].keyboardfunc(event.code)]
+
+    Model Placer Controls
+    B = TRANSLATE Mode
+    N = ROTATE Mode
+    M = Scale Mode
+    I/K = Z Axis (translate/rotate)
+    J/L = X Axis (translate/rotate)
+    U/O = Y Axis (translate/rotate)
 </pre>
 <pre style="position: absolute; left:50%; top: 0; color: white; border: 1px solid black;" id="fps">
 </pre>
