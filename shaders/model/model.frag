@@ -26,7 +26,7 @@ void main(void){
     vec3 V = normalize(viewPos - v_pos);
     vec3 diffuseColor = vec3(0.0);
     vec3 specularColor = vec3(0.0);
-    
+
     for(int i = 0; i < u_LightCount; i++){
         if (u_Lights[i].type == LightType_Directional) {
             diffuseColor += calculateDirectionalLightDiffuse(u_Lights[i], normal);
@@ -40,8 +40,22 @@ void main(void){
         }
     }
 
+    float shadow = 0.0;
+    for(int i = 0; i < u_LightCount; i++){
+        if(u_Lights[i].shadows == 1){
+            if (u_Lights[i].type == LightType_Directional || u_Lights[i].type == LightType_Spot) {
+                vec4 fragPosLightSpace = u_LightSpaceMatrices[u_Lights[i].shadowMapIndex] * vec4(v_pos,1.0);
+                shadow += ShadowCalculation(fragPosLightSpace, u_Lights[i].shadowMapIndex);
+            }else if(u_Lights[i].type == LightType_Point){
+                shadow += ShadowCalculationPoint(v_pos, u_Lights[i].position, u_Lights[i].shadowMapIndex,u_Lights[i].range);
+            }
+        }
+    }
+    diffuseColor = (1.0 - shadow) * diffuseColor;
+
     vec3 baseColor = material.diffuse * texture(samplerDiffuse,v_tex).rgb;
-    gColor = vec4( baseColor * diffuseColor + specularColor, material.opacity);
+    vec3 finalColor = mix(baseColor * diffuseColor + specularColor, vec3(0.0), shadow);
+    gColor = vec4( finalColor, material.opacity);
     gEmission = vec4(material.emissive,material.opacity);
     gNormal = vec4(normal,1.0);
     gObjectID = objectID;

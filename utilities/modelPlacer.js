@@ -143,5 +143,54 @@ class ModelPlacer {
         mat4.scale(transformationMatrix, transformationMatrix, ${scale});
         `;
     }
+
+    renderUI(){
+        ImGui.Text("Model Placer Controls:");
+        // Radio buttons to select mode
+        if (ImGui.RadioButton("TRANSLATE", this.mode === 'TRANSLATE')) {
+            this.handleModeChange('TRANSLATE');
+        }
+        ImGui.SameLine();
+        if (ImGui.RadioButton("ROTATE", this.mode === 'ROTATE')) {
+            this.handleModeChange('ROTATE');
+        }
+        ImGui.SameLine();
+        if (ImGui.RadioButton("SCALE", this.mode === 'SCALE')) {
+            this.handleModeChange('SCALE');
+        }
+
+        ImGui.Separator();
+        let pos = [this.position[0],this.position[1],this.position[2],0.0];
+        ImGui.Text("Translation:");
+        if(ImGui.DragFloat3("Position", pos)){
+            vec3.set(this.position,pos[0],pos[1],pos[2]);
+        }
+        ImGui.Separator();
+        let rot = [this.rotation[0],this.rotation[1],this.rotation[2],0.0];
+        ImGui.Text("Rotation:");
+        if(ImGui.DragFloat3("Rotation", rot,0.1)){
+            vec3.set(this.rotation,rot[0],rot[1],rot[2]);
+        }
+        ImGui.Separator();
+        let scale = [this.scale[0],this.scale[1],this.scale[2],0.0];
+        ImGui.Text("Scale:");
+        if(ImGui.DragFloat3("Scaling", scale,0.1,1.0,100.0)){
+            vec3.set(this.scale,scale[0],scale[1],scale[2]);
+        }
+        ImGui.Separator();
+        ImGui.Text("Multiplier:");
+        if (ImGui.Button("Increase (Period)")) {
+          this.multiplier *= 10.0;
+        }
+        ImGui.SameLine();
+        if (ImGui.Button("Decrease (Comma)")) {
+          this.multiplier *= 0.1;
+        }
+
+        if (ImGui.Button("Print Transformation Matrix In Console")) {
+            console.log(this.generateTransformationCode());
+        }
+    }
+
 }
 

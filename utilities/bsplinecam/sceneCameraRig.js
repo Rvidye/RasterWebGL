@@ -133,6 +133,110 @@ class SceneCameraRig {
         return this.mountCamera;
     }
 
+    renderUI(){
+        ImGui.Text("Scene Camera Rig Controls");
+        // Render settings
+        ImGui.Checkbox("Render Path", (value = this.isRenderPath) => this.isRenderPath = value);
+        ImGui.Checkbox("Render Front", (value = this.isRenderFront) => this.isRenderFront = value);
+        ImGui.Checkbox("Render Path to Front", (value = this.isRenderPathToFront) => this.isRenderPathToFront = value);
+        // if(ImGui.Checkbox("Render Path Points", (value = this.isRenderPathPoints) => this.isRenderPathPoints = value)){
+        //     //this.pathRenderer.setRenderPoints(setting);
+        // }
+        // if(ImGui.Checkbox("Render Front Points", (value = this.isRenderFrontPoints) => this.isRenderFrontPoints = value)){
+        //     //this.frontRenderer.setRenderPoints(setting);
+        // }
+
+        // Scaling factor
+        ImGui.SliderFloat("Scaling Factor", (value = this.scalingFactor) => this.scalingFactor = value, 0.1, 10.0);
+
+        // // Selected Path Point
+        ImGui.Text(`Selected Path Point: ${this.selectedPathPoint}`);
+        if (ImGui.Button("Previous Path Point")) {
+            this.selectedPathPoint = (this.selectedPathPoint === 0) ? this.mountCamera.m_bspPositions.getPoints().length - 1 : (this.selectedPathPoint - 1) % this.mountCamera.m_bspPositions.getPoints().length;
+        }
+        ImGui.SameLine();
+        if (ImGui.Button("Next Path Point")) {
+            this.selectedPathPoint = (this.selectedPathPoint + 1) % this.mountCamera.m_bspPositions.getPoints().length;
+        }
+
+        // // Selected Front Point
+        ImGui.Text(`Selected Front Point: ${this.selectedFrontPoint}`);
+        if (ImGui.Button("Previous Front Point")) {
+            this.selectedFrontPoint = (this.selectedFrontPoint === 0) ? this.mountCamera.m_bspFront.getPoints().length - 1 : (this.selectedFrontPoint - 1) % this.mountCamera.m_bspFront.getPoints().length;
+        }
+        ImGui.SameLine();
+        if (ImGui.Button("Next Front Point")) {
+            this.selectedFrontPoint = (this.selectedFrontPoint + 1) % this.mountCamera.m_bspFront.getPoints().length;
+        }
+        if (ImGui.Button("Print Camera Info")) {
+            this.mountCamera.printVectors();
+        }
+        ImGui.Separator();
+        ImGui.Text("To Move Selected Path Point");
+        ImGui.Text("I/K = Z path point\nL/J = X path point\nO/U = Y path point");
+        ImGui.Text("To Move Selected Front Point");
+        ImGui.Text("T/G = Z front point\nH/F = X front point\nY/R = Y front point");
+        ImGui.Separator();
+        // // Point adjustments
+        // ImGui.Text("Adjust Selected Path Point");
+        // if (ImGui.Button("Move +X")) {
+        //     this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint][0] += 0.1;
+        //     this.updatePathPoints();
+        // }
+        // ImGui.SameLine();
+        // if (ImGui.Button("Move -X")) {
+        //     this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint][0] -= 0.1;
+        //     this.updatePathPoints();
+        // }
+        // if (ImGui.Button("Move +Y")) {
+        //     this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint][1] += 0.1;
+        //     this.updatePathPoints();
+        // }
+        // ImGui.SameLine();
+        // if (ImGui.Button("Move -Y")) {
+        //     this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint][1] -= 0.1;
+        //     this.updatePathPoints();
+        // }
+        // if (ImGui.Button("Move +Z")) {
+        //     this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint][2] += 0.1;
+        //     this.updatePathPoints();
+        // }
+        // ImGui.SameLine();
+        // if (ImGui.Button("Move -Z")) {
+        //     this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint][2] -= 0.1;
+        //     this.updatePathPoints();
+        // }
+
+        // ImGui.Text("Adjust Selected Front Point");
+        // if (ImGui.Button("Move +X")) {
+        //     this.mountCamera.m_bspFront.getPoints()[this.selectedFrontPoint][0] += 0.1;
+        //     this.updateFrontPoints();
+        // }
+        // ImGui.SameLine();
+        // if (ImGui.Button("Move -X")) {
+        //     this.mountCamera.m_bspFront.getPoints()[this.selectedFrontPoint][0] -= 0.1;
+        //     this.updateFrontPoints();
+        // }
+        // if (ImGui.Button("Move +Y")) {
+        //     this.mountCamera.m_bspFront.getPoints()[this.selectedFrontPoint][1] += 0.1;
+        //     this.updateFrontPoints();
+        // }
+        // ImGui.SameLine();
+        // if (ImGui.Button("Move -Y")) {
+        //     this.mountCamera.m_bspFront.getPoints()[this.selectedFrontPoint][1] -= 0.1;
+        //     this.updateFrontPoints();
+        // }
+        // if (ImGui.Button("Move +Z")) {
+        //     this.mountCamera.m_bspFront.getPoints()[this.selectedFrontPoint][2] += 0.1;
+        //     this.updateFrontPoints();
+        // }
+        // ImGui.SameLine();
+        // if (ImGui.Button("Move -Z")) {
+        //     this.mountCamera.m_bspFront.getPoints()[this.selectedFrontPoint][2] -= 0.1;
+        //     this.updateFrontPoints();
+        // }
+    }
+
     keyboardFunc(key) {
         let refreshPos = false;
         let refreshFront = false;
@@ -143,18 +247,18 @@ class SceneCameraRig {
             case 'ArrowRight':
                 this.mountCamera.updateT(0.01);
                 break;
-            case 'KeyV':
-                this.selectedFrontPoint = (this.selectedFrontPoint === 0) ? this.mountCamera.m_bspFront.getPoints().length - 1 : (this.selectedFrontPoint - 1) % this.mountCamera.m_bspFront.getPoints().length;
-                break;
-            case 'KeyB':
-                this.selectedFrontPoint = (this.selectedFrontPoint + 1) % this.mountCamera.m_bspFront.getPoints().length;
-                break;
-            case 'KeyN':
-                this.selectedPathPoint = (this.selectedPathPoint === 0) ? this.mountCamera.m_bspPositions.getPoints().length - 1 : (this.selectedPathPoint - 1) % this.mountCamera.m_bspPositions.getPoints().length;
-                break;
-            case 'KeyM':
-                this.selectedPathPoint = (this.selectedPathPoint + 1) % this.mountCamera.m_bspPositions.getPoints().length;
-                break;
+            // case 'KeyV':
+            //     this.selectedFrontPoint = (this.selectedFrontPoint === 0) ? this.mountCamera.m_bspFront.getPoints().length - 1 : (this.selectedFrontPoint - 1) % this.mountCamera.m_bspFront.getPoints().length;
+            //     break;
+            // case 'KeyB':
+            //     this.selectedFrontPoint = (this.selectedFrontPoint + 1) % this.mountCamera.m_bspFront.getPoints().length;
+            //     break;
+            // case 'KeyN':
+            //     this.selectedPathPoint = (this.selectedPathPoint === 0) ? this.mountCamera.m_bspPositions.getPoints().length - 1 : (this.selectedPathPoint - 1) % this.mountCamera.m_bspPositions.getPoints().length;
+            //     break;
+            // case 'KeyM':
+            //     this.selectedPathPoint = (this.selectedPathPoint + 1) % this.mountCamera.m_bspPositions.getPoints().length;
+            //     break;
             case 'KeyT':
                 this.mountCamera.m_bspFront.getPoints()[this.selectedFrontPoint][2] += 0.1;
                 refreshFront = true;
@@ -203,19 +307,19 @@ class SceneCameraRig {
                 this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint][1] -= 0.1;
                 refreshPos = true;
                 break;
-            case 'BracketRight':
-                if (this.selectedPathPoint === this.mountCamera.m_bspPositions.getPoints().length) {
-                    this.mountCamera.m_bspPositions.getPoints().push(this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint]);
-                } else {
-                    this.mountCamera.m_bspPositions.getPoints().splice(this.selectedPathPoint + 1, 0, this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint]);
-                }
-                refreshPos = true;
-                break;
-            case 'BracketLeft':
-                this.mountCamera.m_bspPositions.getPoints().splice(this.selectedPathPoint, 1);
-                this.selectedPathPoint = this.selectedPathPoint % this.mountCamera.m_bspPositions.getPoints().length;
-                refreshPos = true;
-                break;
+            // case 'BracketRight':
+            //     if (this.selectedPathPoint === this.mountCamera.m_bspPositions.getPoints().length) {
+            //         this.mountCamera.m_bspPositions.getPoints().push(this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint]);
+            //     } else {
+            //         this.mountCamera.m_bspPositions.getPoints().splice(this.selectedPathPoint + 1, 0, this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint]);
+            //     }
+            //     refreshPos = true;
+            //     break;
+            // case 'BracketLeft':
+            //     this.mountCamera.m_bspPositions.getPoints().splice(this.selectedPathPoint, 1);
+            //     this.selectedPathPoint = this.selectedPathPoint % this.mountCamera.m_bspPositions.getPoints().length;
+            //     refreshPos = true;
+            //     break;
             case 'Period':
                 if (this.selectedFrontPoint === this.mountCamera.m_bspFront.getPoints().length) {
                     this.mountCamera.m_bspFront.getPoints().push(this.mountCamera.m_bspFront.getPoints()[this.selectedFrontPoint]);

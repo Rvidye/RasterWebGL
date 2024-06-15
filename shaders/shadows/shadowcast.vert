@@ -6,21 +6,15 @@ layout(location = 2) in vec2 vTex;
 layout(location = 3) in ivec4 vBoneIds;  // Bone IDs
 layout(location = 4) in vec4 vWeights;   // Bone weights
 
-uniform mat4 pMat;
-uniform mat4 vMat;
+uniform mat4 pvMat;
 uniform mat4 mMat;
 uniform mat4 nMat; // node matrix
 uniform mat4 bMat[100]; // Bone matrices
 
 uniform bool useSkinning; // Boolean to determine if skinning is used
 
-out vec3 v_pos;
-out vec3 v_normal;
-out vec2 v_tex;
-
-void main(void) {
+void main() {
     gl_PointSize = 1.0;
-
     vec4 pos;
     vec3 normal;
 
@@ -44,9 +38,5 @@ void main(void) {
         pos = mMat * nMat * vPos;
         normal = mat3(mMat) * vNor;
     }
-
-    v_pos = vec3(pos.xyz) / pos.w;
-    v_normal = normal;
-    v_tex = vTex;
-    gl_Position = pMat * vMat * pos;
+    gl_Position = pvMat * pos;
 }

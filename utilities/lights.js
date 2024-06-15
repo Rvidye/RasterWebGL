@@ -1,7 +1,7 @@
 "use strict"
 
 class Light {
-    constructor(type, color = [1, 1, 1], intensity = 1.0, position = [0, 0, 0], direction = [0, 0, 0], range = 0.0, spotAngle = 0.0, spotExponent = 0.0) {
+    constructor(type, color = [1, 1, 1], intensity = 1.0, position = [0, 0, 0], direction = [0, 0, 0], range = 0.0, spotAngle = 0.0, spotExponent = 0.0, castShadows=false) {
         this.type = type;
         this.color = color;
         this.intensity = intensity;
@@ -10,6 +10,17 @@ class Light {
         this.range = range;
         this.spotAngle = spotAngle;
         this.spotExponent = spotExponent;
+        this.shadows = castShadows;
+        this.shadowIndex = 0;
+    }
+
+    setShadowCasting(enable, shadowMapManager) {
+        this.castsShadow = enable;
+        if (enable) {
+            shadowMapManager.createShadowMapForLight(this);
+        } else {
+            shadowMapManager.removeShadowMapForLight(this);
+        }
     }
 }
 
@@ -17,11 +28,16 @@ class LightManager {
     constructor(maxLights = 10) {
         this.lights = [];
         this.maxLights = maxLights;
+        this.shadowMapManager = new ShadowManager();
     }
 
     addLight(light) {
         if (this.lights.length < this.maxLights) {
             this.lights.push(light);
+            if(light.shadows){
+                const shadowMap = this.shadowMapManager.createShadowMapForLight(light);
+                light.shadowIndex = this.shadowMapManager.getShadowMaps().length - 1;
+            }
         } else {
             console.warn("Maximum number of lights reached.");
         }
@@ -37,12 +53,92 @@ class LightManager {
             gl.uniform1f(gl.getUniformLocation(program, `u_Lights[${index}].spotAngle`), light.spotAngle);
             gl.uniform1f(gl.getUniformLocation(program, `u_Lights[${index}].spotExponent`), light.spotExponent);
             gl.uniform1i(gl.getUniformLocation(program, `u_Lights[${index}].type`), light.type);
+            gl.uniform1i(gl.getUniformLocation(program, `u_Lights[${index}].shadows`), light.shadows);
+
+            if(light.shadows){
+                const shadowMap = this.shadowMapManager.getShadowMaps()[light.shadowIndex];
+                if (shadowMap) {
+                    gl.uniform1i(gl.getUniformLocation(program, `u_Lights[${index}].shadowMapIndex`), light.shadowIndex);
+                    let textureUnit;// Start binding from texture unit 8
+                    if (light.type === 0 || light.type === 2) {
+                        textureUnit = 11 + (light.shadowIndex % 3); // Use texture units 11-13 for shadow maps
+                        gl.activeTexture(gl.TEXTURE0 + textureUnit); // 8 is because i want to keep first few slots open for model textures and webgl does not support bindless textures.
+                        gl.bindTexture(gl.TEXTURE_2D, shadowMap.texture);
+                        gl.uniform1i(gl.getUniformLocation(program, `u_ShadowMap${light.shadowIndex % 3}`), textureUnit );
+                        gl.uniformMatrix4fv(gl.getUniformLocation(program, `u_LightSpaceMatrices[${light.shadowIndex % 3}]`), false, shadowMap.lightSpaceMatrix);
+                    } else if (light.type === 1) {
+                        textureUnit = 14 + (light.shadowIndex % 3); // Use texture units 14-16 for cube maps
+                        gl.activeTexture(gl.TEXTURE0 + textureUnit); // 8 is because i want to keep first few slots open for model textures and webgl does not support bindless textures.
+                        gl.bindTexture(gl.TEXTURE_CUBE_MAP, shadowMap.texture);
+                        gl.uniform1i(gl.getUniformLocation(program, `u_ShadowCubeMap${light.shadowIndex % 3}`), textureUnit);
+                    }
+                }
+            }
         });
         gl.uniform1i(gl.getUniformLocation(program, 'u_LightCount'), this.lights.length);
+        // I dont know why but its needed here.
+        for (let i = 0; i < 3; i++) {
+            gl.uniform1i(gl.getUniformLocation(program, `u_ShadowMap${i}`), 11 + i);
+            gl.uniform1i(gl.getUniformLocation(program, `u_ShadowCubeMap${i}`), 14 + i);
+        }
     }
 
     getLight(index){
         return this.lights[index];
+    }
+
+    getShadowCatingLights(){
+        return this.lights.filter(light => light.shadows);
+    }
+
+    getShadowMapManager() {
+        return this.shadowMapManager;
+    }
+
+    toggleLightShadow(light, enable) {
+        light.setShadowCasting(enable, this.shadowMapManager);
+    }
+
+    renderUI(){
+        ImGui.Text("Light Manager Controls");
+        this.lights.forEach((light, index) => {
+            if (ImGui.TreeNode(`Light ${index}`)) {
+                ImGui.Text(`Type: ${light.type}`);
+                if (ImGui.ColorEdit3(`Color##${index}`, light.color)) {
+                    // Color changed
+                }
+                if (ImGui.SliderFloat(`Intensity##${index}`, (value = light.intensity) => light.intensity = value, 0.0, 10.0)) {
+                    // Intensity changed
+                }
+                if (ImGui.DragFloat3(`Position##${index}`, light.position)) {
+                    // Position changed
+                }
+                if (light.type === 0 || light.type === 2) { // Directional light
+                    if (ImGui.DragFloat3(`Direction##${index}`, light.direction)) {
+                        // Direction changed
+                    }
+                }
+                if (light.type === 1 || light.type === 2) { // Point light or spot light
+                    if (ImGui.SliderFloat(`Range##${index}`, (value = light.range) => light.range = value, 0.0, 100.0)) {
+                        // Range changed
+                    }
+                }
+                if (light.type === 2) { // Spot light
+                    if (ImGui.SliderFloat(`Spot Angle##${index}`, (value = light.spotAngle) => light.spotAngle = value, 0.0, 180.0)) {
+                        // Spot angle changed
+                    }
+                    if (ImGui.SliderFloat(`Spot Exponent##${index}`, (value = light.spotExponent) => light.spotExponent = value, 0.0, 10.0)) {
+                        // Spot exponent changed
+                    }
+                }
+                // if (ImGui.Checkbox(`Cast Shadows##${index}`, (value = light.shadows) => {
+                //     //this.toggleLightShadow(light, value);
+                // })) {
+                //     // Shadow casting changed
+                // }
+                ImGui.TreePop();
+            }
+        });
     }
 }
 

@@ -36,4 +36,3 @@ void main(void) {
     v_tex = vTex;
     v_normal = mat3(mMat) * vNor;
 }
-

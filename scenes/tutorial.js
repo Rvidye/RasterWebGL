@@ -7,7 +7,8 @@ var tutorialScene ={
     modelSkeletalBased : null,
     modelPlacer : null,
     mytimer : null,
-    lightManager : null
+    sceneCamera : null,
+    sceneCameraRig : null
 };
 
 const eventIDS = {
@@ -15,10 +16,6 @@ const eventIDS = {
     MOVE_T:1,
     END_T:2
 };
-var scenecamera;
-var bspline;
-var splinerenderer;
-var cameraRig;
 class tutorial extends Scene
 {
     constructor()
@@ -29,8 +26,8 @@ class tutorial extends Scene
     setupProgram() 
     {
         // Load All Shaders here
-        tutorialScene.programNodeAnimatedModel = new ShaderProgram(gl,['shaders/model/modelanim.vert','shaders/model/model.frag']);
-        tutorialScene.programSkeletalAnimatedModel = new ShaderProgram(gl,['shaders/model/modelanim.vert','shaders/model/celShader.frag']);
+        tutorialScene.programNodeAnimatedModel = new ShaderProgram(gl,['shaders/model/model.vert','shaders/model/model.frag']);
+        tutorialScene.programSkeletalAnimatedModel = new ShaderProgram(gl,['shaders/model/model.vert','shaders/model/celShader.frag']);
     }
 
     setupCamera() 
@@ -45,22 +42,21 @@ class tutorial extends Scene
         ];
 
         const frontKeyFrames = [
-            [0, 0, -1],    // Look forward
-            [0, 0, -1],    // Look forward
-            [0, 0, -1],    // Look forward
-            [0, 0, -1],    // Look forward
-            [0, 0, -1]     // Look forward
+            [0, 0, -1],
+            [0, 0, -1],
+            [0, 0, -1],
+            [0, 0, -1],
+            [0, 0, -1] 
         ];
-        //bspline = new BsplineInterpolator(positionKeyFrames);
-        //splinerenderer = new SplineRenderer(gl,bspline,0.01);
-        scenecamera = new SceneCamera(positionKeyFrames, frontKeyFrames);
-        cameraRig = new SceneCameraRig(scenecamera);
-        cameraRig.setRenderFront(true);
-        cameraRig.setRenderFrontPoints(true);
-        cameraRig.setRenderPath(true);
-        cameraRig.setRenderPathPoints(true);
-        cameraRig.setRenderPathToFront(false);
-        cameraRig.setScalingFactor(0.1);
+
+        tutorialScene.sceneCamera = new SceneCamera(positionKeyFrames, frontKeyFrames);
+        tutorialScene.sceneCameraRig = new SceneCameraRig(tutorialScene.sceneCamera);
+        tutorialScene.sceneCameraRig.setRenderFront(true);
+        tutorialScene.sceneCameraRig.setRenderFrontPoints(true);
+        tutorialScene.sceneCameraRig.setRenderPath(true);
+        tutorialScene.sceneCameraRig.setRenderPathPoints(true);
+        tutorialScene.sceneCameraRig.setRenderPathToFront(true);
+        tutorialScene.sceneCameraRig.setScalingFactor(0.1);
     }
 
     init() 
@@ -75,14 +71,14 @@ class tutorial extends Scene
             [eventIDS.END_T,[5.0,2.0]]
         ]);
 
-        tutorialScene.lightManager = new LightManager();
-        const directionalLight = new Light(0, [1.0, 1.0, 1.0], 1.0, [0, 0, 0], [-1.0, 1.0, -1.0],0.0,0.0,0.0);
-        const pointLight = new Light(1, [1.0, 0.0, 0.0], 2.0, [0.0, 0.0, 0.0],[0.0, 0.0, 0.0],5.0,0.0,0.0);
-        const spotLight = new Light(2, [0.0, 1.0, 0.0], 1.0, [1.0, 0.0, -3.0], [0.0, 0.0, -1.0], 5.0, Math.cos(Math.PI / 16), 64);
+        this.lightManager = new LightManager();
+        const directionalLight = new Light(0, [1.0, 1.0, 1.0], 1.0, [0, 0, 0], [0.0, 0.0, -1.0],0.0,0.0,0.0,true);
+        const pointLight = new Light(1, [1.0, 0.0, 0.0], 2.0, [0.0, 0.0, 0.0],[0.0, 0.0, 0.0],20.0,0.0,0.0,false);
+        const spotLight = new Light(2, [0.0, 1.0, 0.0], 1.0, [1.0, 0.0, -3.0], [0.0, 0.0, -1.0], 5.0, Math.cos(Math.PI / 16), 64,false);
 
-        tutorialScene.lightManager.addLight(directionalLight);
-        tutorialScene.lightManager.addLight(pointLight);
-        tutorialScene.lightManager.addLight(spotLight);
+        this.lightManager.addLight(directionalLight);
+        this.lightManager.addLight(pointLight);
+        this.lightManager.addLight(spotLight);
 
         tutorialScene.modelPlacer = new ModelPlacer();
         // Set initial position, rotation, and scale for the model (if needed)
@@ -91,19 +87,32 @@ class tutorial extends Scene
         // tutorialScene.modelPlacer.setScale(1.0, 1.0, 1.0);
     }
 
-    render() 
-    {
-
-        //splinerenderer.render([1.0, 1.0, 1.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0], -1, 0.1);
-        cameraRig.render();
+    renderShadow(shadowProgram){
+        // Not sure best way to do this and increases extra work on developer side but at this point fuck it ...
+        // make sure to keep this and render function transformation in sync ...
 
         var mMat = mat4.create();
         mat4.identity(mMat);
-        mat4.translate(mMat, mMat, vec3.fromValues(-2.00, 0.00, -4.00));
-        mat4.rotateX(mMat, mMat, 0.00);
-        mat4.rotateY(mMat, mMat, 7.00);
-        mat4.rotateZ(mMat, mMat, -6.00);
-        mat4.scale(mMat, mMat, vec3.fromValues(1.00, 1.00, 1.00));
+        mat4.translate(mMat, mMat, vec3.fromValues(0.00, 0.00, -6.0));
+        gl.uniformMatrix4fv(shadowProgram.getUniformLocation("mMat"),false, mMat);
+        uploadBoneMatrices(tutorialScene.modelSkeletalBased,shadowProgram,0);
+        renderModel(tutorialScene.modelSkeletalBased, shadowProgram, false);
+        
+        mat4.translate(mMat, mat4.create(), vec3.fromValues(1.0, 0.0, -5.0));
+        gl.uniformMatrix4fv(shadowProgram.getUniformLocation("mMat"),false, tutorialScene.modelPlacer.getTransformationMatrix());
+        uploadBoneMatrices(tutorialScene.modelSkeletalBased,shadowProgram,0);
+        renderModel(tutorialScene.modelSkeletalBased, shadowProgram, false);
+    }
+    
+    render() {
+
+        if(DEBUGMODE === CAMERA){
+            tutorialScene.sceneCameraRig.render();
+        }
+
+        var mMat = mat4.create();
+        mat4.identity(mMat);
+        mat4.translate(mMat, mMat, vec3.fromValues(0.00, 0.00, -6.0));
         //mat4.translate(mMat, mat4.create(), vec3.fromValues(-1.0, 0.0, -5.0));
 
         tutorialScene.programNodeAnimatedModel.use();
@@ -111,7 +120,7 @@ class tutorial extends Scene
         gl.uniformMatrix4fv(tutorialScene.programNodeAnimatedModel.getUniformLocation("vMat"),false, currentCamera.getViewMatrix());
         gl.uniformMatrix4fv(tutorialScene.programNodeAnimatedModel.getUniformLocation("mMat"),false, mMat);
         gl.uniform3fv(tutorialScene.programNodeAnimatedModel.getUniformLocation("viewPos"), currentCamera.getPosition());
-        tutorialScene.lightManager.updateLights(tutorialScene.programNodeAnimatedModel.programObject);
+        this.lightManager.updateLights(tutorialScene.programNodeAnimatedModel.programObject);
         uploadBoneMatrices(tutorialScene.modelSkeletalBased,tutorialScene.programNodeAnimatedModel,0);
         renderModel(tutorialScene.modelSkeletalBased, tutorialScene.programNodeAnimatedModel, true);
 
@@ -121,16 +130,16 @@ class tutorial extends Scene
         gl.uniformMatrix4fv(tutorialScene.programSkeletalAnimatedModel.getUniformLocation("vMat"),false, currentCamera.getViewMatrix());
         gl.uniformMatrix4fv(tutorialScene.programSkeletalAnimatedModel.getUniformLocation("mMat"),false, tutorialScene.modelPlacer.getTransformationMatrix());
         gl.uniform3fv(tutorialScene.programSkeletalAnimatedModel.getUniformLocation("viewPos"), currentCamera.getPosition());
-        tutorialScene.lightManager.updateLights(tutorialScene.programSkeletalAnimatedModel.programObject);
+        this.lightManager.updateLights(tutorialScene.programSkeletalAnimatedModel.programObject);
         uploadBoneMatrices(tutorialScene.modelSkeletalBased,tutorialScene.programSkeletalAnimatedModel,0);
         renderModel(tutorialScene.modelSkeletalBased, tutorialScene.programSkeletalAnimatedModel, true);
-        
-        lightRenderer.renderLights(tutorialScene.lightManager);
+
+        lightRenderer.renderLights(this.lightManager);
     }
 
     update() 
     {
-        scenecamera.setT(tutorialScene.mytimer.getEventTime(eventIDS.MOVE_T));
+        tutorialScene.sceneCamera.setT(tutorialScene.mytimer.getEventTime(eventIDS.MOVE_T));
         //updateModel(tutorialScene.modelNodeBased,0,GLOBAL.deltaTime);
         updateModel(tutorialScene.modelSkeletalBased,0,GLOBAL.deltaTime);
         tutorialScene.mytimer.increment();
@@ -138,6 +147,22 @@ class tutorial extends Scene
             //this.isComplete = true;
         }
         //console.log(tutorialScene.mytimer.getT());
+    }
+
+    renderUI(){
+        switch(DEBUGMODE){
+            case MODEL:
+                tutorialScene.modelPlacer.renderUI();
+            break;
+            case CAMERA:
+                tutorialScene.sceneCameraRig.renderUI();
+            break;
+            case LIGHT:
+                this.lightManager.renderUI();
+            break;
+            case NONE:
+            break;
+        }
     }
 
     reset() 
@@ -159,8 +184,6 @@ class tutorial extends Scene
             break;
             case CAMERA:
                 cameraRig.keyboardFunc(key);
-            break;
-            case SPLINE:
             break;
             case LIGHT:
             break;

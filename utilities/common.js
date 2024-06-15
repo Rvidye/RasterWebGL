@@ -14,21 +14,23 @@ var gl = null;
 var lightRenderer = null;
 var gBuffer = null;
 var exposure = 0.9;
+var maxTextureUnits = 16;
 
 const postProcessingSettings = {
 	enableHDR: true,
 	enableBloom: false,
-	enableGodRays: true,
-	enableFog: true,
+	enableGodRays: false,
+	enableFog: false,
+	debugShaow:false
 };
 
 const NONE = 0;
 const CAMERA = 1;
 const MODEL = 2;
-const SPLINE = 3;
-const LIGHT = 4;
+const LIGHT = 3;
 
 var DEBUGMODE = NONE;
+const debugModes = ["None", "Camera", "Model", "Light"];
 
 const mat4 = glMatrix.mat4;
 const vec3 = glMatrix.vec3;

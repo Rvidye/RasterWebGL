@@ -51,7 +51,11 @@ class renderGrass extends Scene {
         this.myGrass.init(bladePos1);
 
         this.myAtmScat.initAtmScattering();
+        this.lightManager = new LightManager();
 
+    }
+
+    renderShadow(shadowProgram){
 
     }
 
@@ -67,6 +71,22 @@ class renderGrass extends Scene {
 
         this.myAtmScat.updateAtmScattering();
         this.myGrass.update();
+    }
+
+    renderUI(){
+        switch(DEBUGMODE){
+            case MODEL:
+                //tutorialScene.modelPlacer.renderUI();
+            break;
+            case CAMERA:
+                //cameraRig.renderUI();
+            break;
+            case LIGHT:
+                this.lightManager.renderUI();
+            break;
+            case NONE:
+            break;
+        }
     }
 
     reset() {
