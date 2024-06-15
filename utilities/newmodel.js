@@ -249,6 +249,7 @@ function setupModel(modelName, skin = false){
 		return undefined;
 	}
 	var modelObj = new dmodel();
+    modelObj.skin = skin;
 	setupMesh(modelObj, model.json, skin);
     setupMaterial(modelObj, model.json, model.directory, model.flipTex);
     setupNodes(modelObj,model.json);
@@ -667,8 +668,18 @@ function renderModel(model, program, useMaterial) {
 
             gl.uniformMatrix4fv(program.getUniformLocation("nMat"), false, globalTransform);
             gl.uniform4fv(program.getUniformLocation("objectID"),mesh.meshID);
+            if(model.skin){
+                gl.uniform1i(program.getUniformLocation("useSkinning"),model.skin);
+            }
             gl.bindVertexArray(mesh.vao);
             gl.drawElements(gl.TRIANGLES, mesh.count, gl.UNSIGNED_SHORT, 0);
+
+            if(useMaterial){
+                if (material.diffuseTextures != undefined) {
+                    gl.activeTexture(gl.TEXTURE0);
+                    gl.bindTexture(gl.TEXTURE_2D, null);
+                }
+            }
         });
 
         node.children.forEach((child) => {

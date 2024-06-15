@@ -153,6 +153,28 @@ class Bloom extends PostProcessingEffect {
     }
 }
 
+class RenderShadowMap extends PostProcessingEffect{
+
+    constructor(gl,vert,frag,width,height){
+        super(gl,vert,frag,width,height);
+    }
+
+    apply(inputTextures){
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo.fbo);
+        gl.viewport(0, 0, this.width, this.height);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        this.program.use();
+        // Bind the input textures and set uniform values
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, inputTextures);
+        gl.uniform1i(this.program.getUniformLocation("shadowTex"), 0);
+        // Draw a full-screen quad
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        return this.fbo.texture;
+    }
+}
+
+
 
 class Fog extends PostProcessingEffect {
     constructor(gl, vert, frag, width, height) {

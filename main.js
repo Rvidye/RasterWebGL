@@ -22,10 +22,13 @@ var fpsElem;
 // global in main.js
 var emptyVao;
 var programFSQ;
+var programShadowMap;
+var programShadowCubeMap;
 
 var bloom;
 var composite;
 var tonemap;
+var shadowMapRender;
 
 var fog;
 
@@ -62,7 +65,18 @@ assimpjs().then(function (ajs) {
 		}).then(() => {
 			return eigen.ready;
 		}).then(() => {
+			return Module(); // Load ImGui module
+		}).then((imguimodule) =>{
+			console.log(imguimodule);
+			ImGui.bind = imguimodule;
+			return ImGui.default();
+		}).then(() =>{
+			ImGui.CHECKVERSION();
+			ImGui.CreateContext();
+			ImGui.StyleColorsDark();
 			main();
+		}).catch((error) => {
+			console.error("Error loading libraries: ", error);
 		});
 	} else {
 		main()
@@ -100,6 +114,8 @@ function main() {
 	gl.enable(gl.DEPTH_TEST);
 	gl.depthFunc(gl.LEQUAL);
 
+	maxTextureUnits = gl.getParameter(gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS);
+
 	// create a G Buffer To store all necessary data
 	gBuffer = createGBuffer(gl, 2048, 2048);
 
@@ -110,15 +126,15 @@ function main() {
 
 	lightRenderer = new LightRenderer();
 
+	programFSQ = new ShaderProgram(gl,['shaders/common/FSQ.vert','shaders/common/FSQ.frag']);
+	programShadowMap = new ShaderProgram(gl,['shaders/shadows/shadowcast.vert','shaders/shadows/shadowcast.frag']);
+	programShadowCubeMap = new ShaderProgram(gl,['shaders/shadows/shadowcastpoint.vert','shaders/shadows/shadowcastpoint.frag']);
 	programFSQ = new ShaderProgram(gl, ['shaders/common/FSQ.vert', 'shaders/common/FSQ.frag']);
-
 	tonemap = new ToneMap(gl, "shaders/hdr.vert", "shaders/hdr.frag", 2048, 2048);
 	bloom = new Bloom(gl, "shaders/common/FSQ.vert", "shaders/bloom/downsample.frag", 2048, 2048);
-
 	fog = new Fog(gl, "shaders/common/FSQ.vert", "shaders/fog/fog.frag", 2048, 2048);
-
 	composite = new PostProcessCompositor(gl, "shaders/common/FSQ.vert", "shaders/composite.frag", 2048, 2048);
-
+	shadowMapRender = new RenderShadowMap(gl,"shaders/common/FSQ.vert","shaders/shadows/shadowmap.frag",1024,1024);
 
 	// scene setup
 	addScene(new tutorial());
@@ -126,33 +142,7 @@ function main() {
 
 	fpsElem = document.getElementById('fps');
 
-	// test bspline interpolator
-	// const bspline = new BsplineInterpolator();
-	// /**
-	//  * eigen-js can only invert a max. of 66x66 matrix.
-	//  * So the max. number of points in a bspline is limited to 68 (= 66 + 2).
-	//  * Cross that and you have exceeded memory bounds.
-	//  * On the same lines, if a point's dimension exceeds 67, you exceed the bounds.
-	//  */
-	// const npoints = 68;
-	// const ndims = 3;
-	// let points = new Array(npoints);
-	// for(let i = 0; i < npoints; i++) {
-	// 	points[i] = new Array(ndims).fill(0);
-	// 	for(let j = 0; j < ndims; j++) {
-	// 		points[i][j] = 100 * Math.random();
-	// 	}
-	// }
-	// bspline.updatePoints(points);
-	// console.time('Spline Recalculation Time');
-	// bspline.recalculateSpline();
-	// console.timeEnd('Spline Recalculation Time');
-	// const samples = [];
-	// for(let i = 0; i <= 100; i++) {
-	// 	samples.push(bspline.interpolateSpline(i / 100));
-	// }
-	// console.log(samples);
-
+	ImGui_Impl.Init(gl);
 	initScenes();
 	window.requestAnimationFrame(renderFrame);
 }
@@ -190,9 +180,6 @@ function onMyKeyPress(event) {
 		break;
 		case "F7":
 			DEBUGMODE = MODEL;
-		break;
-		case "F8":
-			DEBUGMODE = SPLINE;
 		break;
 		case "F9":
 			DEBUGMODE = LIGHT;
@@ -242,25 +229,147 @@ function initScenes() {
 	});
 }
 
+function resetScene() {
+}
+
+function handleUI(){
+	ImGui.SetNextWindowPos(new ImGui.ImVec2(10, 10), ImGui.Cond.Always);
+	ImGui.Begin("Debug Controls",null,ImGui.WindowFlags.AlwaysAutoResize);
+	ImGui.Text("Press F1 : Enter Fullscreen Mode");
+	const fps = 1 / GLOBAL.deltaTime;
+    ImGui.Text(`FPS: ${fps.toFixed(2)}`);
+
+	if (ImGui.Button(isAnimating ? "Stop Animation" : "Start Animation")) {
+        isAnimating = !isAnimating;
+    }
+
+	if (ImGui.Button(isDebugCameraOn ? "Disable Debug Camera (F2)" : "Enable Debug Camera (F2)")) {
+        isDebugCameraOn = !isDebugCameraOn;
+    }
+
+	if (ImGui.Button("Reset Scene (F4)")) {
+        resetScene();
+    }
+
+	if (ImGui.Button("Reset Debug Camera Position and Orientation (F10)")) {
+        debugCamera.position = scenes[currentSceneIndex].getCamera().getPosition();
+        debugCamera.cameraYaw = -90.0;
+        debugCamera.cameraPitch = 0.0;
+    }
+
+	ImGui.Text("Post-Processing Settings:");
+	if (ImGui.Checkbox("Enable HDR", (value = postProcessingSettings.enableHDR) => postProcessingSettings.enableHDR = value));
+	if (ImGui.Checkbox("Enable Bloom", (value = postProcessingSettings.enableBloom) => postProcessingSettings.enableBloom = value));
+	if (ImGui.Checkbox("Enable God Rays", (value = postProcessingSettings.enableGodRays) => postProcessingSettings.enableGodRays = value));
+	if (ImGui.Checkbox("Enable Fog", (value = postProcessingSettings.enableFog) => postProcessingSettings.enableFog = value));
+	if (ImGui.Checkbox("Debug Shadow", (value = postProcessingSettings.debugShadow) => postProcessingSettings.debugShadow = value));
+
+	ImGui.Text("Select Debug Mode:");
+	if (ImGui.BeginCombo("", debugModes[DEBUGMODE])) {
+		for (let i = 0; i < debugModes.length; i++) {
+		if (ImGui.Selectable(debugModes[i], i === DEBUGMODE)) {
+			DEBUGMODE = i;
+		}
+	}
+	ImGui.EndCombo();
+	}
+}
 
 // just wanted something similar to rendering loop in OpenGL/Win32
 function renderFrame(timeStamp) {
 	GLOBAL.deltaTime = (timeStamp - GLOBAL.lastFrameTime) * 0.001;
 	GLOBAL.lastFrameTime = timeStamp;
 	const fps = 1 / GLOBAL.deltaTime;
-	fpsElem.textContent = "Debug Mode :"+DEBUGMODE+" FPS : " + fps.toFixed(1);
+	//fpsElem.textContent = "Debug Mode :"+DEBUGMODE+" FPS : " + fps.toFixed(1);
 	//console.log("Rendering frame with delta time:", GLOBAL.deltaTime);
 	render();
 	update();
+
+	ImGui_Impl.NewFrame();
+	ImGui.NewFrame();
+	handleUI();
+
+	if (currentSceneIndex < scenes.length) {
+		scenes[currentSceneIndex].renderUI();
+	}
+
+    ImGui.EndFrame();
+	// Render ImGUI
+	ImGui.Render();
+	ImGui_Impl.RenderDrawData(ImGui.GetDrawData());
 	requestAnimationFrame(renderFrame);
+}
+
+function renderShadowPass(lightManager){
+	const shadowMapManager = lightManager.getShadowMapManager();
+	const shadowCastingLights = lightManager.getShadowCatingLights();
+
+	shadowCastingLights.forEach((light) =>{
+		const shadowMap = shadowMapManager.getShadowMaps()[light.shadowIndex];
+
+		if (shadowMap === undefined) {
+            console.warn("No shadow map found for the light.");
+            return;
+        }
+
+        if (light.type === 0 || light.type === 2) {
+            gl.bindFramebuffer(gl.FRAMEBUFFER, shadowMap.framebuffer);
+            gl.viewport(0, 0, SHADOWMAP_SIZE, SHADOWMAP_SIZE);
+            gl.clear(gl.DEPTH_BUFFER_BIT);
+			
+			programShadowMap.use();
+            // Compute light's view and projection matrices
+            let lightSpaceMatrix = computeLightSpaceMatrix(light);
+            gl.uniformMatrix4fv(programShadowMap.getUniformLocation('pvMat'), false, lightSpaceMatrix);
+            // Render the scene from the light's perspective
+            if (currentSceneIndex < scenes.length) {
+                scenes[currentSceneIndex].renderShadow(programShadowMap);
+            }
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        } else if (light.type === 1) {
+			// Render to each face of the cube map
+			gl.bindFramebuffer(gl.FRAMEBUFFER, shadowMap.framebuffer);
+            for (let face = 0; face < 6; face++) {
+                gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_CUBE_MAP_POSITIVE_X + face, shadowMap.texture, 0);
+                gl.viewport(0, 0, SHADOWMAP_SIZE, SHADOWMAP_SIZE);
+                gl.clear(gl.DEPTH_BUFFER_BIT);
+				programShadowCubeMap.use();
+				gl.uniform3fv(programShadowCubeMap.getUniformLocation('u_LightPos'), light.position);
+				gl.uniform1f(programShadowCubeMap.getUniformLocation('u_FarPlane'), light.range);
+				let lightSpaceMatrix = computePointLightSpaceMatrix(light, face);
+				gl.uniformMatrix4fv(programShadowCubeMap.getUniformLocation('pvMat'), false, lightSpaceMatrix);
+                // Render the scene from the light's perspective
+                if (currentSceneIndex < scenes.length) {
+                    scenes[currentSceneIndex].renderShadow(programShadowCubeMap);
+                }
+            }
+			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        }
+	});
+}
+
+function resetTextureUnits(maxUnits) {
+    for (let i = 0; i < maxUnits; i++) {
+        gl.activeTexture(gl.TEXTURE0 + i);
+        gl.bindTexture(gl.TEXTURE_2D, null);
+        gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
+        // If you use other texture types, unbind them as well
+        gl.bindTexture(gl.TEXTURE_2D_ARRAY, null);
+        gl.bindTexture(gl.TEXTURE_3D, null);
+    }
 }
 
 function render() {
 
+	// Shadow Pass
+	if (currentSceneIndex < scenes.length && scenes[currentSceneIndex].lightManager) {
+        renderShadowPass(scenes[currentSceneIndex].lightManager);
+    }
 	if (currentSceneIndex < scenes.length) {
 		currentCamera = isDebugCameraOn ? debugCamera : scenes[currentSceneIndex].getCamera();
 	}
 
+	resetTextureUnits(maxTextureUnits);
 	// Render To G Buffer
 	gl.bindFramebuffer(gl.FRAMEBUFFER, gBuffer.fbo);
 	const drawBuffers = [
@@ -295,8 +404,6 @@ function render() {
 		textures.push(gBuffer.colorTexture);
 	}
 
-
-
 	if (postProcessingSettings.enableBloom) {
 		const bloomTex = bloom.apply(gBuffer.emissionTexture);
 		textures.push(bloomTex);
@@ -308,6 +415,13 @@ function render() {
 	} else {
 		finalTexture = gBuffer.colorTexture;
 	}
+
+	if(postProcessingSettings.debugShaow){
+		const light = scenes[currentSceneIndex].lightManager.getLight(2);
+		const shadowMap = scenes[currentSceneIndex].lightManager.getShadowMapManager().getShadowMaps()[light.shadowIndex];
+		finalTexture = shadowMapRender.apply(shadowMap.texture);
+	}
+
 	const hdrTex = tonemap.apply(finalTexture);
 
 	// Render Final Texture To Screen
@@ -343,8 +457,6 @@ function update() {
 		currentScene.update();
 	}
 }
-
-//main();
 
 
 function loadTexture(path, isTexFlipped) {

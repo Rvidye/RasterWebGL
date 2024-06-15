@@ -11,6 +11,8 @@ struct Light
     float spotAngle;   // For spot lights
     float spotExponent; // For spot lights
     int type;          // 0 = directional, 1 = point, 2 = spot
+    int shadows;
+    int shadowMapIndex; // Index of the shadow map
 };
 
 const int LightType_Directional = 0;
@@ -21,6 +23,17 @@ const float toon_scale_factor = 1.0 / toon_color_levels;
 
 uniform Light u_Lights[10]; //More Lights Less performance ...
 uniform int u_LightCount;
+
+//shadows related shit
+uniform sampler2D u_ShadowMap0;
+uniform sampler2D u_ShadowMap1;
+uniform sampler2D u_ShadowMap2;
+
+uniform samplerCube u_ShadowCubeMap0;
+uniform samplerCube u_ShadowCubeMap1;
+uniform samplerCube u_ShadowCubeMap2;
+
+uniform mat4 u_LightSpaceMatrices[10];
 
 vec3 calculateDirectionalLightDiffuse(Light light, vec3 normal) {
     vec3 lightDir = normalize(-light.direction);
@@ -110,5 +123,34 @@ vec3 calculateSpotLightSpecular(Light light, vec3 fragPos, vec3 normal, vec3 vie
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
     return spec * light.color * light.intensity * attenuation * intensity;
+}
+
+float ShadowCalculation(vec4 fragPosLightSpace, int shadowMapIndex) {
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    projCoords = projCoords * 0.5 + 0.5;
+
+    float closestDepth;
+    if (shadowMapIndex == 0) closestDepth = texture(u_ShadowMap0, projCoords.xy).r;
+    else if (shadowMapIndex == 1) closestDepth = texture(u_ShadowMap1, projCoords.xy).r;
+    else if (shadowMapIndex == 2) closestDepth = texture(u_ShadowMap2, projCoords.xy).r;
+
+    float currentDepth = projCoords.z;
+    float bias = 0.005;
+    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+    return shadow;
+}
+
+float ShadowCalculationPoint(vec3 fragPos, vec3 lightPos, int shadowMapIndex, float farPlane) {
+
+    vec3 fragToLight = fragPos - lightPos;
+    float currentDepth = length(fragToLight);
+    float bias = 0.005;
+    float closestDepth;
+    if (shadowMapIndex == 0) closestDepth = texture(u_ShadowCubeMap0, fragToLight).r * farPlane;
+    else if (shadowMapIndex == 1) closestDepth = texture(u_ShadowCubeMap1, fragToLight).r * farPlane;
+    else if (shadowMapIndex == 2) closestDepth = texture(u_ShadowCubeMap2, fragToLight).r * farPlane;
+
+    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+    return shadow;
 }
 

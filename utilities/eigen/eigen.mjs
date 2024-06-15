@@ -1,6 +1,6 @@
 "use strict";
 
-const Module = load_eigen({
+const EModule = load_eigen({
   // wasmBinary: wasm // Comment out for local testing
 });
 
@@ -94,7 +94,7 @@ const eigen = {
   GC: GarbageCollector
 }
 
-eigen.ready = Module.then(module => {
+eigen.ready = EModule.then(module => {
   const classes = new Set([
     "Vector",
     "Vector2d",
