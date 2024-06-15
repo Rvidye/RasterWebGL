@@ -77,8 +77,8 @@ class tutorial extends Scene
         const spotLight = new Light(2, [0.0, 1.0, 0.0], 1.0, [1.0, 0.0, -3.0], [0.0, 0.0, -1.0], 5.0, Math.cos(Math.PI / 16), 64,false);
 
         this.lightManager.addLight(directionalLight);
-        this.lightManager.addLight(pointLight);
-        this.lightManager.addLight(spotLight);
+        //this.lightManager.addLight(pointLight);
+        //this.lightManager.addLight(spotLight);
 
         tutorialScene.modelPlacer = new ModelPlacer();
         // Set initial position, rotation, and scale for the model (if needed)

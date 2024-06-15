@@ -21,7 +21,8 @@ const postProcessingSettings = {
 	enableBloom: false,
 	enableGodRays: false,
 	enableFog: false,
-	debugShaow:false
+	debugShaow:false,
+	enableOutline:false
 };
 
 const NONE = 0;

@@ -1,8 +1,7 @@
 
 // see https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_lights_punctual
 
-struct Light
-{
+struct Light {
     vec3 position;     // For point and spot lights
     vec3 direction;    // For directional and spot lights
     vec3 color;
@@ -130,9 +129,12 @@ float ShadowCalculation(vec4 fragPosLightSpace, int shadowMapIndex) {
     projCoords = projCoords * 0.5 + 0.5;
 
     float closestDepth;
-    if (shadowMapIndex == 0) closestDepth = texture(u_ShadowMap0, projCoords.xy).r;
-    else if (shadowMapIndex == 1) closestDepth = texture(u_ShadowMap1, projCoords.xy).r;
-    else if (shadowMapIndex == 2) closestDepth = texture(u_ShadowMap2, projCoords.xy).r;
+    if(shadowMapIndex == 0)
+        closestDepth = texture(u_ShadowMap0, projCoords.xy).r;
+    else if(shadowMapIndex == 1)
+        closestDepth = texture(u_ShadowMap1, projCoords.xy).r;
+    else if(shadowMapIndex == 2)
+        closestDepth = texture(u_ShadowMap2, projCoords.xy).r;
 
     float currentDepth = projCoords.z;
     float bias = 0.005;
@@ -146,11 +148,23 @@ float ShadowCalculationPoint(vec3 fragPos, vec3 lightPos, int shadowMapIndex, fl
     float currentDepth = length(fragToLight);
     float bias = 0.005;
     float closestDepth;
-    if (shadowMapIndex == 0) closestDepth = texture(u_ShadowCubeMap0, fragToLight).r * farPlane;
-    else if (shadowMapIndex == 1) closestDepth = texture(u_ShadowCubeMap1, fragToLight).r * farPlane;
-    else if (shadowMapIndex == 2) closestDepth = texture(u_ShadowCubeMap2, fragToLight).r * farPlane;
+    if(shadowMapIndex == 0)
+        closestDepth = texture(u_ShadowCubeMap0, fragToLight).r * farPlane;
+    else if(shadowMapIndex == 1)
+        closestDepth = texture(u_ShadowCubeMap1, fragToLight).r * farPlane;
+    else if(shadowMapIndex == 2)
+        closestDepth = texture(u_ShadowCubeMap2, fragToLight).r * farPlane;
 
     float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
     return shadow;
 }
 
+float rimLightIntensityFactor(vec3 normal, vec3 viewDir) {
+    float rimLightFacor = max(0.0, 1.0 - dot(viewDir, normal));
+
+    rimLightFacor = pow(rimLightFacor, 4.0);
+
+    rimLightFacor = smoothstep(0.3, 0.4, rimLightFacor);
+
+    return rimLightFacor;
+}
