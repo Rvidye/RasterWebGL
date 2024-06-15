@@ -28,6 +28,7 @@ var programShadowCubeMap;
 var bloom;
 var composite;
 var tonemap;
+var outlines;
 var shadowMapRender;
 
 var fog;
@@ -133,6 +134,7 @@ function main() {
 	tonemap = new ToneMap(gl, "shaders/hdr.vert", "shaders/hdr.frag", 2048, 2048);
 	bloom = new Bloom(gl, "shaders/common/FSQ.vert", "shaders/bloom/downsample.frag", 2048, 2048);
 	fog = new Fog(gl, "shaders/common/FSQ.vert", "shaders/fog/fog.frag", 2048, 2048);
+	outlines = new Outline(gl,"shaders/common/FSQ.vert", "shaders/outlines/outline.frag", 2048, 2048);
 	composite = new PostProcessCompositor(gl, "shaders/common/FSQ.vert", "shaders/composite.frag", 2048, 2048);
 	shadowMapRender = new RenderShadowMap(gl,"shaders/common/FSQ.vert","shaders/shadows/shadowmap.frag",1024,1024);
 
@@ -263,6 +265,7 @@ function handleUI(){
 	if (ImGui.Checkbox("Enable God Rays", (value = postProcessingSettings.enableGodRays) => postProcessingSettings.enableGodRays = value));
 	if (ImGui.Checkbox("Enable Fog", (value = postProcessingSettings.enableFog) => postProcessingSettings.enableFog = value));
 	if (ImGui.Checkbox("Debug Shadow", (value = postProcessingSettings.debugShadow) => postProcessingSettings.debugShadow = value));
+	if (ImGui.Checkbox("Enable Outline", (value = postProcessingSettings.enableOutline) => postProcessingSettings.enableOutline = value));
 
 	ImGui.Text("Select Debug Mode:");
 	if (ImGui.BeginCombo("", debugModes[DEBUGMODE])) {
@@ -369,7 +372,7 @@ function render() {
 		currentCamera = isDebugCameraOn ? debugCamera : scenes[currentSceneIndex].getCamera();
 	}
 
-	resetTextureUnits(maxTextureUnits);
+	//resetTextureUnits(maxTextureUnits);
 	// Render To G Buffer
 	gl.bindFramebuffer(gl.FRAMEBUFFER, gBuffer.fbo);
 	const drawBuffers = [
@@ -407,6 +410,11 @@ function render() {
 	if (postProcessingSettings.enableBloom) {
 		const bloomTex = bloom.apply(gBuffer.emissionTexture);
 		textures.push(bloomTex);
+	}
+
+	if (postProcessingSettings.enableOutline) {
+		const outlineTex = outlines.apply(gBuffer.colorTexture,gBuffer.normalsTexture,gBuffer.depthTexture);
+		textures.push(outlineTex);
 	}
 
 	let finalTexture;
@@ -598,6 +606,12 @@ function createGBuffer(gl, width, height) {
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 	gl.bindTexture(gl.TEXTURE_2D, null);
+
+	gl.bindTexture(gl.TEXTURE_2D, depthTexture);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+	gl.bindTexture(gl.TEXTURE_2D, null);
+
 
 	// Attach textures to the FBO
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, colorTexture, 0);

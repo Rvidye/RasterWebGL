@@ -9,9 +9,9 @@ in vec2 v_tex;
 #include<shaders/common/lights.glsl>
 
 struct material_t {
-	vec3 diffuse;
-	vec3 emissive;
-	float opacity;
+    vec3 diffuse;
+    vec3 emissive;
+    float opacity;
 };
 
 uniform material_t material;
@@ -21,26 +21,29 @@ uniform vec4 objectID;
 
 #include<shaders/common/outputs.glsl>
 
-void main(void){
+void main(void) {
 
     vec3 normal = normalize(v_normal);
     vec3 V = normalize(viewPos - v_pos);
-    vec3 diffuseColor = vec3(0.0);
+    vec3 diffuseColor = vec3(0.0f);
 
-    for(int i = 0; i < u_LightCount; i++){
-        if (u_Lights[i].type == LightType_Directional) {
+    for(int i = 0; i < u_LightCount; i++) {
+        if(u_Lights[i].type == LightType_Directional) {
             diffuseColor += calculateDirectionalLightDiffuseToon(u_Lights[i], normal);
-        } else if (u_Lights[i].type == LightType_Point) {
+        } else if(u_Lights[i].type == LightType_Point) {
             diffuseColor += calculatePointLightDiffuseToon(u_Lights[i], v_pos, normal);
-        } else if (u_Lights[i].type == LightType_Spot) {
+        } else if(u_Lights[i].type == LightType_Spot) {
             diffuseColor += calculateSpotLightDiffuseToon(u_Lights[i], v_pos, normal);
         }
     }
-    vec3 baseColor = material.diffuse * texture(samplerDiffuse,v_tex).rgb;
+    vec3 baseColor = material.diffuse * texture(samplerDiffuse, v_tex).rgb;
     diffuseColor *= baseColor;
-    gColor = vec4(diffuseColor, material.opacity);
-    gEmission = vec4(material.emissive,material.opacity);
-    gNormal = vec4(normal,1.0);
+
+    //rim Lighting
+    vec3 rimLight = baseColor * rimLightIntensityFactor(v_normal, V);
+    gColor = vec4(diffuseColor + rimLight, material.opacity);
+
+    gEmission = vec4(material.emissive, material.opacity);
+    gNormal = vec4(normal, 1.0f);
     gObjectID = objectID;
 }
-
