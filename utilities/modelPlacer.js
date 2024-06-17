@@ -148,15 +148,18 @@ class ModelPlacer {
         ImGui.Text("Model Placer Controls:");
         // Radio buttons to select mode
         if (ImGui.RadioButton("TRANSLATE", this.mode === 'TRANSLATE')) {
-            this.handleModeChange('TRANSLATE');
+            //this.handleModeChange('TRANSLATE');
+            this.mode = 'TRANSLATE';
         }
         ImGui.SameLine();
         if (ImGui.RadioButton("ROTATE", this.mode === 'ROTATE')) {
-            this.handleModeChange('ROTATE');
+            //this.handleModeChange('ROTATE');
+            this.mode = 'ROTATE';
         }
         ImGui.SameLine();
         if (ImGui.RadioButton("SCALE", this.mode === 'SCALE')) {
-            this.handleModeChange('SCALE');
+            //this.handleModeChange('SCALE');
+            this.mode = 'SCALE';
         }
 
         ImGui.Separator();
@@ -190,6 +193,12 @@ class ModelPlacer {
         if (ImGui.Button("Print Transformation Matrix In Console")) {
             console.log(this.generateTransformationCode());
         }
+
+        ImGui.Separator();
+        ImGui.Text("To Move Selected Path Point");
+        ImGui.Text("I/K = Z axis\nL/J = X axis\nO/U = Y axis");
+        ImGui.Text("Multipler = " + this.multiplier);
+        ImGui.Separator();
     }
 
 }

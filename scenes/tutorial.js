@@ -66,9 +66,9 @@ class tutorial extends Scene
         tutorialScene.modelSkeletalBased = setupModel("test3",true);
 
         tutorialScene.mytimer = new timer([
-            [eventIDS.START_T,[0.0,1.0]],
-            [eventIDS.MOVE_T,[1.0,5.0]],
-            [eventIDS.END_T,[5.0,2.0]]
+            [eventIDS.START_T,[0.0,3.0]],
+            [eventIDS.MOVE_T,[3.0,5.0]],
+            [eventIDS.END_T,[8.0,3.0]]
         ]);
 
         this.lightManager = new LightManager();
@@ -139,14 +139,26 @@ class tutorial extends Scene
 
     update() 
     {
+    
+        tutorialScene.mytimer.increment();
         tutorialScene.sceneCamera.setT(tutorialScene.mytimer.getEventTime(eventIDS.MOVE_T));
+
+        // Fade IN This condition ensures that only change fade when start event is started and it not completed.
+        if(tutorialScene.mytimer.isEventStarted(eventIDS.START_T) && !tutorialScene.mytimer.isEventComplete(eventIDS.START_T)){
+            globalFade = 1.0 - tutorialScene.mytimer.getEventTime(eventIDS.START_T);
+        }
+
         //updateModel(tutorialScene.modelNodeBased,0,GLOBAL.deltaTime);
         updateModel(tutorialScene.modelSkeletalBased,0,GLOBAL.deltaTime);
-        tutorialScene.mytimer.increment();
-        if(tutorialScene.mytimer.isEventComplete(eventIDS.END_T)){
-            //this.isComplete = true;
+
+        if(tutorialScene.mytimer.isEventStarted(eventIDS.END_T) && !tutorialScene.mytimer.isEventComplete(eventIDS.END_T)){
+            globalFade = tutorialScene.mytimer.getEventTime(eventIDS.END_T);
         }
-        //console.log(tutorialScene.mytimer.getT());
+
+        if(tutorialScene.mytimer.isEventComplete(eventIDS.END_T)){
+            this.isComplete = true;
+        }
+        console.log(tutorialScene.mytimer.getT());
     }
 
     renderUI(){
@@ -212,11 +224,16 @@ class tutorial extends Scene
     getCamera() 
     {
         // return camera created in setupCameras;
-        return scenecamera;
+        return tutorialScene.sceneCamera;
     }
 
     isCompleted() 
     {
         return this.isComplete;
     }
+
+    getSceneTime() {
+        return tutorialScene.mytimer.getT()
+    }
+
 }

@@ -15,6 +15,7 @@ class Scene{
     render() { throw new Error("Must implement render"); }
     renderShadow(shadowProgram) { throw new Error("Must implement renderShadow"); }
     renderUI() { throw new Error("Must implement render UI"); }
+    getSceneTime() {throw new Error("Must implement getSceneTime");}
     update() { throw new Error("Must implement update"); }
     reset() { throw new Error("Must implement reset"); }
     unint() { throw new Error("Must implement unint"); }

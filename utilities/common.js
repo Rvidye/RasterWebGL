@@ -15,6 +15,7 @@ var lightRenderer = null;
 var gBuffer = null;
 var exposure = 0.9;
 var maxTextureUnits = 16;
+var programCubemapRenderer;
 
 const postProcessingSettings = {
 	enableHDR: true,
@@ -38,6 +39,8 @@ const vec3 = glMatrix.vec3;
 const vec4 = glMatrix.vec4;
 const quat = glMatrix.quat;
 const toRadian = glMatrix.glMatrix.toRadian;
+
+var globalFade = 1.0; // 0 means show scene , 1 means display scene
 
 function getRandomInRange(min, max)  {
 	return Math.random() * (max - min) + min;
