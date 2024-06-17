@@ -335,9 +335,18 @@ function setupMesh(model, json, skin)
             }
             bindAndBufferData(gl, VBOBone, boneIdsArray, 3, 4, gl.INT);
             bindAndBufferData(gl, VBOWeight, weightArray, 4, 4);
+        }else
+        {
+            gl.enableVertexAttribArray(3);
+            gl.vertexAttribIPointer(3, 4, gl.INT, 0, 0);
+            gl.enableVertexAttribArray(4);
+            gl.vertexAttribPointer(4, 4, gl.FLOAT, false, 0, 0);
+            //gl.disableVertexAttribArray(3);
+            //gl.disableVertexAttribArray(4);
         }
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, EBO);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, faceArray, gl.STATIC_DRAW);
+        gl.bindVertexArray(null);
         model.meshes.push(new dmesh(VAO,faceArray.length,mesh.materialindex,vec4.fromValues(getRandomInRange(0.0,1.0),getRandomInRange(0.0,1.0),getRandomInRange(0.0,1.0),1.0)));
     });
 }
@@ -646,7 +655,7 @@ function updateModel(model, i, delta) {
     model.updateAnimations(i,delta);
 }
 
-function renderModel(model, program, useMaterial) {
+function renderModel(model, program, useMaterial, drawOutline = false) {
     function recursiveRenderNode(node, parentTransform) {
         const globalTransform = mat4.create();
         mat4.multiply(globalTransform, parentTransform, node.globalTransform);
@@ -660,17 +669,22 @@ function renderModel(model, program, useMaterial) {
                 gl.uniform3fv(program.getUniformLocation("material.emissive"), material.emissiveColor);
                 gl.uniform1f(program.getUniformLocation("material.opacity"), material.opacity);
                 if (material.diffuseTextures != undefined) {
+                    gl.uniform1i(program.getUniformLocation("useTexture"),true);
                     gl.activeTexture(gl.TEXTURE0);
                     gl.bindTexture(gl.TEXTURE_2D, material.diffuseTextures);
                     gl.uniform1i(program.getUniformLocation("samplerDiffuse"), 0);
                 }
+                else{
+                    gl.uniform1i(program.getUniformLocation("useTexture"),false);
+                }
             }
 
             gl.uniformMatrix4fv(program.getUniformLocation("nMat"), false, globalTransform);
-            gl.uniform4fv(program.getUniformLocation("objectID"),mesh.meshID);
-            if(model.skin){
-                gl.uniform1i(program.getUniformLocation("useSkinning"),model.skin);
-            }
+            if(drawOutline) 
+                gl.uniform4fv(program.getUniformLocation("objectID"),mesh.meshID);
+            else 
+                gl.uniform4fv(program.getUniformLocation("objectID"),[0.0,0.0,0.0,0.0]);
+            gl.uniform1i(program.getUniformLocation("useSkinning"),model.skin);
             gl.bindVertexArray(mesh.vao);
             gl.drawElements(gl.TRIANGLES, mesh.count, gl.UNSIGNED_SHORT, 0);
 

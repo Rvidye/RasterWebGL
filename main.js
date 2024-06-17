@@ -2,22 +2,25 @@
 
 var loadedTextures = {}
 var modelList = [
-	{ name: "test2", files: ['models/cube.glb'], flipTex: true },
-	{ name: "test1", files: ['models/cube/AnimatedCube.gltf', 'models/cube/AnimatedCube.bin'], flipTex: true },
+	// { name: "test1", files: ['models/cube/AnimatedCube.gltf', 'models/cube/AnimatedCube.bin'], flipTex: true },
 	{ name: "test3", files: ['models/cesiumman/CesiumMan.gltf', 'models/cesiumman/CesiumMan_data.bin'], flipTex: true },
+	{ name: "cube", files: ['models/cube.glb'], flipTex: true },
 	{ name: "arrow", files: ['models/lightmesh/arrow.obj'], flipTex: false },
 	{ name: "cone", files: ['models/lightmesh/cone.obj'], flipTex: false },
 	{ name: "point", files: ['models/lightmesh/point.obj'], flipTex: false },
+	//{ name: "cat", files: ['models/scene1/cat/cat.gltf', "models/scene1/cat/cat.bin"], flipTex: true },
+	{ name: "room1", files: ['models/scene1/room/room12.gltf', "models/scene1/room/room12.bin"], flipTex: true },
+	{ name: "book", files: ['models/scene1/book/book.gltf', "models/scene1/book/book.bin"], flipTex: true },
 	//{ name: "sphere", files: ['models/sphere.glb'], flipTex: true },
 	//{ name: "test4", files: ['models/Avocado.glb'], flipTex: true },
-
-
 ]
 
 var scenes = [];
 var currentSceneIndex = 0;
 var debugCamera;
 var fpsElem;
+
+var songPlayer;
 
 // global in main.js
 var emptyVao;
@@ -137,9 +140,13 @@ function main() {
 	outlines = new Outline(gl,"shaders/common/FSQ.vert", "shaders/outlines/outline.frag", 2048, 2048);
 	composite = new PostProcessCompositor(gl, "shaders/common/FSQ.vert", "shaders/composite.frag", 2048, 2048);
 	shadowMapRender = new RenderShadowMap(gl,"shaders/common/FSQ.vert","shaders/shadows/shadowmap.frag",1024,1024);
+	programCubemapRenderer = new CubeMapRender(gl,"shaders/cubemap/cubemap.vert","shaders/cubemap/cubemap.frag");
+
+	songPlayer = document.getElementById("songid");
 
 	// scene setup
-	addScene(new tutorial());
+	//addScene(new tutorial());
+	addScene(new roomScene());
 	// addScene(new renderGrass());
 
 	fpsElem = document.getElementById('fps');
@@ -164,6 +171,12 @@ function onMyKeyPress(event) {
 		break;
 		case "Space":
 			isAnimating = !isAnimating;
+			if(isAnimating){
+				songPlayer.play();
+			}
+			else{
+				songPlayer.pause();
+			}
 			break;
 		case "F1":
 			canvas.requestFullscreen();
@@ -243,6 +256,12 @@ function handleUI(){
 
 	if (ImGui.Button(isAnimating ? "Stop Animation" : "Start Animation")) {
         isAnimating = !isAnimating;
+		if(isAnimating){
+			songPlayer.play();
+		}
+		else{
+			songPlayer.pause();
+		}
     }
 
 	if (ImGui.Button(isDebugCameraOn ? "Disable Debug Camera (F2)" : "Enable Debug Camera (F2)")) {
@@ -266,6 +285,8 @@ function handleUI(){
 	if (ImGui.Checkbox("Enable Fog", (value = postProcessingSettings.enableFog) => postProcessingSettings.enableFog = value));
 	if (ImGui.Checkbox("Debug Shadow", (value = postProcessingSettings.debugShadow) => postProcessingSettings.debugShadow = value));
 	if (ImGui.Checkbox("Enable Outline", (value = postProcessingSettings.enableOutline) => postProcessingSettings.enableOutline = value));
+
+	ImGui.Text("Scene Time : "+scenes[currentSceneIndex].getSceneTime());
 
 	ImGui.Text("Select Debug Mode:");
 	if (ImGui.BeginCombo("", debugModes[DEBUGMODE])) {
@@ -413,7 +434,7 @@ function render() {
 	}
 
 	if (postProcessingSettings.enableOutline) {
-		const outlineTex = outlines.apply(gBuffer.colorTexture,gBuffer.normalsTexture,gBuffer.depthTexture);
+		const outlineTex = outlines.apply(gBuffer.colorTexture,gBuffer.objectIdTexture,gBuffer.depthTexture);
 		textures.push(outlineTex);
 	}
 
@@ -441,6 +462,7 @@ function render() {
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, hdrTex);
 	gl.uniform1i(programFSQ.getUniformLocation("screenTex"), 0);
+	gl.uniform1f(programFSQ.getUniformLocation("fade"),globalFade);
 	gl.bindVertexArray(emptyVao);
 	gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 	gl.bindVertexArray(null);
