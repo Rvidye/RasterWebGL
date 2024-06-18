@@ -11,8 +11,22 @@ var modelList = [
 	//{ name: "cat", files: ['models/scene1/cat/cat.gltf', "models/scene1/cat/cat.bin"], flipTex: true },
 	{ name: "room1", files: ['models/scene1/room/room12.gltf', "models/scene1/room/room12.bin"], flipTex: true },
 	{ name: "book", files: ['models/scene1/book/book.gltf', "models/scene1/book/book.bin"], flipTex: true },
-	//{ name: "sphere", files: ['models/sphere.glb'], flipTex: true },
-	//{ name: "test4", files: ['models/Avocado.glb'], flipTex: true },
+
+	{ name: "terrain", files: ['models/ElephantScene/elp4_3.glb'], flipTex: true },
+	{ name: "tree1", files: ['models/ElephantScene/TreeSetup/bigTree.glb'], flipTex: true },
+	{ name: "tree2", files: ['models/ElephantScene/TreeSetup/mediumTree.glb'], flipTex: true },
+	{ name: "tree3", files: ['models/ElephantScene/TreeSetup/smallTree.glb'], flipTex: true },
+	{ name: "treeLog1", files: ['models/ElephantScene/TreeSetup/bigLog.glb'], flipTex: true },
+	{ name: "treeLog2", files: ['models/ElephantScene/TreeSetup/mediumLog.glb'], flipTex: true },
+	{ name: "treeTrunk1", files: ['models/ElephantScene/TreeSetup/bigTrunk.glb'], flipTex: true },
+	{ name: "treeTrunk2", files: ['models/ElephantScene/TreeSetup/mediumTrunk.glb'], flipTex: true },
+
+
+	{ name: "pondWaterMesh", files: ['models/ElephantScene/pondWaterMesh4.glb'], flipTex: true },
+	{ name: "stone1", files: ['models/ElephantScene/stone1/stone1.gltf', 'models/ElephantScene/stone1/stone1.bin'], flipTex: true },
+	//	{ name: "stone2", files: ['models/ElephantScene/rock1.glb'], flipTex: false },
+	//	{ name: "stone3", files: ['models/ElephantScene/rock2.glb'], flipTex: false },
+
 ]
 
 var scenes = [];
@@ -70,11 +84,11 @@ assimpjs().then(function (ajs) {
 			return eigen.ready;
 		}).then(() => {
 			return Module(); // Load ImGui module
-		}).then((imguimodule) =>{
+		}).then((imguimodule) => {
 			console.log(imguimodule);
 			ImGui.bind = imguimodule;
 			return ImGui.default();
-		}).then(() =>{
+		}).then(() => {
 			ImGui.CHECKVERSION();
 			ImGui.CreateContext();
 			ImGui.StyleColorsDark();
@@ -130,24 +144,24 @@ function main() {
 
 	lightRenderer = new LightRenderer();
 
-	programFSQ = new ShaderProgram(gl,['shaders/common/FSQ.vert','shaders/common/FSQ.frag']);
-	programShadowMap = new ShaderProgram(gl,['shaders/shadows/shadowcast.vert','shaders/shadows/shadowcast.frag']);
-	programShadowCubeMap = new ShaderProgram(gl,['shaders/shadows/shadowcastpoint.vert','shaders/shadows/shadowcastpoint.frag']);
+	programFSQ = new ShaderProgram(gl, ['shaders/common/FSQ.vert', 'shaders/common/FSQ.frag']);
+	programShadowMap = new ShaderProgram(gl, ['shaders/shadows/shadowcast.vert', 'shaders/shadows/shadowcast.frag']);
+	programShadowCubeMap = new ShaderProgram(gl, ['shaders/shadows/shadowcastpoint.vert', 'shaders/shadows/shadowcastpoint.frag']);
 	programFSQ = new ShaderProgram(gl, ['shaders/common/FSQ.vert', 'shaders/common/FSQ.frag']);
 	tonemap = new ToneMap(gl, "shaders/hdr.vert", "shaders/hdr.frag", 2048, 2048);
 	bloom = new Bloom(gl, "shaders/common/FSQ.vert", "shaders/bloom/downsample.frag", 2048, 2048);
 	fog = new Fog(gl, "shaders/common/FSQ.vert", "shaders/fog/fog.frag", 2048, 2048);
-	outlines = new Outline(gl,"shaders/common/FSQ.vert", "shaders/outlines/outline.frag", 2048, 2048);
+	outlines = new Outline(gl, "shaders/common/FSQ.vert", "shaders/outlines/outline.frag", 2048, 2048);
 	composite = new PostProcessCompositor(gl, "shaders/common/FSQ.vert", "shaders/composite.frag", 2048, 2048);
-	shadowMapRender = new RenderShadowMap(gl,"shaders/common/FSQ.vert","shaders/shadows/shadowmap.frag",1024,1024);
-	programCubemapRenderer = new CubeMapRender(gl,"shaders/cubemap/cubemap.vert","shaders/cubemap/cubemap.frag");
+	shadowMapRender = new RenderShadowMap(gl, "shaders/common/FSQ.vert", "shaders/shadows/shadowmap.frag", 1024, 1024);
+	programCubemapRenderer = new CubeMapRender(gl, "shaders/cubemap/cubemap.vert", "shaders/cubemap/cubemap.frag");
 
 	songPlayer = document.getElementById("songid");
 
 	// scene setup
 	//addScene(new tutorial());
 	addScene(new roomScene());
-	// addScene(new renderGrass());
+	//addScene(new elephantScene());
 
 	fpsElem = document.getElementById('fps');
 
@@ -166,44 +180,44 @@ function onMyResize() {
 
 function onMyKeyPress(event) {
 	//console.log("In Keypress");
-	switch(event.code){
+	switch (event.code) {
 		case "Tab":
-		break;
+			break;
 		case "Space":
 			isAnimating = !isAnimating;
-			if(isAnimating){
+			if (isAnimating) {
 				songPlayer.play();
 			}
-			else{
+			else {
 				songPlayer.pause();
 			}
 			break;
 		case "F1":
 			canvas.requestFullscreen();
-		break;
+			break;
 		case "F2":
 			isDebugCameraOn = !isDebugCameraOn;
-		break;
+			break;
 		case "F3":
 			DEBUGMODE = NONE;
-		break;
+			break;
 		case "F4":
 			resetScene();
-		break;
+			break;
 		case "F6":
 			DEBUGMODE = CAMERA;
-		break;
+			break;
 		case "F7":
 			DEBUGMODE = MODEL;
-		break;
+			break;
 		case "F9":
 			DEBUGMODE = LIGHT;
-		break;
+			break;
 		case "F10":
 			debugCamera.position = scenes[currentSceneIndex].getCamera().getPosition();
 			debugCamera.cameraYaw = -90.0;
 			debugCamera.cameraPitch = 0.0;
-		break;
+			break;
 	}
 
 	debugCamera.keyboard(event);
@@ -247,36 +261,36 @@ function initScenes() {
 function resetScene() {
 }
 
-function handleUI(){
+function handleUI() {
 	ImGui.SetNextWindowPos(new ImGui.ImVec2(10, 10), ImGui.Cond.Always);
-	ImGui.Begin("Debug Controls",null,ImGui.WindowFlags.AlwaysAutoResize);
+	ImGui.Begin("Debug Controls", null, ImGui.WindowFlags.AlwaysAutoResize);
 	ImGui.Text("Press F1 : Enter Fullscreen Mode");
 	const fps = 1 / GLOBAL.deltaTime;
-    ImGui.Text(`FPS: ${fps.toFixed(2)}`);
+	ImGui.Text(`FPS: ${fps.toFixed(2)}`);
 
 	if (ImGui.Button(isAnimating ? "Stop Animation" : "Start Animation")) {
-        isAnimating = !isAnimating;
-		if(isAnimating){
+		isAnimating = !isAnimating;
+		if (isAnimating) {
 			songPlayer.play();
 		}
-		else{
+		else {
 			songPlayer.pause();
 		}
-    }
+	}
 
 	if (ImGui.Button(isDebugCameraOn ? "Disable Debug Camera (F2)" : "Enable Debug Camera (F2)")) {
-        isDebugCameraOn = !isDebugCameraOn;
-    }
+		isDebugCameraOn = !isDebugCameraOn;
+	}
 
 	if (ImGui.Button("Reset Scene (F4)")) {
-        resetScene();
-    }
+		resetScene();
+	}
 
 	if (ImGui.Button("Reset Debug Camera Position and Orientation (F10)")) {
-        debugCamera.position = scenes[currentSceneIndex].getCamera().getPosition();
-        debugCamera.cameraYaw = -90.0;
-        debugCamera.cameraPitch = 0.0;
-    }
+		debugCamera.position = scenes[currentSceneIndex].getCamera().getPosition();
+		debugCamera.cameraYaw = -90.0;
+		debugCamera.cameraPitch = 0.0;
+	}
 
 	ImGui.Text("Post-Processing Settings:");
 	if (ImGui.Checkbox("Enable HDR", (value = postProcessingSettings.enableHDR) => postProcessingSettings.enableHDR = value));
@@ -286,16 +300,16 @@ function handleUI(){
 	if (ImGui.Checkbox("Debug Shadow", (value = postProcessingSettings.debugShadow) => postProcessingSettings.debugShadow = value));
 	if (ImGui.Checkbox("Enable Outline", (value = postProcessingSettings.enableOutline) => postProcessingSettings.enableOutline = value));
 
-	ImGui.Text("Scene Time : "+scenes[currentSceneIndex].getSceneTime());
+	ImGui.Text("Scene Time : " + scenes[currentSceneIndex].getSceneTime());
 
 	ImGui.Text("Select Debug Mode:");
 	if (ImGui.BeginCombo("", debugModes[DEBUGMODE])) {
 		for (let i = 0; i < debugModes.length; i++) {
-		if (ImGui.Selectable(debugModes[i], i === DEBUGMODE)) {
-			DEBUGMODE = i;
+			if (ImGui.Selectable(debugModes[i], i === DEBUGMODE)) {
+				DEBUGMODE = i;
+			}
 		}
-	}
-	ImGui.EndCombo();
+		ImGui.EndCombo();
 	}
 }
 
@@ -317,78 +331,78 @@ function renderFrame(timeStamp) {
 		scenes[currentSceneIndex].renderUI();
 	}
 
-    ImGui.EndFrame();
+	ImGui.EndFrame();
 	// Render ImGUI
 	ImGui.Render();
 	ImGui_Impl.RenderDrawData(ImGui.GetDrawData());
 	requestAnimationFrame(renderFrame);
 }
 
-function renderShadowPass(lightManager){
+function renderShadowPass(lightManager) {
 	const shadowMapManager = lightManager.getShadowMapManager();
 	const shadowCastingLights = lightManager.getShadowCatingLights();
 
-	shadowCastingLights.forEach((light) =>{
+	shadowCastingLights.forEach((light) => {
 		const shadowMap = shadowMapManager.getShadowMaps()[light.shadowIndex];
 
 		if (shadowMap === undefined) {
-            console.warn("No shadow map found for the light.");
-            return;
-        }
+			console.warn("No shadow map found for the light.");
+			return;
+		}
 
-        if (light.type === 0 || light.type === 2) {
-            gl.bindFramebuffer(gl.FRAMEBUFFER, shadowMap.framebuffer);
-            gl.viewport(0, 0, SHADOWMAP_SIZE, SHADOWMAP_SIZE);
-            gl.clear(gl.DEPTH_BUFFER_BIT);
-			
+		if (light.type === 0 || light.type === 2) {
+			gl.bindFramebuffer(gl.FRAMEBUFFER, shadowMap.framebuffer);
+			gl.viewport(0, 0, SHADOWMAP_SIZE, SHADOWMAP_SIZE);
+			gl.clear(gl.DEPTH_BUFFER_BIT);
+
 			programShadowMap.use();
-            // Compute light's view and projection matrices
-            let lightSpaceMatrix = computeLightSpaceMatrix(light);
-            gl.uniformMatrix4fv(programShadowMap.getUniformLocation('pvMat'), false, lightSpaceMatrix);
-            // Render the scene from the light's perspective
-            if (currentSceneIndex < scenes.length) {
-                scenes[currentSceneIndex].renderShadow(programShadowMap);
-            }
-            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        } else if (light.type === 1) {
+			// Compute light's view and projection matrices
+			let lightSpaceMatrix = computeLightSpaceMatrix(light);
+			gl.uniformMatrix4fv(programShadowMap.getUniformLocation('pvMat'), false, lightSpaceMatrix);
+			// Render the scene from the light's perspective
+			if (currentSceneIndex < scenes.length) {
+				scenes[currentSceneIndex].renderShadow(programShadowMap);
+			}
+			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+		} else if (light.type === 1) {
 			// Render to each face of the cube map
 			gl.bindFramebuffer(gl.FRAMEBUFFER, shadowMap.framebuffer);
-            for (let face = 0; face < 6; face++) {
-                gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_CUBE_MAP_POSITIVE_X + face, shadowMap.texture, 0);
-                gl.viewport(0, 0, SHADOWMAP_SIZE, SHADOWMAP_SIZE);
-                gl.clear(gl.DEPTH_BUFFER_BIT);
+			for (let face = 0; face < 6; face++) {
+				gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_CUBE_MAP_POSITIVE_X + face, shadowMap.texture, 0);
+				gl.viewport(0, 0, SHADOWMAP_SIZE, SHADOWMAP_SIZE);
+				gl.clear(gl.DEPTH_BUFFER_BIT);
 				programShadowCubeMap.use();
 				gl.uniform3fv(programShadowCubeMap.getUniformLocation('u_LightPos'), light.position);
 				gl.uniform1f(programShadowCubeMap.getUniformLocation('u_FarPlane'), light.range);
 				let lightSpaceMatrix = computePointLightSpaceMatrix(light, face);
 				gl.uniformMatrix4fv(programShadowCubeMap.getUniformLocation('pvMat'), false, lightSpaceMatrix);
-                // Render the scene from the light's perspective
-                if (currentSceneIndex < scenes.length) {
-                    scenes[currentSceneIndex].renderShadow(programShadowCubeMap);
-                }
-            }
+				// Render the scene from the light's perspective
+				if (currentSceneIndex < scenes.length) {
+					scenes[currentSceneIndex].renderShadow(programShadowCubeMap);
+				}
+			}
 			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        }
+		}
 	});
 }
 
 function resetTextureUnits(maxUnits) {
-    for (let i = 0; i < maxUnits; i++) {
-        gl.activeTexture(gl.TEXTURE0 + i);
-        gl.bindTexture(gl.TEXTURE_2D, null);
-        gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
-        // If you use other texture types, unbind them as well
-        gl.bindTexture(gl.TEXTURE_2D_ARRAY, null);
-        gl.bindTexture(gl.TEXTURE_3D, null);
-    }
+	for (let i = 0; i < maxUnits; i++) {
+		gl.activeTexture(gl.TEXTURE0 + i);
+		gl.bindTexture(gl.TEXTURE_2D, null);
+		gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
+		// If you use other texture types, unbind them as well
+		gl.bindTexture(gl.TEXTURE_2D_ARRAY, null);
+		gl.bindTexture(gl.TEXTURE_3D, null);
+	}
 }
 
 function render() {
 
 	// Shadow Pass
 	if (currentSceneIndex < scenes.length && scenes[currentSceneIndex].lightManager) {
-        renderShadowPass(scenes[currentSceneIndex].lightManager);
-    }
+		renderShadowPass(scenes[currentSceneIndex].lightManager);
+	}
 	if (currentSceneIndex < scenes.length) {
 		currentCamera = isDebugCameraOn ? debugCamera : scenes[currentSceneIndex].getCamera();
 	}
@@ -434,7 +448,7 @@ function render() {
 	}
 
 	if (postProcessingSettings.enableOutline) {
-		const outlineTex = outlines.apply(gBuffer.colorTexture,gBuffer.objectIdTexture,gBuffer.depthTexture);
+		const outlineTex = outlines.apply(gBuffer.colorTexture, gBuffer.objectIdTexture, gBuffer.depthTexture);
 		textures.push(outlineTex);
 	}
 
@@ -445,7 +459,7 @@ function render() {
 		finalTexture = gBuffer.colorTexture;
 	}
 
-	if(postProcessingSettings.debugShaow){
+	if (postProcessingSettings.debugShaow) {
 		const light = scenes[currentSceneIndex].lightManager.getLight(2);
 		const shadowMap = scenes[currentSceneIndex].lightManager.getShadowMapManager().getShadowMaps()[light.shadowIndex];
 		finalTexture = shadowMapRender.apply(shadowMap.texture);
@@ -462,7 +476,7 @@ function render() {
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, hdrTex);
 	gl.uniform1i(programFSQ.getUniformLocation("screenTex"), 0);
-	gl.uniform1f(programFSQ.getUniformLocation("fade"),globalFade);
+	gl.uniform1f(programFSQ.getUniformLocation("fade"), globalFade);
 	gl.bindVertexArray(emptyVao);
 	gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 	gl.bindVertexArray(null);

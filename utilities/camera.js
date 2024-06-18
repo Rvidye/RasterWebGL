@@ -49,47 +49,43 @@ class camera {
     mouseUp(event) { }
 };
 
-class DebugCamera extends camera
-{
-    constructor(position,front,up)
-    {
-        super(position,front,up);
-        this.speed = 0.3;
+class DebugCamera extends camera {
+    constructor(position, front, up) {
+        super(position, front, up);
+        this.speed = 5.3;
 
         this.cameraYaw = -90.0;
         this.cameraPitch = 0.0;
-        this.lastmousex = -1; 
+        this.lastmousex = -1;
         this.lastmousey = -1;
     }
 
-    keyboard(event)
-    {
-        switch(event.code)
-        {
+    keyboard(event) {
+        switch (event.code) {
             case 'KeyD':
                 var dir = vec3.create();
                 vec3.cross(dir, this.front, this.up);
                 vec3.normalize(dir, dir);
                 vec3.multiply(dir, dir, [this.speed, this.speed, this.speed]);
                 vec3.add(this.position, this.position, dir);
-            break;
+                break;
             case 'KeyA':
                 var dir = vec3.create();
                 vec3.cross(dir, this.front, this.up);
                 vec3.normalize(dir, dir);
                 vec3.multiply(dir, dir, [this.speed, this.speed, this.speed]);
                 vec3.subtract(this.position, this.position, dir);
-            break;
+                break;
             case 'KeyW':
                 var dir = vec3.create();
                 vec3.multiply(dir, this.front, [this.speed, this.speed, this.speed]);
                 vec3.add(this.position, this.position, dir);
-            break;
+                break;
             case 'KeyS':
                 var dir = vec3.create();
                 vec3.multiply(dir, this.front, [this.speed, this.speed, this.speed]);
                 vec3.subtract(this.position, this.position, dir);
-            break;
+                break;
         }
     }
 
@@ -106,38 +102,35 @@ class DebugCamera extends camera
         return this.view;
     }
 
-    mouseDown(event)
-    {
+    mouseDown(event) {
         this.lastmousex = event.x;
-		this.lastmousey = event.y;
+        this.lastmousey = event.y;
     }
 
-    mouseMove(event)
-    {
-        if(this.lastmousex != -1 && this.lastmousey != -1) {
-			var xoffset = event.x - this.lastmousex;
-			var yoffset = this.lastmousey - event.y; 
-			this.lastmousex = event.x;
-			this.lastmousey = event.y;
-			var sensitivity = 0.1;
-			xoffset *= sensitivity;
-			yoffset *= sensitivity;
-			this.cameraYaw += xoffset;
-			this.cameraPitch += yoffset;
-		
-			if(this.cameraPitch > 89.0) {
-				this.cameraPitch = 89.0;
-			} else if(this.cameraPitch < -89.0) {
-				this.cameraPitch = -89.0;
-			}
-			var direction = [Math.cos(glMatrix.glMatrix.toRadian(this.cameraYaw)) * Math.cos(glMatrix.glMatrix.toRadian(this.cameraPitch)), Math.sin(glMatrix.glMatrix.toRadian(this.cameraPitch)), Math.sin(glMatrix.glMatrix.toRadian(this.cameraYaw)) * Math.cos(glMatrix.glMatrix.toRadian(this.cameraPitch))];
-			vec3.normalize(this.front, direction);
-		}
+    mouseMove(event) {
+        if (this.lastmousex != -1 && this.lastmousey != -1) {
+            var xoffset = event.x - this.lastmousex;
+            var yoffset = this.lastmousey - event.y;
+            this.lastmousex = event.x;
+            this.lastmousey = event.y;
+            var sensitivity = 0.1;
+            xoffset *= sensitivity;
+            yoffset *= sensitivity;
+            this.cameraYaw += xoffset;
+            this.cameraPitch += yoffset;
+
+            if (this.cameraPitch > 89.0) {
+                this.cameraPitch = 89.0;
+            } else if (this.cameraPitch < -89.0) {
+                this.cameraPitch = -89.0;
+            }
+            var direction = [Math.cos(glMatrix.glMatrix.toRadian(this.cameraYaw)) * Math.cos(glMatrix.glMatrix.toRadian(this.cameraPitch)), Math.sin(glMatrix.glMatrix.toRadian(this.cameraPitch)), Math.sin(glMatrix.glMatrix.toRadian(this.cameraYaw)) * Math.cos(glMatrix.glMatrix.toRadian(this.cameraPitch))];
+            vec3.normalize(this.front, direction);
+        }
     }
 
-    mouseUp(event)
-    {
+    mouseUp(event) {
         this.lastmousex = -1;
-		this.lastmousey = -1;
+        this.lastmousey = -1;
     }
 };

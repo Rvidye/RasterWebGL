@@ -64,7 +64,9 @@ class grass {
         this.programTransformFeedbackGrass.queryUniforms();
     }
 
-    init(bladeInstancePosition) {
+    initGrass(bladeInstancePosition) {
+
+        this.setupProgram();
 
         let bladePos = bladeInstancePosition;
 
@@ -187,7 +189,7 @@ class grass {
 
     }
 
-    render() {
+    renderGrass() {
 
         //code
 
@@ -199,9 +201,16 @@ class grass {
         gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, this.tfo);
         gl.enable(gl.RASTERIZER_DISCARD);
 
+
+
+        // var modelMatrix = mat4.create();
+        //mat4.scale(modelMatrix, modelMatrix, [500.0, 500.0, 500.0]);
+
         //Set Unifroms
         gl.uniform1f(this.programTransformFeedbackGrass.getUniformLocation("uTime"), this.time);
         gl.uniformMatrix4fv(this.programTransformFeedbackGrass.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
+        gl.uniformMatrix4fv(this.programTransformFeedbackGrass.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
+
 
         //Bind vao
         gl.bindVertexArray(this.tf_vao);
@@ -242,7 +251,6 @@ class grass {
 
         this.programRenderGrass.use();
 
-
         //Transformations
         //Set Uniforms
         gl.uniformMatrix4fv(this.programRenderGrass.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
@@ -255,15 +263,15 @@ class grass {
 
         gl.useProgram(null);
 
-        //this.update();
+
 
     }
 
-    update() {
+    updateGrass() {
         this.time += GLOBAL.deltaTime;
     }
 
-    uninit() {
+    uninitGrass() {
 
     }
 }

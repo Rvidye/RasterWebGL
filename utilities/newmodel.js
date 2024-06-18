@@ -1,49 +1,49 @@
 "use strict"
 
 const TextureMacros = {
-	Diffuse: 1,
-	Specular: 2,
+    Diffuse: 1,
+    Specular: 2,
     Emissive: 4
 };
 
 class dmodel {
-	constructor() {
-		this.meshes = [];
+    constructor() {
+        this.meshes = [];
         this.materials = [];
         this.nodes = [];
-		this.animator = [];
-		this.isInit = false;
+        this.animator = [];
+        this.isInit = false;
         this.skin = false;
         this.rootNode = null;
         this.boneInfoMap = [];
-		this.boneCounter = 0;
-	}
+        this.boneCounter = 0;
+    }
 
     addAnimation(animation) {
         this.animator.push(animation);
     }
 
-    updateAnimations(index,deltaTime) {
-        if(index < this.animator.length){
+    updateAnimations(index, deltaTime) {
+        if (index < this.animator.length) {
             this.animator[index].update(deltaTime);
             this.animator[index].calculateTransforms();
-        }else {
+        } else {
             console.error("Invalid Animation Index : ${index}");
         }
     }
 }
 
 class dmesh {
-	constructor(vao, count, materialIndex, meshID) {
-		this.vao = vao;
-		this.count = count;
+    constructor(vao, count, materialIndex, meshID) {
+        this.vao = vao;
+        this.count = count;
         this.materialIndex = materialIndex;
         this.meshID = meshID;
-	}
+    }
 }
 
-class dmaterial{
-    constructor(diffuseColor,emissiveColor,opacity,diffuseTextures,emissiveTexture){
+class dmaterial {
+    constructor(diffuseColor, emissiveColor, opacity, diffuseTextures, emissiveTexture) {
         this.diffuseColor = diffuseColor;
         this.emissiveColor = emissiveColor;
         this.opacity = opacity;
@@ -53,16 +53,16 @@ class dmaterial{
 }
 
 class dnodedata {
-	constructor() {
-		this.name = "";
-		this.transformation = mat4.create();
+    constructor() {
+        this.name = "";
+        this.transformation = mat4.create();
         this.globalTransform = mat4.create();
-		this.children = [];
+        this.children = [];
         this.meshIndices = [];
         this.positionkeys = [];
         this.rotationkeys = [];
         this.scalingkeys = [];
-	}
+    }
 }
 
 class BaseAnimation {
@@ -108,37 +108,37 @@ class SkeletonAnimation extends BaseAnimation {
 }
 
 class dkeyposition {
-	constructor(translate, timeStamp) {
-		this.translate = vec3.create();
-		vec3.set(this.translate, translate[0], translate[1], translate[2]);
-		this.timeStamp = timeStamp;
-	}
+    constructor(translate, timeStamp) {
+        this.translate = vec3.create();
+        vec3.set(this.translate, translate[0], translate[1], translate[2]);
+        this.timeStamp = timeStamp;
+    }
 }
 class dkeyrotation {
-	constructor(rotate, timeStamp) {
-		this.rotate = quat.create();
-		quat.set(this.rotate, rotate[1], rotate[2], rotate[3], rotate[0]);
-		quat.normalize(this.rotate, this.rotate);
-		this.timeStamp = timeStamp;
-	}
+    constructor(rotate, timeStamp) {
+        this.rotate = quat.create();
+        quat.set(this.rotate, rotate[1], rotate[2], rotate[3], rotate[0]);
+        quat.normalize(this.rotate, this.rotate);
+        this.timeStamp = timeStamp;
+    }
 }
 class dkeyscaling {
-	constructor(scale, timeStamp) {
-		this.scale = vec3.create();
-		vec3.set(this.scale, scale[0], scale[1], scale[2]);
-		this.timeStamp = timeStamp;
-	}
+    constructor(scale, timeStamp) {
+        this.scale = vec3.create();
+        vec3.set(this.scale, scale[0], scale[1], scale[2]);
+        this.timeStamp = timeStamp;
+    }
 }
 
 class dboneinfo {
-	constructor(id, offsetMatrix) {
-		this.id = id;
-		this.offsetMatrix = offsetMatrix;
-	}
+    constructor(id, offsetMatrix) {
+        this.id = id;
+        this.offsetMatrix = offsetMatrix;
+    }
 }
 
 class dbone {
-	constructor(id, name, localTransform) {
+    constructor(id, name, localTransform) {
         this.id = id;
         this.name = name;
         this.transform = localTransform;
@@ -146,7 +146,7 @@ class dbone {
         this.rotationkeys = [];
         this.scalingkeys = [];
         this.localTransform = mat4.create();
-	}
+    }
 }
 
 
@@ -165,17 +165,17 @@ function bindAndBufferData(gl, buffer, data, attribLocation, size, type = gl.FLO
 }
 
 function loadMaterial(material, directory, type, flipTexture) {
-	var texturesArray = [];
-	for(var i = 0; i < material.length; i++) {
-		if(material[i].key != undefined && material[i].key === "$tex.file" && material[i].semantic === type) {
-			var texFile = directory + '/' + material[i].value;
-			if(loadedTexturesForModelLoading[texFile] == undefined) {
-				loadedTexturesForModelLoading[texFile] = loadTexture(texFile, flipTexture);
-			}
-			texturesArray.push(loadedTexturesForModelLoading[texFile]);
-		}
-	}
-	return texturesArray;
+    var texturesArray = [];
+    for (var i = 0; i < material.length; i++) {
+        if (material[i].key != undefined && material[i].key === "$tex.file" && material[i].semantic === type) {
+            var texFile = directory + '/' + material[i].value;
+            if (loadedTexturesForModelLoading[texFile] == undefined) {
+                loadedTexturesForModelLoading[texFile] = loadTexture(texFile, flipTexture);
+            }
+            texturesArray.push(loadedTexturesForModelLoading[texFile]);
+        }
+    }
+    return texturesArray;
 }
 
 function findNodeByName(node, name) {
@@ -194,11 +194,11 @@ function findNodeByName(node, name) {
 }
 
 function getScaleFactor(lastTimeStamp, nextTimeStamp, animationTime) {
-	var scaleFactor = 0.0;
-	var midWayLength = animationTime - lastTimeStamp;
-	var framesDiff = nextTimeStamp - lastTimeStamp;
-	scaleFactor = midWayLength / framesDiff;
-	return scaleFactor;
+    var scaleFactor = 0.0;
+    var midWayLength = animationTime - lastTimeStamp;
+    var framesDiff = nextTimeStamp - lastTimeStamp;
+    scaleFactor = midWayLength / framesDiff;
+    return scaleFactor;
 }
 
 function interpolateKeyframes(keys, time, isQuat) {
@@ -231,41 +231,38 @@ function interpolateKeyframes(keys, time, isQuat) {
 }
 
 function readHierarchyData(dest, src) {
-	dest.name = src.name;
-	var transformMat = mat4.create();
-	mat4.transpose(transformMat, src.transformation);
-	dest.transformation = transformMat;
-	for (var i = 0; src.children != undefined && i < src.children.length; i++) {
-		var newData = new dnodedata();
-		readHierarchyData(newData, src.children[i]);
-		dest.children.push(newData);
-	}
+    dest.name = src.name;
+    var transformMat = mat4.create();
+    mat4.transpose(transformMat, src.transformation);
+    dest.transformation = transformMat;
+    for (var i = 0; src.children != undefined && i < src.children.length; i++) {
+        var newData = new dnodedata();
+        readHierarchyData(newData, src.children[i]);
+        dest.children.push(newData);
+    }
 }
 
-function setupModel(modelName, skin = false){
+function setupModel(modelName, skin = false) {
     var model = modelList.find(o => o.name === modelName);
-	if(model === undefined || model.json === undefined) {
-		console.error("Failed: Couldn't find ${modelName}");
-		return undefined;
-	}
-	var modelObj = new dmodel();
+    if (model === undefined || model.json === undefined) {
+        console.error("Failed: Couldn't find ${modelName}");
+        return undefined;
+    }
+    var modelObj = new dmodel();
     modelObj.skin = skin;
-	setupMesh(modelObj, model.json, skin);
+    setupMesh(modelObj, model.json, skin);
     setupMaterial(modelObj, model.json, model.directory, model.flipTex);
-    setupNodes(modelObj,model.json);
-    if(skin)
-    {
-        setupSkeletonAnimation(modelObj,model.json);
+    setupNodes(modelObj, model.json);
+    if (skin) {
+        setupSkeletonAnimation(modelObj, model.json);
     }
-    else
-    {
-        setupNodeAnimation(modelObj,model.json);
+    else {
+        setupNodeAnimation(modelObj, model.json);
     }
-	return modelObj;
+    return modelObj;
 }
 
-function setupMesh(model, json, skin)
-{
+function setupMesh(model, json, skin) {
     json.meshes.forEach(mesh => {
         const VAO = gl.createVertexArray();
         const VBO = gl.createBuffer();
@@ -278,32 +275,31 @@ function setupMesh(model, json, skin)
         var texCoordArray;
         const faceArray = new Uint16Array(mesh.faces.flat());
 
-        if(mesh.normals){
-            normalArray = new Float32Array(mesh.normals); 
+        if (mesh.normals) {
+            normalArray = new Float32Array(mesh.normals);
         }
 
-        if(mesh.texturecoords){
+        if (mesh.texturecoords) {
             texCoordArray = new Float32Array(mesh.texturecoords[0]);
         }
 
         // Bind and buffer data
         gl.bindVertexArray(VAO);
         bindAndBufferData(gl, VBO, vertexArray, 0, 3);
-        if(normalArray)
+        if (normalArray)
             bindAndBufferData(gl, VBONormal, normalArray, 1, 3);
         else
             gl.disableVertexAttribArray(1);
 
-        if(texCoordArray)
+        if (texCoordArray)
             bindAndBufferData(gl, VBOTexCoord, texCoordArray, 2, 2);
         else
             gl.disableVertexAttribArray(2);
-        if(skin)
-        {
+        if (skin) {
             const VBOBone = gl.createBuffer();
             const VBOWeight = gl.createBuffer();
             const boneIdsArray = new Int32Array(mesh.vertices.length / 3 * 4);
-            for(var j = 0; j < boneIdsArray.length; j++) {
+            for (var j = 0; j < boneIdsArray.length; j++) {
                 boneIdsArray[j] = -1;
             }
             const weightArray = new Float32Array(mesh.vertices.length / 3 * 4);
@@ -321,10 +317,10 @@ function setupMesh(model, json, skin)
                     boneID = model.boneInfoMap[boneName].id;
                 }
                 var weights = mesh.bones[boneIndex].weights;
-                for(var weightIndex = 0; weightIndex < weights.length; ++weightIndex) {
+                for (var weightIndex = 0; weightIndex < weights.length; ++weightIndex) {
                     var vertexId = weights[weightIndex][0];
                     var weight = weights[weightIndex][1];
-                    for(var k = 0; k < 4; ++k) {
+                    for (var k = 0; k < 4; ++k) {
                         if (boneIdsArray[vertexId * 4 + k] < 0) {
                             weightArray[vertexId * 4 + k] = weight;
                             boneIdsArray[vertexId * 4 + k] = boneID;
@@ -335,8 +331,7 @@ function setupMesh(model, json, skin)
             }
             bindAndBufferData(gl, VBOBone, boneIdsArray, 3, 4, gl.INT);
             bindAndBufferData(gl, VBOWeight, weightArray, 4, 4);
-        }else
-        {
+        } else {
             gl.enableVertexAttribArray(3);
             gl.vertexAttribIPointer(3, 4, gl.INT, 0, 0);
             gl.enableVertexAttribArray(4);
@@ -347,12 +342,11 @@ function setupMesh(model, json, skin)
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, EBO);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, faceArray, gl.STATIC_DRAW);
         gl.bindVertexArray(null);
-        model.meshes.push(new dmesh(VAO,faceArray.length,mesh.materialindex,vec4.fromValues(getRandomInRange(0.0,1.0),getRandomInRange(0.0,1.0),getRandomInRange(0.0,1.0),1.0)));
+        model.meshes.push(new dmesh(VAO, faceArray.length, mesh.materialindex, vec4.fromValues(getRandomInRange(0.0, 1.0), getRandomInRange(0.0, 1.0), getRandomInRange(0.0, 1.0), 1.0)));
     });
 }
 
-function setupMaterial(modelObj,json,directory,isFlipTexture)
-{
+function setupMaterial(modelObj, json, directory, isFlipTexture) {
     const usedMaterialIndices = new Set();
     json.meshes.forEach(mesh => {
         usedMaterialIndices.add(mesh.materialindex);
@@ -366,17 +360,17 @@ function setupMaterial(modelObj,json,directory,isFlipTexture)
         var diffuseTextures;
         var emissiveTextures;
 
-        mat.properties.forEach(prop =>{
+        mat.properties.forEach(prop => {
             switch (prop.key) {
                 case "$clr.diffuse":
                     vec3.set(diffuseColor, prop.value[0], prop.value[1], prop.value[2]);
-                break;
+                    break;
                 case "$clr.emissive":
                     vec3.set(emissiveColor, prop.value[0], prop.value[1], prop.value[2]);
-                break;
+                    break;
                 case "$mat.opacity":
                     opacity = prop.value;
-                break;
+                    break;
                 case "$tex.file":
                     if (prop.semantic === TextureMacros.Diffuse) {
                         const texFile = directory + '/' + prop.value;
@@ -391,10 +385,10 @@ function setupMaterial(modelObj,json,directory,isFlipTexture)
                         }
                         emissiveTextures = loadedTexturesForModelLoading[texFile];
                     }
-                break;
+                    break;
             }
         });
-        modelObj.materials.push(new dmaterial(diffuseColor,emissiveColor,opacity,diffuseTextures,emissiveTextures));
+        modelObj.materials.push(new dmaterial(diffuseColor, emissiveColor, opacity, diffuseTextures, emissiveTextures));
     });
 }
 // this should never be called
@@ -421,7 +415,7 @@ function setupMaterial(modelObj,json,directory,isFlipTexture)
 // }
 
 function setupNodeAnimation(modelObj, json) {
-    if(json.animations === undefined)
+    if (json.animations === undefined)
         return;
     json.animations.forEach(anim => {
         const animation = new NodeAnimation(anim.duration, anim.tickspersecond, modelObj.rootNode);
@@ -485,7 +479,7 @@ function setupSkeletonAnimation(modelObj, json) {
     }
 }
 
-function setupNodes(modelObj,json){
+function setupNodes(modelObj, json) {
     function recursiveLoadNodes(nodeData) {
         const node = new dnodedata();
         node.name = nodeData.name;
@@ -634,14 +628,14 @@ function calculateBoneTransform(animator, node, parentTransform) {
     }
 }
 
-function uploadBoneMatrices(model,program,index) {
+function uploadBoneMatrices(model, program, index) {
     if (model.animator[index] === undefined) {
         console.error(`Invalid animator index: ${index}`);
         return;
     }
     // This is a bit hacky but seems to work for now
     // Ensure that boneMatrices is a 2D array where each entry is a 4x4 matrix
-    const flattenedMatrices = new Float32Array(model.animator[index].finalBoneMatrices.length * 16);    
+    const flattenedMatrices = new Float32Array(model.animator[index].finalBoneMatrices.length * 16);
     for (let i = 0; i < model.animator[index].finalBoneMatrices.length; i++) {
         flattenedMatrices.set(model.animator[index].finalBoneMatrices[i], i * 16);
     }
@@ -649,10 +643,10 @@ function uploadBoneMatrices(model,program,index) {
 }
 
 function updateModel(model, i, delta) {
-    if(model === undefined) {
-		return;
-	}
-    model.updateAnimations(i,delta);
+    if (model === undefined) {
+        return;
+    }
+    model.updateAnimations(i, delta);
 }
 
 function renderModel(model, program, useMaterial, drawOutline = false) {
@@ -663,32 +657,31 @@ function renderModel(model, program, useMaterial, drawOutline = false) {
         node.meshIndices.forEach((meshIndex) => {
             const mesh = model.meshes[meshIndex];
             const material = model.materials[mesh.materialIndex];
-            
-            if(useMaterial){
+
+            if (useMaterial) {
                 gl.uniform3fv(program.getUniformLocation("material.diffuse"), material.diffuseColor);
                 gl.uniform3fv(program.getUniformLocation("material.emissive"), material.emissiveColor);
                 gl.uniform1f(program.getUniformLocation("material.opacity"), material.opacity);
+
                 if (material.diffuseTextures != undefined) {
-                    gl.uniform1i(program.getUniformLocation("useTexture"),true);
                     gl.activeTexture(gl.TEXTURE0);
                     gl.bindTexture(gl.TEXTURE_2D, material.diffuseTextures);
                     gl.uniform1i(program.getUniformLocation("samplerDiffuse"), 0);
                 }
-                else{
-                    gl.uniform1i(program.getUniformLocation("useTexture"),false);
-                }
+
             }
 
+
             gl.uniformMatrix4fv(program.getUniformLocation("nMat"), false, globalTransform);
-            if(drawOutline) 
-                gl.uniform4fv(program.getUniformLocation("objectID"),mesh.meshID);
-            else 
-                gl.uniform4fv(program.getUniformLocation("objectID"),[0.0,0.0,0.0,0.0]);
-            gl.uniform1i(program.getUniformLocation("useSkinning"),model.skin);
+            if (drawOutline)
+                gl.uniform4fv(program.getUniformLocation("objectID"), mesh.meshID);
+            else
+                gl.uniform4fv(program.getUniformLocation("objectID"), [0.0, 0.0, 0.0, 0.0]);
+            gl.uniform1i(program.getUniformLocation("useSkinning"), model.skin);
             gl.bindVertexArray(mesh.vao);
             gl.drawElements(gl.TRIANGLES, mesh.count, gl.UNSIGNED_SHORT, 0);
 
-            if(useMaterial){
+            if (useMaterial) {
                 if (material.diffuseTextures != undefined) {
                     gl.activeTexture(gl.TEXTURE0);
                     gl.bindTexture(gl.TEXTURE_2D, null);

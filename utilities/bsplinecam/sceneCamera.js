@@ -1,7 +1,6 @@
 "use strict";
 
-class SceneCamera extends camera
-{
+class SceneCamera extends camera {
     constructor(positionKeyFrames, frontKeyFrames) {
         super();
         assert(

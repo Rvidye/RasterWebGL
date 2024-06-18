@@ -15,7 +15,6 @@ struct material_t {
 };
 
 uniform material_t material;
-uniform bool useTexture;
 uniform sampler2D samplerDiffuse;
 uniform vec3 viewPos;
 uniform vec4 objectID;
@@ -37,7 +36,7 @@ void main(void) {
             diffuseColor += calculateSpotLightDiffuseToon(u_Lights[i], v_pos, normal);
         }
     }
-    vec3 baseColor = material.diffuse * ((useTexture) ? texture(samplerDiffuse,v_tex).rgb : vec3(1.0));
+    vec3 baseColor = material.diffuse * texture(samplerDiffuse, v_tex).rgb;
     diffuseColor *= baseColor;
 
     //rim Lighting

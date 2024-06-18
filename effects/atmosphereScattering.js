@@ -15,7 +15,7 @@ class atmScattering {
 
         this.spProgramObject = null;
 
-        this.atmRadius = 200.0;
+        this.atmRadius = 1.0;
 
         //data
         this.sphere = null;
@@ -25,15 +25,6 @@ class atmScattering {
         this.time = 10.0;
 
 
-        //model loading
-        this.sphereModel = null;
-        this.modelPlacer = null;
-        this.modelProgram = null;
-
-        this.lightManager = new LightManager();
-        const directionalLight = new Light(0, [1.0, 1.0, 1.0], 1.0, [2000, 2000, 2000], [-1.0, 1.0, -1.0], 0.0, 0.0, 0.0);
-
-        this.lightManager.addLight(directionalLight);
 
     }
 
@@ -42,9 +33,7 @@ class atmScattering {
         this.atmScatteringProgramObject = new ShaderProgram(gl, ['shaders/atmosphericScattering/atm.vert', 'shaders/atmosphericScattering/atm.frag']);
         this.spProgramObject = new ShaderProgram(gl, ['shaders/atmosphericScattering/sp.vert', 'shaders/atmosphericScattering/sp.frag']);
 
-        this.modelProgram = new ShaderProgram(gl, ['shaders/model/model.vert', 'shaders/model/model.frag']);
         this.initFBO();
-
         this.setupData();
 
     }
@@ -55,9 +44,7 @@ class atmScattering {
         this.sphere = new Mesh();
         makeSphere(this.sphere, this.atmRadius, 40, 40);
 
-        //this.sphereModel = setupModel("test4", false);
 
-        this.modelPlacer = new ModelPlacer();
 
         // Declare position and color array
         var square_position = new Float32Array([
@@ -119,9 +106,9 @@ class atmScattering {
 
         //First Pass
         //Atmospheric Scattering on Screen Space square draw on fbo
-        
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
         gl.viewport(0, 0, this.textureWidth, this.textureHeight);
+
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
         this.atmScatteringProgramObject.use();
 
 
@@ -139,29 +126,25 @@ class atmScattering {
         gl.bindFramebuffer(gl.FRAMEBUFFER, gBuffer.fbo);
         gl.viewport(0, 0, 2048, 2048);
 
-        //onMyResize();
+        onMyResize();
 
 
-        //gl.clearColor(0.0, 0.0, 0.0, 1.0);
-        //gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         //Transformations
         // mat4.translate(modelMatrix, mat4.create(), [0.0, 0.0, 0.0]);
         var modelMatrix = mat4.create();
-        mat4.translate(modelMatrix, modelMatrix, [0.0, -80.0, 0.0]);
+        mat4.translate(modelMatrix, modelMatrix, [0.0, -10.0, 0.0]);
         mat4.rotateX(modelMatrix, modelMatrix, -Math.PI / 2.0);
+        mat4.scale(modelMatrix, modelMatrix, [500.0, 500.0, 500.0]);
 
 
 
         this.spProgramObject.use();
 
 
-
         gl.uniformMatrix4fv(this.spProgramObject.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
         gl.uniformMatrix4fv(this.spProgramObject.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
         gl.uniformMatrix4fv(this.spProgramObject.getUniformLocation("mMat"), false, modelMatrix);
-
-
 
         //Bind Texture Create din first Pass
         gl.activeTexture(gl.TEXTURE0);
@@ -170,29 +153,6 @@ class atmScattering {
 
         this.sphere.draw();
         gl.bindTexture(gl.TEXTURE_2D, null);
-        /*
-        //Model Loading
-        var modelMatrix = mat4.create();
-        mat4.scale(modelMatrix, modelMatrix, [10.0, 10.0, 10.0]);
-        mat4.translate(modelMatrix, modelMatrix, [0.0, 0.0, 0.0]);
-        
-        mat4.rotateX(modelMatrix, modelMatrix, Math.PI / 2.0);
-        
-        
-        this.modelProgram.use();
-        
-        gl.uniformMatrix4fv(this.modelProgram.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
-        gl.uniformMatrix4fv(this.modelProgram.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
-        gl.uniformMatrix4fv(this.modelProgram.getUniformLocation("mMat"), false, modelMatrix);
-        gl.uniform3fv(this.modelProgram.getUniformLocation("viewPos"), currentCamera.getPosition());
-        this.lightManager.updateLights(this.modelProgram.programObject);
-        
-        //  gl.activeTexture(gl.TEXTURE0);
-        //   gl.bindTexture(gl.TEXTURE_2D, this.fboColorTexture);
-        // gl.uniform1i(this.modelProgram.getUniformLocation("samplerDiffuse"), 0);
-        
-        renderModel(this.sphereModel, this.modelProgram, true);
-        */
 
     }
 
@@ -203,5 +163,10 @@ class atmScattering {
 
         // console.log(this.time);
     }
+
+    uninitAtmScaterring() {
+
+    }
+
 }
 
