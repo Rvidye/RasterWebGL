@@ -2,7 +2,6 @@
 
 class CsplineInterpolator {
 	cpoints;	/* private vec3[] -> number[][] */
-	nsplines;	/* private int */
 
 	/**
 	 * @public
@@ -11,9 +10,7 @@ class CsplineInterpolator {
 	constructor(
 		cpoints
 	) {
-		this.cpoints = [];
 		this.resetControlPoints(cpoints);
-		this.nsplines = Math.trunc(cpoints.length / 4);
 	}
 
 	/**
@@ -24,58 +21,19 @@ class CsplineInterpolator {
 		cpoints
 	) {
 		assert(
-			0 !== cpoints.length,
+			cpoints.length > 0,
 			"0 control points"
 		);
 		assert(
 			0 === cpoints.length % 4,
 			"non-multiple of 4 number of control points"
 		);
-		this.cpoints.length = 0;
+		
+		if(undefined !== this.cpoints)
+			delete this.cpoints;
 
-		const ncpoints = cpoints.length;
-		const ndims = cpoints[0].length;
-		switch(ndims) {
-			case 3:
-				for(let i = 0; i < ncpoints; i++)
-					this.cpoints.push([
-						cpoints[i][0],
-						cpoints[i][1],
-						cpoints[i][2]
-					]);
-				break;
-			case 2:
-				for(let i = 0; i < ncpoints; i++) {
-					this.cpoints.push([
-						cpoints[i][0],
-						cpoints[i][1]
-					]);
-				}
-				break;
-
-			default:
-				for(let i = 0; i < ncpoints; i++)
-					for(let j = 0; j < ndims; j++)
-						this.cpoints.push([
-							cpoints[i][j]
-						]);
-				break;
-		}
-	}
-
-	/**
-	 * Maps parameteric distance (range `[0.0, 1.0]`) onto range
-	 * `[0.0, number of bezier curves the spline has]`.
-	 * 
-	 * Useful in localizing a point corresponding to a particular `t`
-	 * value on a given spline.
-	 * 
-	 * @param {number} t interpolating parameter
-	 */
-	splineSegmentIndexDistance(
-		t
-	) {
-		return t * this.nsplines;
+		// deep copy cpoints
+		this.cpoints = structuredClone(cpoints);
 	}
 
 	/**
@@ -91,7 +49,8 @@ class CsplineInterpolator {
 			return this.cpoints[this.cpoints.length - 1];
 
 		const clamped_t = clamp(t, 0.0, 1.0);
-		const spline_segment_index_dist = this.splineSegmentIndexDistance(clamped_t);
+		const nsegments = Math.trunc(this.cpoints.length / 4);
+		const spline_segment_index_dist = clamped_t * nsegments;
 
 		const segment_starting_cpoint_index = Math.floor(spline_segment_index_dist);
 		const a = this.cpoints[segment_starting_cpoint_index * 4 + 0];

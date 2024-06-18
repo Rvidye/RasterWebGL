@@ -1,10 +1,11 @@
-"use strict"
+"use strict";
 
 class SceneCameraRig {
     constructor(sceneCamera) {
-        if(!sceneCamera){
-            throw new Error("Null Pointer To Constructor");
-        }
+        assert(
+            undefined !== sceneCamera || null !== sceneCamera,
+            "Null Pointer to Constructor"
+        );
 
         this.isRenderPath = false;
         this.isRenderFront = false;

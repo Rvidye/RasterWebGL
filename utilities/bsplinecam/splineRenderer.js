@@ -1,4 +1,4 @@
-"use strict"
+"use strict";
 
 class SplineRenderer{
     constructor(program,interpolator, linspace = 0.01) {

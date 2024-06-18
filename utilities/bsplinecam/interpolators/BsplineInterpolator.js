@@ -1,8 +1,9 @@
 "use strict";
 
 class BsplineInterpolator {
-	points;  /* private vec3[] -> number[][] */
-	cspline_interpolator;  /* CsplineInterpolator */
+	points;  /* private eigen.Matrix[] */
+	original_points;  /* private number[][] */
+	cspline_interpolator;  /* private CsplineInterpolator */
 
 	/**
 	 * @public
@@ -11,7 +12,6 @@ class BsplineInterpolator {
 	constructor(
 		points
 	) {
-		this.originalPoint = points;
 		this.cspline_interpolator = null;
 		if(points) {
 			this.updatePoints(points);
@@ -32,7 +32,7 @@ class BsplineInterpolator {
 		}
 		const npoints = points.length;
 		const ndims = points[0].length;
-		this.originalPoint = points;
+		this.original_points = points;
 		this.points = new Array();
 		for(let i = 0; i < npoints; i++) {
 			const vector = new eigen.Matrix(1, ndims);
@@ -189,6 +189,6 @@ class BsplineInterpolator {
 	}
 
 	getPoints(){
-		return this.originalPoint;
+		return this.original_points;
 	}
 }
