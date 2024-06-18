@@ -16,13 +16,13 @@ uniform sampler2D depthTexture;
 
 void main(void) {
 
-    vec4 fogColor = vec4(0.25f, 0.25f, 0.25f, 1.0f);
+    vec4 fogColor = vec4(0.75f, 0.75f, 0.75f, 1.0f);
     vec4 diffuseColor = texture(colorTexture, texCoord);
 
     float curDepth = texture(depthTexture, texCoord).r;
 
     //Change below value for the fog depth
-    float fogStart = 0.998f;
+    float fogStart = 0.99988f;
     float fogEnd = 1.0f;
 
     float fogRange = fogEnd - fogStart;
@@ -40,7 +40,7 @@ void main(void) {
 //Expnonetial fog   
 #else   
     float distRatio = 4.0f * fogDist / fogEnd;
-    float fogDensity = 300.0f;
+    float fogDensity = 3000.0f;
     fogFactor = exp(-distRatio * fogDensity * distRatio * fogDensity);
     gColor = mix(diffuseColor, fogColor, fogFactor);
 

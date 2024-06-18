@@ -26,30 +26,32 @@ float hash12(vec2 p) {
 }
 
 void main(void) {
-    vec3 baseColor = vec3(0.05f, 0.2f, 0.01f);
+    vec3 baseColor = vec3(0.06f, 0.29f, 0.02f);
 
-    vec3 tipColor = vec3(0.5f, 0.5f, 0.1f);
+    vec3 tipColor = vec3(0.07f, 1.0f, 0.0f);
 
     float bladeVertexHeight = (aBladeVertex.y) / (4.465777f + 1.5f);
 
     mat4 yRotMatrix = mat4(vec4(cos(fAngleY), 0.0f, -sin(fAngleY), 0.0f), vec4(0.0f, 1.0f, 0.0f, 0.0f), vec4(sin(fAngleY), 0.0f, cos(fAngleY), 0.0f), vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
-    if(float(gl_VertexID) >= clamp(mix(0.0f, 12.0f, depthOfBlade), 0.0f, 12.0f)) {
+    //if(float(gl_VertexID) >= clamp(mix(0.0f, 15.0f, depthOfBlade), 0.0f, 15.0f)) {
 
-        float fAngleX = hash12(aInstancePosition.xz) * 3.14159f / 4.0f * bladeVertexHeight;// + noiseSample * bladeVertexHeight  * 0.1;" 
-        float fAngleX2 = windDir * windLeanAngle * bladeVertexHeight;
+    float fAngleX = hash12(aInstancePosition.xz) * 3.14159f / 4.0f * bladeVertexHeight;// + noiseSample * bladeVertexHeight  * 0.1;" 
+    float fAngleX2 = windDir * windLeanAngle * bladeVertexHeight;
 
-        mat4 xRotMatrix = mat4(vec4(1.0f, 0.0f, 0.0f, 0.0f), vec4(0.0f, cos(fAngleX), sin(fAngleX), 0.0f), vec4(0.0f, sin(fAngleX), cos(fAngleX), 0.0f), vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    mat4 xRotMatrix = mat4(vec4(1.0f, 0.0f, 0.0f, 0.0f), vec4(0.0f, cos(fAngleX), sin(fAngleX), 0.0f), vec4(0.0f, sin(fAngleX), cos(fAngleX), 0.0f), vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
-        mat4 xRotMatrix2 = mat4(vec4(1.0f, 0.0f, 0.0f, 0.0f), vec4(0.0f, cos(fAngleX2), sin(fAngleX2), 0.0f), vec4(0.0f, sin(fAngleX2), cos(fAngleX2), 0.0f), vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    mat4 xRotMatrix2 = mat4(vec4(1.0f, 0.0f, 0.0f, 0.0f), vec4(0.0f, cos(fAngleX2), sin(fAngleX2), 0.0f), vec4(0.0f, sin(fAngleX2), cos(fAngleX2), 0.0f), vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
-        gl_Position = pMat * vMat * mMat * (xRotMatrix2 * yRotMatrix * xRotMatrix * aBladeVertex + aInstancePosition);
+    gl_Position = pMat * vMat * mMat * (xRotMatrix2 * yRotMatrix * xRotMatrix * aBladeVertex + aInstancePosition);
 
-        difffuseColor = mix(baseColor, tipColor, bladeVertexHeight);
+    difffuseColor = mix(baseColor, tipColor, bladeVertexHeight);
+/*
+} else {
 
-    } else {
+difffuseColor = mix(baseColor, tipColor, bladeVertexHeight);
+gl_Position = pMat * vMat * mMat * (yRotMatrix * aBladeVertex + aInstancePosition);
+}
+*/
 
-        difffuseColor = mix(baseColor, tipColor, bladeVertexHeight);
-        gl_Position = pMat * vMat * mMat * (yRotMatrix * aBladeVertex + aInstancePosition);
-    }
 }

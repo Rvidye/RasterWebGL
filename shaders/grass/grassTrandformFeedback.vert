@@ -5,6 +5,7 @@ layout(location = 0) in vec4 aInstancePosition;
 
 uniform float uTime;
 uniform mat4 vMat;
+uniform mat4 pMat;
 
 out float windDir;
 out float windLeanAngle;
@@ -51,9 +52,13 @@ float noise(in vec2 st) {
 void main(void) {
 
     //Increare The below grassBladeMaxDepthLevel value to increase the level of details(wavy effect) of far grass blade
-    float grassBladeMaxDepthLevel = 200.0f;
+    float grassBladeMaxDepthLevel = 500.0f;
 
-    depthOfBlade = -(vMat * aInstancePosition).z / grassBladeMaxDepthLevel;
+    vec4 tPos = vMat * aInstancePosition;
+
+//    depthOfBlade = -(vMat * aInstancePosition).z / grassBladeMaxDepthLevel;
+
+   // depthOfBlade = clamp(-tPos.z / grassBladeMaxDepthLevel, 0.0f, 1.0f);
 
     fAngleY = hash12(aInstancePosition.xz) * 2.0f * 3.14159f;
 
