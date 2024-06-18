@@ -1,15 +1,17 @@
-"use strict"
+"use strict";
 
 class SceneCamera extends camera
 {
     constructor(positionKeyFrames, frontKeyFrames) {
         super();
-        if (positionKeyFrames.length <= 0) {
-            throw new Error("SceneCamera cannot take empty positionKeyFrames vector");
-        }
-        if (frontKeyFrames.length <= 0) {
-            throw new Error("SceneCamera cannot take empty frontKeyFrames vector");
-        }
+        assert(
+            positionKeyFrames.length > 0,
+            "SceneCamera cannot take empty positionKeyFrames vector"
+        );
+        assert(
+            frontKeyFrames.length > 0,
+            "SceneCamera cannot take empty frontKeyFrames vector"
+        );
 
         this.m_bspPositions = new BsplineInterpolator(positionKeyFrames);
         this.m_bspFront = new BsplineInterpolator(frontKeyFrames);
@@ -30,10 +32,6 @@ class SceneCamera extends camera
 
     getT() {
         return this.t;
-    }
-
-    getDistanceOnSpline() {
-        return this.m_bspPositions.getDistanceOnSpline(this.t);
     }
 
     getViewMatrix() {
