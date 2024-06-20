@@ -1,56 +1,80 @@
 "use strict"
 
-var startScene ={
-    programPhongShader : null,
-    programCelShader : null,
-    modelName : null,
-    modelCat : null,
-    modelRoom : null,
-    modelPlacer : null,
-    timer : null,
-    skyTex : null,
-    sceneCamera : null,
-    sceneCameraRig : null
+var startScene = {
+    programPhongShader: null,
+    programCelShader: null,
+    programSkyRender: null,
+    programLight: null,
+    modelName: null,
+    modelBook: null,
+    modelRoom: null,
+    modelAMC: null,
+    modelRASTER: null,
+    modelNightSky: null,
+    modelPlacer: null,
+    timer: null,
+    skyTex: null,
+    sceneCamera: null,
+    sceneCameraRig: null
 };
 
 const startSceneEventIDS = {
-    START_T:0,
-    MOVE_T:1,
-    END_T:2
+    START_T: 0,
+    AMC_TITLE_T: 1,
+    GRP_TITLE_T: 2,
+    CAMERA1_T: 3,
+    BOOK_OPEN_T: 4,
+    END_T: 5
 };
 
-class roomScene extends Scene
-{
-    constructor()
-    {
+var test = 0.0;
+
+class roomScene extends Scene {
+    constructor() {
         super();
         this.isComplete = false;
     }
 
-    setupProgram() 
-    {
+    setupProgram() {
         // Load All Shaders here
-        startScene.programPhongShader = new ShaderProgram(gl,['shaders/model/model.vert','shaders/model/model.frag']);
-        startScene.programCelShader = new ShaderProgram(gl,['shaders/model/model.vert','shaders/model/celShader.frag']);
+        startScene.programPhongShader = new ShaderProgram(gl, ['shaders/model/model.vert', 'shaders/model/model.frag']);
+        startScene.programCelShader = new ShaderProgram(gl, ['shaders/model/model.vert', 'shaders/model/celShader.frag']);
+        startScene.programLight = new ShaderProgram(gl, ['shaders/utilities/lightsrc.vert', 'shaders/utilities/lightsrc.frag']);
+        startScene.programSkyRender = new ShaderProgram(gl, ['shaders/cubemap/spheremap.vert', 'shaders/model/texturedMesh.frag']);
     }
 
-    setupCamera() 
-    {
+    setupCamera() {
         // Setup All Cameras here
         const positionKeyFrames = [
-            [0.0,0.0,5.0],   
-            [0.0,0.0,4.0],   
-            [0.0,0.0,3.0],   
-            [0.0,0.0,2.0],   
-            [0.0,0.0,1.0]
+            [15.899999999999999, 2.9999999999999987, 2.4999999999999996],
+            [13.200000000000003, 3.4999999999999996, 2.5999999999999996],
+            [10.900000000000007, 3.8, 2.8],
+            [7.19999999999999, 3.5000000000000018, 3.400000000000021],
+            [4.899999999999999, 2.600000000000001, 4.000000000000018],
+            [2.1000000000000005, 2.500000000000001, 5.20000000000001],
+            [-0.5999999999999998, 2.600000000000001, 4.10000000000001],
+            [1.4, 2.3000000000000007, 1.3000000000000047],
+            [2.600000000000001, 1.9000000000000004, 0.30000000000000104],
+            [5.1999999999999975, 1.8000000000000003, 0.6999999999999971],
+            [6.099999999999994, 1.0999999999999999, 2.099999999999999],
+            [5.099999999999998, 1.0999999999999999, 2],
+            [4.799999999999999, 0.7999999999999999, 1.9000000000000008]
         ];
 
         const frontKeyFrames = [
-            [0, 0, -1],
-            [0, 0, -1],
-            [0, 0, -1],
-            [0, 0, -1],
-            [0, 0, -1] 
+            [17.70000000000002, 2.5999999999999983, 2.4000000000000004],
+            [14.7, 3.0999999999999988, 2.5000000000000004],
+            [12.100000000000003, 3.8, 2.7000000000000006],
+            [8.599999999999987, 3.7000000000000015, 3.1000000000000205],
+            [6.599999999999994, 3.300000000000001, 3.4000000000000172],
+            [3.100000000000002, 2.3000000000000007, 4.000000000000014],
+            [0.6000000000000008, 2.3000000000000007, 3.8000000000000105],
+            [2.5000000000000013, 2.1000000000000005, 1.600000000000005],
+            [4.300000000000002, 1.4000000000000001, 1.4000000000000012],
+            [4.300000000000002, 1.0999999999999999, 2.1999999999999984],
+            [4.8, 0.7999999999999999, 1.9999999999999991],
+            [4.8, 0.7, 1.9],
+            [4.8, 0.6, 1.9000000000000008]
         ];
 
         startScene.sceneCamera = new SceneCamera(positionKeyFrames, frontKeyFrames);
@@ -63,25 +87,29 @@ class roomScene extends Scene
         startScene.sceneCameraRig.setScalingFactor(0.1);
     }
 
-    init() 
-    {
+    init() {
         // init all resouces models, texures, buffers etc
         //startScene.modelName = setupModel("test3",true);
-        startScene.modelRoom = setupModel("room1",false)
-        startScene.modelCat = setupModel("book",true);
+        startScene.modelRoom = setupModel("room1", false)
+        startScene.modelBook = setupModel("book", true);
+        startScene.modelAMC = setupModel("AMC", false);
+        startScene.modelRASTER = setupModel("RASTER", false);
+        startScene.modelNightSky = setupModel("nightSky", false);
 
         startScene.timer = new timer([
-            [startSceneEventIDS.START_T,[0.0,1.0]],
-            [startSceneEventIDS.MOVE_T,[1.0,49.0]],
-            [startSceneEventIDS.END_T,[49.0,1.0]]
+            [startSceneEventIDS.START_T, [0.0, 1.0]],
+            [startSceneEventIDS.AMC_TITLE_T, [1.0, 5.0]],
+            [startSceneEventIDS.GRP_TITLE_T, [4.0, 5.0]],
+            [startSceneEventIDS.CAMERA1_T, [8.0, 44.0]],
+            [startSceneEventIDS.BOOK_OPEN_T, [44.0, 5.0]],
+            [startSceneEventIDS.END_T, [49.0, 1.0]]
         ]);
 
         this.lightManager = new LightManager();
-        const directionalLight = new Light(0, [1.0, 1.0, 1.0], 1.0, [0, 0, 0], [0.0, 0.0, -1.0],0.0,0.0,0.0,true);
-        const pointLight = new Light(1, [1.0, 1.0, 1.0], 1.0, [0.0, 0.0, 0.0],[0.0, 0.0, 0.0],20.0,0.0,0.0,false);
-        const spotLight = new Light(2, [0.0, 1.0, 0.0], 1.0, [1.0, 0.0, -3.0], [0.0, 0.0, -1.0], 5.0, Math.cos(Math.PI / 16), 64,false);
+        const directionalLight = new Light(0, [1.0, 1.0, 1.0], 0.1, [0, 0, 0], [0.0, -1.0, -1.0], 0.0, 0.0, 0.0, false);
+        const pointLight = new Light(1, [1.0, 0.75, 0.27], 0.515, [2.0, 1.0, 0.0], [0.0, 0.0, 0.0], 20.0, 0.0, 0.0, false);
 
-        //this.lightManager.addLight(directionalLight);
+        this.lightManager.addLight(directionalLight);
         this.lightManager.addLight(pointLight);
         //this.lightManager.addLight(spotLight);
 
@@ -89,125 +117,156 @@ class roomScene extends Scene
         startScene.skyTex = loadTextureCubemap("textures/sky.jpg", false);
     }
 
-    renderShadow(shadowProgram){
+    renderShadow(shadowProgram) {
     }
-    
+
     render() {
-        if(DEBUGMODE === CAMERA){
+
+        gl.disable(gl.DEPTH_TEST);
+        startScene.programSkyRender.use();
+        gl.uniformMatrix4fv(startScene.programSkyRender.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
+        gl.uniformMatrix4fv(startScene.programSkyRender.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
+        renderModel(startScene.modelNightSky, startScene.programSkyRender, true, false);
+        gl.enable(gl.DEPTH_TEST);
+
+        if (DEBUGMODE === CAMERA) {
             startScene.sceneCameraRig.render();
         }
 
-        //programCubemapRenderer.render(currentCamera.getProjectionMatrix(),currentCamera.getViewMatrix(),startScene.skyTex);
+        var transformationMatrix = mat4.create();
+        mat4.identity(transformationMatrix);
+        mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(lerp(0.0, 50.0, startScene.timer.getEventTime(startSceneEventIDS.AMC_TITLE_T)), 2.50, 2.00));
+        mat4.rotateX(transformationMatrix, transformationMatrix, 0.00);
+        mat4.rotateY(transformationMatrix, transformationMatrix, -1.50);
+        mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00);
+        mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(1.00, 1.00, 1.00));
+
+        startScene.programLight.use();
+        gl.uniformMatrix4fv(startScene.programLight.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
+        gl.uniformMatrix4fv(startScene.programLight.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
+        gl.uniform3fv(startScene.programLight.getUniformLocation("lightcolor"), [1.0, 0.5, 0.0]);
+        if (!startScene.timer.isEventComplete(startSceneEventIDS.AMC_TITLE_T)) {
+            gl.uniformMatrix4fv(startScene.programLight.getUniformLocation("mMat"), false, transformationMatrix);
+            renderModel(startScene.modelAMC, startScene.programLight, false, false);
+        }
+
+        if (!startScene.timer.isEventComplete(startSceneEventIDS.GRP_TITLE_T)) {
+            mat4.identity(transformationMatrix);
+            mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(lerp(0.0, 50.0, startScene.timer.getEventTime(startSceneEventIDS.GRP_TITLE_T)), 2.50, 2.00));
+            mat4.rotateX(transformationMatrix, transformationMatrix, 0.00);
+            mat4.rotateY(transformationMatrix, transformationMatrix, -1.50);
+            mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00);
+            mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(1.00, 1.00, 1.00));
+            gl.uniformMatrix4fv(startScene.programLight.getUniformLocation("mMat"), false, transformationMatrix);
+            renderModel(startScene.modelRASTER, startScene.programLight, false, false);
+        }
 
         startScene.programCelShader.use();
-        gl.uniformMatrix4fv(startScene.programCelShader.getUniformLocation("pMat"),false, currentCamera.getProjectionMatrix());
-        gl.uniformMatrix4fv(startScene.programCelShader.getUniformLocation("vMat"),false, currentCamera.getViewMatrix());
+        gl.uniformMatrix4fv(startScene.programCelShader.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
+        gl.uniformMatrix4fv(startScene.programCelShader.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
         gl.uniform3fv(startScene.programCelShader.getUniformLocation("viewPos"), currentCamera.getPosition());
         this.lightManager.updateLights(startScene.programCelShader.programObject);
-        gl.uniformMatrix4fv(startScene.programCelShader.getUniformLocation("mMat"),false, mat4.create());
-        //uploadBoneMatrices(startScene.modelName,startScene.programCelShader,0);
-        //renderModel(startScene.modelBed, startScene.programCelShader, true);
-        renderModel(startScene.modelRoom, startScene.programCelShader, true,true);
+        gl.uniformMatrix4fv(startScene.programCelShader.getUniformLocation("mMat"), false, mat4.create());
+        renderModel(startScene.modelRoom, startScene.programCelShader, true, true);
 
-        gl.uniformMatrix4fv(startScene.programCelShader.getUniformLocation("mMat"),false, startScene.modelPlacer.getTransformationMatrix());
-        uploadBoneMatrices(startScene.modelCat,startScene.programCelShader,0);
-        renderModel(startScene.modelCat, startScene.programCelShader, true);
+        mat4.identity(transformationMatrix);
+        mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(4.80, 0.55, 2.00));
+        mat4.rotateX(transformationMatrix, transformationMatrix, 0.00);
+        mat4.rotateY(transformationMatrix, transformationMatrix, -1.50);
+        mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00);
+        mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(0.06, 0.06, 0.06));
+        gl.uniformMatrix4fv(startScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
+        uploadBoneMatrices(startScene.modelBook, startScene.programCelShader, 0);
+        renderModel(startScene.modelBook, startScene.programCelShader, true);
 
-        lightRenderer.renderLights(this.lightManager);
+        //lightRenderer.renderLights(this.lightManager);
 
     }
 
-    update() 
-    {
-        startScene.sceneCamera.setT(startScene.timer.getEventTime(startSceneEventIDS.MOVE_T));
-        updateModel(startScene.modelCat,0,GLOBAL.deltaTime);
+    update() {
         startScene.timer.increment();
-        if(startScene.timer.isEventComplete(startSceneEventIDS.END_T)){
-            //this.isComplete = true;
-        }
 
+        startScene.sceneCamera.setT(startScene.timer.getEventTime(startSceneEventIDS.CAMERA1_T));
+
+
+
+        startScene.modelBook.lerpAnimations(0, lerp(0.0, 0.7, startScene.timer.getEventTime(startSceneEventIDS.BOOK_OPEN_T)));
         // Fade IN This condition ensures that only change fade when start event is started and it not completed.
-        if(startScene.timer.isEventStarted(eventIDS.START_T) && !startScene.timer.isEventComplete(eventIDS.START_T)){
-            globalFade = 1.0 - startScene.timer.getEventTime(eventIDS.START_T);
+        if (startScene.timer.isEventStarted(startSceneEventIDS.START_T) && !startScene.timer.isEventComplete(startSceneEventIDS.START_T)) {
+            globalFade = 1.0 - startScene.timer.getEventTime(startSceneEventIDS.START_T);
         }
 
-        if(startScene.timer.isEventStarted(eventIDS.END_T) && !startScene.timer.isEventComplete(eventIDS.END_T)){
+        if (startScene.timer.isEventStarted(startSceneEventIDS.END_T) && !startScene.timer.isEventComplete(startSceneEventIDS.END_T)) {
             globalFade = startScene.timer.getEventTime(eventIDS.END_T);
         }
 
-        if(startScene.timer.isEventComplete(eventIDS.END_T)){
+        if (startScene.timer.isEventComplete(startSceneEventIDS.END_T)) {
             this.isComplete = true;
         }
     }
 
-    renderUI(){
-        switch(DEBUGMODE){
+    renderUI() {
+        switch (DEBUGMODE) {
             case MODEL:
                 startScene.modelPlacer.renderUI();
-            break;
+                break;
             case CAMERA:
                 startScene.sceneCameraRig.renderUI();
-            break;
+                break;
             case LIGHT:
                 this.lightManager.renderUI();
-            break;
+                break;
             case NONE:
-            break;
+                break;
         }
     }
 
-    reset() 
-    {
+    reset() {
         // reset stuff like timers and events
         startScene.timer.reset();
     }
 
-    unint() 
-    {
+    unint() {
         // clean eveything created in init
     }
 
-    keyboardfunc(key) 
-    {
-        switch(DEBUGMODE){
+    keyboardfunc(key) {
+        switch (DEBUGMODE) {
             case MODEL:
                 startScene.modelPlacer.handleKeyboardInput(key);
-            break;
+                break;
             case CAMERA:
                 startScene.sceneCameraRig.keyboardFunc(key);
-            break;
+                break;
             case LIGHT:
-            break;
+                break;
             case NONE:
-            break;
+                break;
         }
-        if(key == 'Space')
-        {
+        if (key == 'Space') {
             //this.isComplete = true;
         }
 
-        switch(key){
+        switch (key) {
             case 'KeyP':
-            break;
+                break;
             case 'ArrowUp':
                 startScene.timer.addTime(0.4);
-            break;
+                break;
             case 'ArrowDown':
                 startScene.timer.subtractTime(0.4);
-            break;
+                break;
             case 'Tab':
-            break;
+                break;
         }
     }
 
-    getCamera() 
-    {
+    getCamera() {
         // return camera created in setupCameras;
         return startScene.sceneCamera;
     }
 
-    isCompleted() 
-    {
+    isCompleted() {
         return this.isComplete;
     }
 

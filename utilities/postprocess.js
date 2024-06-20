@@ -126,7 +126,7 @@ class Bloom extends PostProcessingEffect {
 
         // Upsample
         this.upsample.use();
-        gl.uniform1f(this.upsample.getUniformLocation("u_filterRadius"), 0.005);
+        gl.uniform1f(this.upsample.getUniformLocation("filterRadius"), 0.005);
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.ONE, gl.ONE);
         gl.blendEquation(gl.FUNC_ADD);

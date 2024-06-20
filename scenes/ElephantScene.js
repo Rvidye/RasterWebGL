@@ -23,8 +23,13 @@ class elephantScene extends Scene {
 
         //Lighting Setup
         this.lightManager = new LightManager();
-        const directionalLight = new Light(0, [1.0, 1.0, 1.0], 1.0, [2000, 2000, 2000], [-1.0, -1.0, -1.0], 0.0, 0.0, 0.0, false);
+        const directionalLight = new Light(0, [1.0, 1.0, 1.0], 1.0, [0, 400, 400], [0.0, -1.0, -1.0], 0.0, 0.0, 0.0, false);
+
+        //For Ambient
+        const directionalLight2 = new Light(0, [1.0, 1.0, 1.0], 0.15, [0, -400, -400], [0.0, -1.0, 1.0], 0.0, 0.0, 0.0, false);
+
         this.lightManager.addLight(directionalLight);
+        this.lightManager.addLight(directionalLight2);
 
 
 
@@ -83,6 +88,8 @@ class elephantScene extends Scene {
         this.stone1Model = setupModel("stone1", false);
         this.stone1ModelMatrixArray = [];
 
+        this.elephantMother = setupModel("elepahntMother",false);
+        this.elephantCub = setupModel("elephantCub",false);
 
     }
 
@@ -93,22 +100,46 @@ class elephantScene extends Scene {
     setupCamera() {
 
         // Setup All Cameras here
+        // Setup All Cameras here
         const positionKeyFrames = [
-            [0.0, 0.0, 50.0],
-            [0.0, 0.0, 5.0],
-            [0.0, 0.0, 4.0],
-            [0.0, 0.0, 3.0],
-            [0.0, 0.0, 2.0],
-            [0.0, 0.0, 1.0]
+            [136, 50, 332],
+            [46, 50, 273],
+            [-34, 42.7999999999999, 209],
+            [-138, 28.399999999999693, 120],
+            [-229, 20.299999999999578, 13],
+            [-215, 16.699999999999527, -112],
+            [-111, 22.899999999999615, -45],
+            [-77, 20.999999999999588, 100],
+            [-158, 8.799999999999544, 163.50000000000003],
+            [-325, 5.099999999999557, 54],
+            [-215, 33.59999999999977, -208],
+            [0, 50, -300],
+            [181, 50, -305],
+            [306, 50, -4],
+            [61, 50, 249],
+            [-24, 28.19999999999969, 132],
+            [0, -1.2000000000004418, 0.9000000000000329]
+
         ];
 
         const frontKeyFrames = [
-            [0, 0, -1],
-            [0, 0, -1],
-            [0, 0, -1],
-            [0, 0, -1],
-            [0, 0, -1],
-            [0, 0, -1]
+            [129, 42, 319],
+            [17, 50, 245],
+            [-79, 35.6999999999998, 154],
+            [-191, 18.799999999999557, 9],
+            [-157, 23.699999999999626, 16],
+            [-165, 21.09999999999959, 26],
+            [-177, 17.099999999999532, 0],
+            [-139, 14.799999999999523, 10],
+            [-325, 4.1999999999995605, 38],
+            [-119, 39.99999999999986, -251],
+            [230, 50, -247],
+            [262, 50, 81],
+            [140, 50, 187],
+            [-7, 50, 148],
+            [12, -1.2000000000004418, -34],
+            [15, -0.8000000000004416, -48],
+            [22, -5.400000000000439, -66]
         ];
 
         ElephantScene.sceneCamera = new SceneCamera(positionKeyFrames, frontKeyFrames);
@@ -131,8 +162,10 @@ class elephantScene extends Scene {
         //Timer
         ElephantScene.timer = new timer([
             [ElephantSceneEventIDS.START_T, [0.0, 1.0]],
-            [ElephantSceneEventIDS.MOVE_T, [1.0, 50.0]],
-            [ElephantSceneEventIDS.END_T, [50.0, 1.0]]
+            //[ElephantSceneEventIDS.MOVE_T, [50.0, 15.0]], baby elephant entry
+            //[ElephantSceneEventIDS.MOVE_T, [65.0, .0]], mother elephant entry
+            [ElephantSceneEventIDS.MOVE_T, [1.0, 54.0]],
+            [ElephantSceneEventIDS.END_T, [55.0, 1.0]]
         ]);
 
 
@@ -349,10 +382,11 @@ class elephantScene extends Scene {
         //  gl.depthMask(gl.TRUE);
         this.myGrass.renderGrass();
 
-        //this.myVegetation.renderVegetation();
+        // this.myVegetation.renderVegetation();
 
         //for Terrain
         this.myModelDraw.renderModels(this.terrainModel, this.terrainTextue, this.terrainModelMatrixArray, this.lightManager);
+
 
         //For tree1 model
         this.myModelDraw.renderModels(this.tree1Model, this.whiteTexture, this.tree1ModelMatrixArray, this.lightManager);
@@ -375,6 +409,35 @@ class elephantScene extends Scene {
         //for stone1 model
         this.myModelDraw.renderModels(this.stone1Model, this.terrainTextue, this.stone1ModelMatrixArray, this.lightManager);
 
+        var transformationMatrix = mat4.create();
+        mat4.identity(transformationMatrix);
+        mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(-178.0, 0.00, -14.0));
+        mat4.rotateX(transformationMatrix, transformationMatrix, 0.00);
+        mat4.rotateY(transformationMatrix, transformationMatrix, 1.60);
+        mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00);
+        mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(9.50, 9.50, 9.50));
+        this.myModelDraw.modelProgram.use();
+        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("pMat"),false, currentCamera.getProjectionMatrix());
+        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("vMat"),false, currentCamera.getViewMatrix());
+        gl.uniform3fv(this.myModelDraw.modelProgram.getUniformLocation("viewPos"), currentCamera.getPosition());
+        this.lightManager.updateLights(this.myModelDraw.modelProgram.programObject);
+        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("mMat"),false, transformationMatrix);
+        renderModel(this.elephantMother, this.myModelDraw.modelProgram, true,true);
+
+        mat4.identity(transformationMatrix);
+        mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(-170.0, 0.00, -35.0));
+        mat4.rotateX(transformationMatrix, transformationMatrix, 0.00);
+        mat4.rotateY(transformationMatrix, transformationMatrix, 1.60);
+        mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00);
+        mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(9.50, 9.50, 9.50));
+        this.myModelDraw.modelProgram.use();
+        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("pMat"),false, currentCamera.getProjectionMatrix());
+        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("vMat"),false, currentCamera.getViewMatrix());
+        gl.uniform3fv(this.myModelDraw.modelProgram.getUniformLocation("viewPos"), currentCamera.getPosition());
+        this.lightManager.updateLights(this.myModelDraw.modelProgram.programObject);
+        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("mMat"),false, transformationMatrix);
+        renderModel(this.elephantCub, this.myModelDraw.modelProgram, true, true);
+
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         this.myPondWater.renderPondWater(this.lightManager);
@@ -396,6 +459,7 @@ class elephantScene extends Scene {
         if (ElephantScene.timer.isEventStarted(ElephantSceneEventIDS.START_T) && ElephantScene.songStart == 0) {
             songPlayer.currentTime = 50.0;
             ElephantScene.songStart = 1;
+            postProcessingSettings.enableFog = true;
         }
 
         // Fade IN This condition ensures that only change fade when start event is started and it not completed.

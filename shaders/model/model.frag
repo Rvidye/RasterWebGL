@@ -15,6 +15,7 @@ struct material_t {
 };
 
 uniform material_t material;
+uniform bool useTexture;
 uniform sampler2D samplerDiffuse;
 uniform vec3 viewPos;
 uniform vec4 objectID;
