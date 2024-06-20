@@ -23,6 +23,15 @@ class dmodel {
         this.animator.push(animation);
     }
 
+    lerpAnimations(index, t) {
+        if (index < this.animator.length) {
+            this.animator[index].interpolate(t);
+            this.animator[index].calculateTransforms();
+        } else {
+            console.error("Invalid Animation Index : ${index}");
+        }
+    }
+
     updateAnimations(index, deltaTime) {
         if (index < this.animator.length) {
             this.animator[index].update(deltaTime);
@@ -70,6 +79,10 @@ class BaseAnimation {
         this.currentTime = 0.0;
         this.duration = duration;
         this.ticksPerSecond = ticksPerSecond;
+    }
+
+    interpolate(t) {
+        this.currentTime = t * this.duration;
     }
 
     update(deltaTime) {
@@ -331,7 +344,8 @@ function setupMesh(model, json, skin) {
             }
             bindAndBufferData(gl, VBOBone, boneIdsArray, 3, 4, gl.INT);
             bindAndBufferData(gl, VBOWeight, weightArray, 4, 4);
-        } else {
+        }else
+        {
             gl.enableVertexAttribArray(3);
             gl.vertexAttribIPointer(3, 4, gl.INT, 0, 0);
             gl.enableVertexAttribArray(4);
@@ -342,7 +356,7 @@ function setupMesh(model, json, skin) {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, EBO);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, faceArray, gl.STATIC_DRAW);
         gl.bindVertexArray(null);
-        model.meshes.push(new dmesh(VAO, faceArray.length, mesh.materialindex, vec4.fromValues(getRandomInRange(0.0, 1.0), getRandomInRange(0.0, 1.0), getRandomInRange(0.0, 1.0), 1.0)));
+        model.meshes.push(new dmesh(VAO,faceArray.length,mesh.materialindex,vec4.fromValues(getRandomInRange(0.0,1.0),getRandomInRange(0.0,1.0),getRandomInRange(0.0,1.0),1.0)));
     });
 }
 
@@ -664,6 +678,7 @@ function renderModel(model, program, useMaterial, drawOutline = false) {
                 gl.uniform1f(program.getUniformLocation("material.opacity"), material.opacity);
 
                 if (material.diffuseTextures != undefined) {
+                    gl.uniform1i(program.getUniformLocation("useTexture"),true);
                     gl.activeTexture(gl.TEXTURE0);
                     gl.bindTexture(gl.TEXTURE_2D, material.diffuseTextures);
                     gl.uniform1i(program.getUniformLocation("samplerDiffuse"), 0);
@@ -673,11 +688,11 @@ function renderModel(model, program, useMaterial, drawOutline = false) {
 
 
             gl.uniformMatrix4fv(program.getUniformLocation("nMat"), false, globalTransform);
-            if (drawOutline)
-                gl.uniform4fv(program.getUniformLocation("objectID"), mesh.meshID);
-            else
-                gl.uniform4fv(program.getUniformLocation("objectID"), [0.0, 0.0, 0.0, 0.0]);
-            gl.uniform1i(program.getUniformLocation("useSkinning"), model.skin);
+            if(drawOutline) 
+                gl.uniform4fv(program.getUniformLocation("objectID"),mesh.meshID);
+            else 
+                gl.uniform4fv(program.getUniformLocation("objectID"),[0.0,0.0,0.0,0.0]);
+            gl.uniform1i(program.getUniformLocation("useSkinning"),model.skin);
             gl.bindVertexArray(mesh.vao);
             gl.drawElements(gl.TRIANGLES, mesh.count, gl.UNSIGNED_SHORT, 0);
 

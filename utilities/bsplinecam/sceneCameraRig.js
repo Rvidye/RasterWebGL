@@ -308,19 +308,19 @@ class SceneCameraRig {
                 this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint][1] -= 0.1;
                 refreshPos = true;
                 break;
-            // case 'BracketRight':
-            //     if (this.selectedPathPoint === this.mountCamera.m_bspPositions.getPoints().length) {
-            //         this.mountCamera.m_bspPositions.getPoints().push(this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint]);
-            //     } else {
-            //         this.mountCamera.m_bspPositions.getPoints().splice(this.selectedPathPoint + 1, 0, this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint]);
-            //     }
-            //     refreshPos = true;
-            //     break;
-            // case 'BracketLeft':
-            //     this.mountCamera.m_bspPositions.getPoints().splice(this.selectedPathPoint, 1);
-            //     this.selectedPathPoint = this.selectedPathPoint % this.mountCamera.m_bspPositions.getPoints().length;
-            //     refreshPos = true;
-            //     break;
+            case 'BracketRight':
+                if (this.selectedPathPoint === this.mountCamera.m_bspPositions.getPoints().length) {
+                    this.mountCamera.m_bspPositions.getPoints().push(this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint]);
+                } else {
+                    this.mountCamera.m_bspPositions.getPoints().splice(this.selectedPathPoint + 1, 0, this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint]);
+                }
+                refreshPos = true;
+                break;
+            case 'BracketLeft':
+                this.mountCamera.m_bspPositions.getPoints().splice(this.selectedPathPoint, 1);
+                this.selectedPathPoint = this.selectedPathPoint % this.mountCamera.m_bspPositions.getPoints().length;
+                refreshPos = true;
+                break;
             case 'Period':
                 if (this.selectedFrontPoint === this.mountCamera.m_bspFront.getPoints().length) {
                     this.mountCamera.m_bspFront.getPoints().push(this.mountCamera.m_bspFront.getPoints()[this.selectedFrontPoint]);

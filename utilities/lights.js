@@ -110,11 +110,11 @@ class LightManager {
                 if (ImGui.SliderFloat(`Intensity##${index}`, (value = light.intensity) => light.intensity = value, 0.0, 10.0)) {
                     // Intensity changed
                 }
-                if (ImGui.DragFloat3(`Position##${index}`, light.position)) {
+                if (ImGui.DragFloat3(`Position##${index}`, light.position,0.5)) {
                     // Position changed
                 }
                 if (light.type === 0 || light.type === 2) { // Directional light
-                    if (ImGui.DragFloat3(`Direction##${index}`, light.direction)) {
+                    if (ImGui.DragFloat3(`Direction##${index}`, light.direction,0.5)) {
                         // Direction changed
                     }
                 }

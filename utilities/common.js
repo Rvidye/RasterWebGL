@@ -45,3 +45,7 @@ var globalFade = 1.0; // 0 means show scene , 1 means display scene
 function getRandomInRange(min, max)  {
 	return Math.random() * (max - min) + min;
 }
+
+function lerp(start, end, t) {
+    return start + t * (end - start);
+}

@@ -34,9 +34,6 @@ class CubeMapRender {
     render(pMat, vMat, cubemapTexture) {
 
         var view = mat4.clone(vMat);
-        vMat[12] = 0.0
-        vMat[13] = 0.0
-        vMat[14] = 0.0
 
         gl.disable(gl.DEPTH_TEST);
         this.program.use();
