@@ -112,7 +112,7 @@ class SkeletonAnimation extends BaseAnimation {
         this.bones = [];
         this.boneInfoMap = boneInfoMap;
         this.rootNode = rootNode;
-        this.finalBoneMatrices = Array(100).fill().map(() => mat4.create());
+        this.finalBoneMatrices = Array(200).fill().map(() => mat4.create());
     }
 
     calculateTransforms(parentTransform = mat4.create()) {
@@ -311,11 +311,14 @@ function setupMesh(model, json, skin) {
         if (skin) {
             const VBOBone = gl.createBuffer();
             const VBOWeight = gl.createBuffer();
-            const boneIdsArray = new Int32Array(mesh.vertices.length / 3 * 4);
+            const boneIdsArray = new Int32Array((mesh.vertices.length / 3) * 4);
             for (var j = 0; j < boneIdsArray.length; j++) {
                 boneIdsArray[j] = -1;
             }
-            const weightArray = new Float32Array(mesh.vertices.length / 3 * 4);
+            const weightArray = new Float32Array((mesh.vertices.length / 3) * 4);
+            for (var j = 0; j < weightArray.length; j++) {
+                weightArray[j] = 0.0;
+            }
             for (var boneIndex = 0; mesh.bones != undefined && boneIndex < mesh.bones.length; boneIndex++) {
                 var boneID = -1;
                 var boneName = mesh.bones[boneIndex].name;
@@ -709,4 +712,41 @@ function renderModel(model, program, useMaterial, drawOutline = false) {
         });
     }
     recursiveRenderNode(model.rootNode, mat4.create());
+}
+
+function renderModelTest(model, program, useMaterial, drawOutline = false) {
+        const globalTransform = mat4.create();
+        for(var i = 0; i < model.meshes.length; i++)
+        {
+            const mesh = model.meshes[i];
+            const material = model.materials[mesh.materialIndex];
+            if (useMaterial) {
+                gl.uniform3fv(program.getUniformLocation("material.diffuse"), material.diffuseColor);
+                gl.uniform3fv(program.getUniformLocation("material.emissive"), material.emissiveColor);
+                gl.uniform1f(program.getUniformLocation("material.opacity"), material.opacity);
+
+                if (material.diffuseTextures != undefined) {
+                    gl.uniform1i(program.getUniformLocation("useTexture"),true);
+                    gl.activeTexture(gl.TEXTURE0);
+                    gl.bindTexture(gl.TEXTURE_2D, material.diffuseTextures);
+                    gl.uniform1i(program.getUniformLocation("samplerDiffuse"), 0);
+                }
+            }
+
+            gl.uniformMatrix4fv(program.getUniformLocation("nMat"), false, globalTransform);
+            if(drawOutline) 
+                gl.uniform4fv(program.getUniformLocation("objectID"),mesh.meshID);
+            else 
+                gl.uniform4fv(program.getUniformLocation("objectID"),[0.0,0.0,0.0,0.0]);
+            gl.uniform1i(program.getUniformLocation("useSkinning"),model.skin);
+            gl.bindVertexArray(mesh.vao);
+            gl.drawElements(gl.TRIANGLES, mesh.count, gl.UNSIGNED_SHORT, 0);
+
+            if (useMaterial) {
+                if (material.diffuseTextures != undefined) {
+                    gl.activeTexture(gl.TEXTURE0);
+                    gl.bindTexture(gl.TEXTURE_2D, null);
+                }
+            }
+        }
 }

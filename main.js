@@ -9,11 +9,13 @@ var modelList = [
 	{ name: "cone", files: ['models/lightmesh/cone.obj'], flipTex: false },
 	{ name: "point", files: ['models/lightmesh/point.obj'], flipTex: false },
 	//{ name: "cat", files: ['models/scene1/cat/cat.gltf', "models/scene1/cat/cat.bin"], flipTex: true },
-	{ name: "room1", files: ['models/scene1/room1/room3.gltf', "models/scene1/room1/room3.bin"], flipTex: true },
+	{ name: "room1", files: ['models/scene1/room/room3.gltf', "models/scene1/room/room3.bin"], flipTex: true },
 	{ name: "book", files: ['models/scene1/book/book.gltf', "models/scene1/book/book.bin"], flipTex: true },
 	{ name: "AMC", files: ['models/scene1/intro/amc.glb'], flipTex: false },
 	{ name: "RASTER", files: ['models/scene1/intro/raster.glb'], flipTex: false },
 	{ name: "nightSky", files: ['models/scene1/night/nightSky.gltf',"models/scene1/night/nightSky.bin"], flipTex: true },
+	{ name: "child", files: ['models/scene1/child/child.gltf',"models/scene1/child/child.bin"], flipTex: true },
+	{ name: "mother", files: ['models/scene1/mother/mother.fbx'], flipTex: true },
 	//{ name: "test4", files: ['models/Avocado.glb'], flipTex: true },
 	{ name: "terrain", files: ['models/ElephantScene/elp4_3.glb'], flipTex: true },
 	{ name: "tree1", files: ['models/ElephantScene/TreeSetup/bigTree.glb'], flipTex: true },
@@ -163,7 +165,7 @@ function main() {
 	// scene setup
 	//addScene(new tutorial());
 	addScene(new roomScene());
-	addScene(new elephantScene());
+	//addScene(new elephantScene());
 
 	fpsElem = document.getElementById('fps');
 
