@@ -523,7 +523,7 @@ class elephantScene extends Scene {
         ElephantScene.timer.increment();
 
         if (ElephantScene.timer.isEventStarted(ElephantSceneEventIDS.START_T) && ElephantScene.songStart == 0) {
-            songPlayer.currentTime = 50.0;
+            //songPlayer.currentTime = 50.0;
             ElephantScene.songStart = 1;
             postProcessingSettings.enableFog = true;
         }

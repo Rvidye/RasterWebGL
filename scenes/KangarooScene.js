@@ -176,7 +176,7 @@ class kangarooScene extends Scene {
                     grassBladesPos.push(data[i + 2] * this.terrainScale * 2.0 + r * Math.sin(fAngle));
                 }
 
-                j++;
+                //j++;
             }
         }
         this.myGrass.GRASS_BLADES = j;
@@ -304,7 +304,7 @@ class kangarooScene extends Scene {
         KangarooScene.timer.increment();
 
         if (KangarooScene.timer.isEventStarted(KangarooSceneEventIDS.START_T) && KangarooScene.songStart == 0) {
-            songPlayer.currentTime = 125.0;
+            //songPlayer.currentTime = 125.0;
             KangarooScene.songStart = 1;
             postProcessingSettings.enableFog = false;
         }

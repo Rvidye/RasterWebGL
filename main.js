@@ -184,12 +184,12 @@ function main() {
 	songPlayer = document.getElementById("songid");
 
 	// scene setup
-	//	addScene(new tutorial());
+	//addScene(new tutorial());
 	addScene(new roomScene());
 	addScene(new elephantScene());
-	//addScene(new pageChangeScene());
-	addScene(new endRoomScene());
+	addScene(new pageChangeScene());
 	addScene(new kangarooScene());
+	addScene(new endRoomScene());
 
 	fpsElem = document.getElementById('fps');
 

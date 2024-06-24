@@ -149,7 +149,7 @@ class pageChangeScene extends Scene {
         room2Scene.sceneCamera.setT(room2Scene.timer.getEventTime(room2SceneEventIDS.CAMERA1_T));
 
         if (room2Scene.timer.isEventStarted(room2SceneEventIDS.START_T) && room2Scene.songStart == 0) {
-            songPlayer.currentTime = 105.0;
+            //songPlayer.currentTime = 105.0;
             room2Scene.songStart = 1;
             postProcessingSettings.enableFog = false;
         }

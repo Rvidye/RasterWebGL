@@ -181,7 +181,7 @@ class endRoomScene extends Scene {
         //updateModel(endScene.modelMother,0,GLOBAL.deltaTime);
 
         if (endScene.timer.isEventStarted(endSceneEventIDS.START_T) && endScene.songStart == 0) {
-            songPlayer.currentTime = 161.0;
+            //songPlayer.currentTime = 161.0;
             endScene.songStart = 1;
         }
 
