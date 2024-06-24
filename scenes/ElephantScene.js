@@ -89,8 +89,8 @@ class elephantScene extends Scene {
         this.stone1Model = setupModel("stone1", false);
         this.stone1ModelMatrixArray = [];
 
-        this.elephantMother = setupModel("elepahntMother",false);
-        this.elephantCub = setupModel("elephantCub",false);
+        //this.elephantMother = setupModel("elepahntMother",false);
+        //this.elephantCub = setupModel("elephantCub",false);
 
         this.elephantMotherAnim = setupModel("elephantMother",true);
         this.elephantCubAnim = setupModel("elephantCub",true);
