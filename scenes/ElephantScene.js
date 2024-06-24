@@ -88,8 +88,8 @@ class elephantScene extends Scene {
         this.stone1Model = setupModel("stone1", false);
         this.stone1ModelMatrixArray = [];
 
-        this.elephantMother = setupModel("elepahntMother",false);
-        this.elephantCub = setupModel("elephantCub",false);
+        this.elephantMother = setupModel("elepahntMother", false);
+        this.elephantCub = setupModel("elephantCub", false);
 
     }
 
@@ -318,7 +318,10 @@ class elephantScene extends Scene {
         }
 
         this.myGrass.GRASS_BLADES = j;
-        this.myGrass.initGrass(grassBladesPos);
+        let baseColor = new Float32Array([0.06, 0.29, 0.02]);
+        let tipColor = new Float32Array([0.07, 1.0, 0.0]);
+        this.myGrass.initGrass(grassBladesPos, baseColor, tipColor);
+
 
         //Terrain modelMatrix
         var modelMatrix = mat4.create();
@@ -377,10 +380,14 @@ class elephantScene extends Scene {
             ElephantScene.sceneCameraRig.render();
         }
 
-        //gl.depthMask(gl.FALSE);
+        // gl.depthMask(gl.FALSE);
         this.myAtmScat.renderAtmScattering();
-        //  gl.depthMask(gl.TRUE);
+        // gl.depthMask(gl.TRUE);
+
+
+        //RenderGrass
         this.myGrass.renderGrass();
+
 
         // this.myVegetation.renderVegetation();
 
@@ -416,13 +423,14 @@ class elephantScene extends Scene {
         mat4.rotateY(transformationMatrix, transformationMatrix, 1.60);
         mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00);
         mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(9.50, 9.50, 9.50));
+
         this.myModelDraw.modelProgram.use();
-        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("pMat"),false, currentCamera.getProjectionMatrix());
-        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("vMat"),false, currentCamera.getViewMatrix());
+        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
+        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
         gl.uniform3fv(this.myModelDraw.modelProgram.getUniformLocation("viewPos"), currentCamera.getPosition());
         this.lightManager.updateLights(this.myModelDraw.modelProgram.programObject);
-        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("mMat"),false, transformationMatrix);
-        renderModel(this.elephantMother, this.myModelDraw.modelProgram, true,true);
+        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("mMat"), false, transformationMatrix);
+        renderModel(this.elephantMother, this.myModelDraw.modelProgram, true, true);
 
         mat4.identity(transformationMatrix);
         mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(-170.0, 0.00, -35.0));
@@ -431,11 +439,11 @@ class elephantScene extends Scene {
         mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00);
         mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(9.50, 9.50, 9.50));
         this.myModelDraw.modelProgram.use();
-        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("pMat"),false, currentCamera.getProjectionMatrix());
-        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("vMat"),false, currentCamera.getViewMatrix());
+        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
+        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
         gl.uniform3fv(this.myModelDraw.modelProgram.getUniformLocation("viewPos"), currentCamera.getPosition());
         this.lightManager.updateLights(this.myModelDraw.modelProgram.programObject);
-        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("mMat"),false, transformationMatrix);
+        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("mMat"), false, transformationMatrix);
         renderModel(this.elephantCub, this.myModelDraw.modelProgram, true, true);
 
         gl.enable(gl.BLEND);
@@ -473,6 +481,8 @@ class elephantScene extends Scene {
 
         if (ElephantScene.timer.isEventComplete(ElephantSceneEventIDS.END_T)) {
             this.isComplete = true;
+
+            //this.uninit();
         }
 
 
@@ -482,8 +492,71 @@ class elephantScene extends Scene {
         // reset stuff like timers and events
     }
 
-    unint() {
+    uninit() {
         // clean eveything created in init
+
+        this.myAtmScat.uninitAtmScaterring();
+        this.myGrass.uninitGrass();
+        this.myModelDraw.uninitDrawModels();
+        this.myPondWater.uninitPondWater();
+        this.myVegetation.unintiVegetation();
+
+
+
+        this.lightManager = null;
+        this.myGrass = null;
+        this.myAtmScat = null;
+        this.myPondWater = null;
+        this.myVegetation = null;
+        this.myModelDraw = null;
+
+
+        //models
+        this.terrainModel = null;
+        this.terrainModelMatrixArray.length = 0;
+        this.terrainTextue = null;
+
+
+        this.whiteTexture = null;
+        //Tree1
+        this.tree1Model = null;
+        this.tree1ModelMatrixArray.length = 0;
+
+
+        //Tree2
+        this.tree2Model = null;
+        this.tree2ModelMatrixArray.length = 0;
+
+        //Tree3
+        this.tree3Model = null;
+        this.tree3ModelMatrixArray.length = 0;
+
+        //Tree Logs
+        this.treeLog1Model = null;
+        this.treeLog1ModelMatrixArray.length = 0;
+
+        this.treeLog2Model = null;
+        this.treeLog2ModelMatrixArray.length = 0;
+
+        //Tree Trunks
+        this.treeTrunk1Model = null;
+        this.treeTrunk1ModelMatrixArray.length = 0;
+
+        this.treeTrunk2Model = null;
+        this.treeTrunk2ModelMatrixArray.length = 0;
+
+
+        //Stones
+        this.stone1Model = null;
+        this.stone1ModelMatrixArray.length = 0;
+
+        this.elephantMother = null;
+        this.elephantCub = null;
+
+        ElephantScene.modelPlacer = null;
+        ElephantScene.sceneCamera = null;
+        ElephantScene.sceneCameraRig = null;
+
     }
 
     renderUI() {

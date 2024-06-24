@@ -1,7 +1,7 @@
 // Keep All Gloabl Common Stuff here
 var GLOBAL = {
-	deltaTime : 0,
-	lastFrameTime : performance.now()
+	deltaTime: 0,
+	lastFrameTime: performance.now()
 };
 
 var isAnimating = false;
@@ -22,8 +22,8 @@ const postProcessingSettings = {
 	enableBloom: false,
 	enableGodRays: false,
 	enableFog: false,
-	debugShaow:false,
-	enableOutline:false
+	debugShaow: false,
+	enableOutline: false
 };
 
 const NONE = 0;
@@ -42,10 +42,21 @@ const toRadian = glMatrix.glMatrix.toRadian;
 
 var globalFade = 1.0; // 0 means show scene , 1 means display scene
 
-function getRandomInRange(min, max)  {
+function getRandomInRange(min, max) {
 	return Math.random() * (max - min) + min;
 }
 
 function lerp(start, end, t) {
-    return start + t * (end - start);
+	return start + t * (end - start);
+}
+
+function colorLerp(start, end, t) {
+
+	let finalColor = [0.0, 0.0, 0.0];
+
+	finalColor[0] = lerp(start[0], end[0], t);
+	finalColor[1] = lerp(start[1], end[1], t);
+	finalColor[2] = lerp(start[2], end[2], t);
+
+	return finalColor;
 }

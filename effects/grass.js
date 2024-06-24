@@ -18,6 +18,7 @@ class grass {
         this.GRASS_PATCH_SIZE = grassPatchSize;
 
 
+
         //this.bladePos = new Float32Array(this.GRASS_BLADES * 4 * 4);
 
         //Grass Rendering Related Variables
@@ -64,7 +65,7 @@ class grass {
         this.programTransformFeedbackGrass.queryUniforms();
     }
 
-    initGrass(bladeInstancePosition) {
+    initGrass(bladeInstancePosition, baseColor, tipColor) {
 
         this.setupProgram();
 
@@ -96,6 +97,19 @@ class grass {
 
         ]);
 
+        let blade_color = [];
+
+        // let baseColor = new Float32Array([0.06, 0.29, 0.02]);
+        // let tipColor = new Float32Array([0.07, 1.0, 0.0]);
+
+        for (let i = 1; i < blade_vertices.length; i += 3) {
+
+            let color = colorLerp(baseColor, tipColor, blade_vertices[i] / (4.465777 + 1.5));
+            blade_color.push(color[0]);
+            blade_color.push(color[1]);
+            blade_color.push(color[2]);
+        }
+
 
 
         this.vaoGrass = gl.createVertexArray();
@@ -108,6 +122,14 @@ class grass {
         gl.bufferData(gl.ARRAY_BUFFER, blade_vertices, gl.STATIC_DRAW);
         gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+        //For Color
+        let vboColor = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vboColor);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(blade_color), gl.STATIC_DRAW);
+        gl.vertexAttribPointer(6, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(6);
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
 
@@ -233,11 +255,8 @@ class grass {
         }
 
         copyBufferDataFrom_TFBO_To_VBO(this.tfbo_windDir, this.vboWinDir, this.GRASS_BLADES * 4);
-
         copyBufferDataFrom_TFBO_To_VBO(this.tfbo_windLeanAngle, this.vboWinLeanAngle, this.GRASS_BLADES * 4);
-
         copyBufferDataFrom_TFBO_To_VBO(this.tfbo_fAngleY, this.vbofAngleY, this.GRASS_BLADES * 4);
-
         copyBufferDataFrom_TFBO_To_VBO(this.tfbo_depthOfBlade, this.vboDepthOfBlade, this.GRASS_BLADES * 4);
 
         gl.bindBuffer(gl.TRANSFORM_FEEDBACK_BUFFER, null);
@@ -257,6 +276,11 @@ class grass {
         gl.uniformMatrix4fv(this.programRenderGrass.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
         gl.uniformMatrix4fv(this.programRenderGrass.getUniformLocation("mMat"), false, mat4.create());
 
+
+        //Grass Blade Colors
+        //  gl.uniform3fv(this.programRenderGrass.getUniformLocation("baseColor"), baseColor);
+        // gl.uniform3fv(this.programRenderGrass.getUniformLocation("tipColor"), tipColor);
+
         gl.bindVertexArray(this.vaoGrass);
         gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, this.GRASS_BLADES_VERTICES, this.GRASS_BLADES);
         gl.bindVertexArray(null);
@@ -272,6 +296,29 @@ class grass {
     }
 
     uninitGrass() {
+
+        this.programTransformFeedbackGrass = null;
+        this.programRenderGrass = null;
+
+        //Grass Rendering Related Variables
+        this.vaoGrass = null;
+        this.vboBladePos = null;
+        this.vboWinDir = null;
+        this.vboWinLeanAngle = null;
+        this.vbofAngleY = null;
+        this.vboDepthOfBlade = null;
+
+        this.time = 0.0;
+
+
+        //Tranform FeedBack
+        this.transformFeedBackShaderProgram = null;
+        this.tfo = null;
+        this.tf_vao = null;
+        this.tfbo_windDir = null;
+        this.tfbo_windLeanAngle = null;
+        this.tfbo_fAngleY = null;
+        this.tfbo_depthOfBlade = null;
 
     }
 }
