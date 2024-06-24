@@ -58,7 +58,7 @@ class tutorial extends Scene {
     init() {
         // init all resouces models, texures, buffers etc
         tutorialScene.modelNodeBased = setupModel("test3", true);
-        tutorialScene.modelSkeletalBased = setupModel("test", true);
+        tutorialScene.modelSkeletalBased = setupModel("elephantCubAnim", true);
         console.log(tutorialScene.modelSkeletalBased);
 
         for(var i = 0; i < tutorialScene.modelSkeletalBased.meshes.length; i++){
@@ -131,10 +131,10 @@ class tutorial extends Scene {
         gl.uniformMatrix4fv(tutorialScene.programSkeletalAnimatedModel.getUniformLocation("mMat"), false, tutorialScene.modelPlacer.getTransformationMatrix());
         gl.uniform3fv(tutorialScene.programSkeletalAnimatedModel.getUniformLocation("viewPos"), currentCamera.getPosition());
         this.lightManager.updateLights(tutorialScene.programSkeletalAnimatedModel.programObject);
-        uploadBoneMatrices(tutorialScene.modelSkeletalBased, tutorialScene.programSkeletalAnimatedModel, 0);
-        renderModelTest(tutorialScene.modelSkeletalBased, tutorialScene.programSkeletalAnimatedModel, true);
+        uploadBoneMatrices(tutorialScene.modelSkeletalBased, tutorialScene.programSkeletalAnimatedModel,0);
+        renderModel(tutorialScene.modelSkeletalBased, tutorialScene.programSkeletalAnimatedModel, true);
 
-        lightRenderer.renderLights(this.lightManager);
+        //lightRenderer.renderLights(this.lightManager);
     }
 
     update() 
@@ -149,7 +149,7 @@ class tutorial extends Scene {
         }
 
         updateModel(tutorialScene.modelNodeBased,0,GLOBAL.deltaTime);
-        updateModel(tutorialScene.modelSkeletalBased,0,0.0);
+        updateModel(tutorialScene.modelSkeletalBased,0,GLOBAL.deltaTime);
 
         if(tutorialScene.mytimer.isEventStarted(eventIDS.END_T) && !tutorialScene.mytimer.isEventComplete(eventIDS.END_T)){
             globalFade = tutorialScene.mytimer.getEventTime(eventIDS.END_T);

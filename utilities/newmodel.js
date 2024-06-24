@@ -337,7 +337,7 @@ function setupMesh(model, json, skin) {
                     var vertexId = weights[weightIndex][0];
                     var weight = weights[weightIndex][1];
                     for (var k = 0; k < 4; ++k) {
-                        if (boneIdsArray[vertexId * 4 + k] < 0) {
+                        if (weightArray[vertexId * 4 + k] == 0.0) {
                             weightArray[vertexId * 4 + k] = weight;
                             boneIdsArray[vertexId * 4 + k] = boneID;
                             break;
@@ -686,9 +686,7 @@ function renderModel(model, program, useMaterial, drawOutline = false) {
                     gl.bindTexture(gl.TEXTURE_2D, material.diffuseTextures);
                     gl.uniform1i(program.getUniformLocation("samplerDiffuse"), 0);
                 }
-
             }
-
 
             gl.uniformMatrix4fv(program.getUniformLocation("nMat"), false, globalTransform);
             if(drawOutline) 
