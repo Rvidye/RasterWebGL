@@ -7,6 +7,9 @@ var startScene = {
     programLight: null,
     modelName: null,
     modelBook: null,
+    modelChild: null,
+    modelMother: null,
+    modelTest: null,
     modelRoom: null,
     modelAMC: null,
     modelRASTER: null,
@@ -52,13 +55,10 @@ class roomScene extends Scene {
             [7.19999999999999, 3.5000000000000018, 3.400000000000021],
             [4.899999999999999, 2.600000000000001, 4.000000000000018],
             [2.1000000000000005, 2.500000000000001, 5.20000000000001],
-            [-0.5999999999999998, 2.600000000000001, 4.10000000000001],
-            [1.4, 2.3000000000000007, 1.3000000000000047],
-            [2.600000000000001, 1.9000000000000004, 0.30000000000000104],
-            [5.1999999999999975, 1.8000000000000003, 0.6999999999999971],
-            [6.099999999999994, 1.0999999999999999, 2.099999999999999],
-            [5.099999999999998, 1.0999999999999999, 2],
-            [4.799999999999999, 0.7999999999999999, 1.9000000000000008]
+            [-0.5999999999999998,2.600000000000001,4.10000000000001],
+            [0.3999999999999998,2.500000000000001,1.700000000000005],
+            [1.4,2.3000000000000007,0.30000000000000104],
+            [3.4000000000000012,0.9999999999999997,1.4999999999999973],
         ];
 
         const frontKeyFrames = [
@@ -69,12 +69,9 @@ class roomScene extends Scene {
             [6.599999999999994, 3.300000000000001, 3.4000000000000172],
             [3.100000000000002, 2.3000000000000007, 4.000000000000014],
             [0.6000000000000008, 2.3000000000000007, 3.8000000000000105],
-            [2.5000000000000013, 2.1000000000000005, 1.600000000000005],
-            [4.300000000000002, 1.4000000000000001, 1.4000000000000012],
-            [4.300000000000002, 1.0999999999999999, 2.1999999999999984],
-            [4.8, 0.7999999999999999, 1.9999999999999991],
-            [4.8, 0.7, 1.9],
-            [4.8, 0.6, 1.9000000000000008]
+            [1.3000000000000003,1.7000000000000002,1.1000000000000045],
+            [2.6000000000000014,1.5,1.3000000000000012],
+            [4.100000000000002,0.6,1.799999999999998],
         ];
 
         startScene.sceneCamera = new SceneCamera(positionKeyFrames, frontKeyFrames);
@@ -92,9 +89,13 @@ class roomScene extends Scene {
         //startScene.modelName = setupModel("test3",true);
         startScene.modelRoom = setupModel("room1", false)
         startScene.modelBook = setupModel("book", true);
+        startScene.modelChild = setupModel("child", false);
+        startScene.modelMother = setupModel("mother", true);
+        //startScene.modelTest = setupModel("test", true);
         startScene.modelAMC = setupModel("AMC", false);
         startScene.modelRASTER = setupModel("RASTER", false);
         startScene.modelNightSky = setupModel("nightSky", false);
+        //console.log(startScene.modelTest);
 
         startScene.timer = new timer([
             [startSceneEventIDS.START_T, [0.0, 1.0]],
@@ -114,7 +115,9 @@ class roomScene extends Scene {
         //this.lightManager.addLight(spotLight);
 
         startScene.modelPlacer = new ModelPlacer();
-        startScene.skyTex = loadTextureCubemap("textures/sky.jpg", false);
+        startScene.modelPlacer.position = vec3.fromValues(4.02000, 0.60000, 1.89000);
+        startScene.modelPlacer.rotation = vec3.fromValues(0.00, 1.50, 0.00);
+        startScene.modelPlacer.scale = vec3.fromValues(0.04000, 0.04000, 0.04000);
     }
 
     renderShadow(shadowProgram) {
@@ -170,17 +173,45 @@ class roomScene extends Scene {
         renderModel(startScene.modelRoom, startScene.programCelShader, true, true);
 
         mat4.identity(transformationMatrix);
-        mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(4.80, 0.55, 2.00));
-        mat4.rotateX(transformationMatrix, transformationMatrix, 0.00);
-        mat4.rotateY(transformationMatrix, transformationMatrix, -1.50);
-        mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00);
-        mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(0.06, 0.06, 0.06));
-        gl.uniformMatrix4fv(startScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
+        mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(3.95500, 0.60000, 1.82900));
+        mat4.rotateX(transformationMatrix, transformationMatrix, 0.00000);
+        mat4.rotateY(transformationMatrix, transformationMatrix, 1.50000);
+        mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00000);
+        mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(0.04000, 0.04000, 0.04000));
+        gl.uniformMatrix4fv(startScene.programCelShader.getUniformLocation("mMat"), false, startScene.modelPlacer.getTransformationMatrix());
         uploadBoneMatrices(startScene.modelBook, startScene.programCelShader, 0);
         renderModel(startScene.modelBook, startScene.programCelShader, true);
 
-        //lightRenderer.renderLights(this.lightManager);
+        mat4.identity(transformationMatrix);
+        mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(3.77, 1.10, 2.27));
+        mat4.rotateX(transformationMatrix, transformationMatrix, 0.00);
+        mat4.rotateY(transformationMatrix, transformationMatrix, -3.30);
+        mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00);
+        mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(1.40, 1.40, 1.40));
+        gl.uniformMatrix4fv(startScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
+        renderModel(startScene.modelChild, startScene.programCelShader, true);
 
+        // mat4.identity(transformationMatrix);
+        // mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(3.70, 1.50, 2.50));
+        // mat4.rotateX(transformationMatrix, transformationMatrix, 0.00);
+        // mat4.rotateY(transformationMatrix, transformationMatrix, -2.50);
+        // mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00);
+        // mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(1.60, 1.60, 1.60));
+        // gl.uniformMatrix4fv(startScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
+        // renderModel(startScene.modelMother, startScene.programCelShader, true);
+
+        mat4.identity(transformationMatrix);
+        mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(4.84, -0.22, 2.62));
+        mat4.rotateX(transformationMatrix, transformationMatrix, 0.00);
+        mat4.rotateY(transformationMatrix, transformationMatrix, -2.50);
+        mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00);
+        mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(0.017, 0.017, 0.017));
+        gl.uniformMatrix4fv(startScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
+        uploadBoneMatrices(startScene.modelMother, startScene.programCelShader, 0);
+        renderModel(startScene.modelMother, startScene.programCelShader, true);
+
+        //gl.uniformMatrix4fv(startScene.programCelShader.getUniformLocation("mMat"), false, startScene.modelPlacer.getTransformationMatrix());
+        //lightRenderer.renderLights(this.lightManager);
     }
 
     update() {
@@ -188,8 +219,7 @@ class roomScene extends Scene {
 
         startScene.sceneCamera.setT(startScene.timer.getEventTime(startSceneEventIDS.CAMERA1_T));
 
-
-
+        updateModel(startScene.modelMother,0,GLOBAL.deltaTime);
         startScene.modelBook.lerpAnimations(0, lerp(0.0, 0.7, startScene.timer.getEventTime(startSceneEventIDS.BOOK_OPEN_T)));
         // Fade IN This condition ensures that only change fade when start event is started and it not completed.
         if (startScene.timer.isEventStarted(startSceneEventIDS.START_T) && !startScene.timer.isEventComplete(startSceneEventIDS.START_T)) {

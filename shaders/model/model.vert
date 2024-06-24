@@ -10,7 +10,7 @@ uniform mat4 pMat;
 uniform mat4 vMat;
 uniform mat4 mMat;
 uniform mat4 nMat; // node matrix
-uniform mat4 bMat[100]; // Bone matrices
+uniform mat4 bMat[200]; // Bone matrices
 
 uniform bool useSkinning; // Boolean to determine if skinning is used
 

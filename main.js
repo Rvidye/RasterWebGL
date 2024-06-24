@@ -15,7 +15,9 @@ var modelList = [
 	{ name: "book", files: ['models/scene1/book/book.gltf', "models/scene1/book/book.bin"], flipTex: true },
 	{ name: "AMC", files: ['models/scene1/intro/amc.glb'], flipTex: false },
 	{ name: "RASTER", files: ['models/scene1/intro/raster.glb'], flipTex: false },
-	{ name: "nightSky", files: ['models/scene1/night/nightSky.gltf', "models/scene1/night/nightSky.bin"], flipTex: true },
+	{ name: "nightSky", files: ['models/scene1/night/nightSky.gltf',"models/scene1/night/nightSky.bin"], flipTex: true },
+	{ name: "child", files: ['models/scene1/child/child.gltf',"models/scene1/child/child.bin"], flipTex: true },
+	{ name: "mother", files: ['models/scene1/mother/mother.fbx'], flipTex: true },
 	//{ name: "test4", files: ['models/Avocado.glb'], flipTex: true },
 
 	//Elephant Scene Models
@@ -29,8 +31,12 @@ var modelList = [
 	{ name: "treeTrunk2", files: ['models/ElephantScene/TreeSetup/mediumTrunk.glb'], flipTex: true },
 	{ name: "pondWaterMesh", files: ['models/ElephantScene/pondWaterMesh4.glb'], flipTex: true },
 	{ name: "stone1", files: ['models/ElephantScene/stone1/stone1.gltf', 'models/ElephantScene/stone1/stone1.bin'], flipTex: true },
-	{ name: "elepahntMother", files: ['models/ElephantScene/elephant/mother.gltf', 'models/ElephantScene/elephant/mother.bin'], flipTex: true },
-	{ name: "elephantCub", files: ['models/ElephantScene/elephant/cub.gltf', 'models/ElephantScene/elephant/cub.bin'], flipTex: true },
+	// { name: "elepahntMother", files: ['models/ElephantScene/elephant/mother.gltf', 'models/ElephantScene/elephant/mother.bin'], flipTex: true },
+	// { name: "elephantCub", files: ['models/ElephantScene/elephant/cub.gltf', 'models/ElephantScene/elephant/cub.bin'], flipTex: true },
+	{ name: "elephantMother", files: ['models/ElephantScene/elephant1/mother.gltf','models/ElephantScene/elephant1/mother.bin'], flipTex: true },
+	{ name: "elephantCub", files: ['models/ElephantScene/elephant1/baby.gltf','models/ElephantScene/elephant1/baby.bin'], flipTex: true },
+	{ name: "kangarooMother", files: ['models/kangaroo/mother.gltf','models/kangaroo/mother.bin'], flipTex: true },
+	{ name: "kangarooJoey", files: ['models/kangaroo/joey.gltf','models/kangaroo/joey.bin'], flipTex: true },
 	//	{ name: "stone2", files: ['models/ElephantScene/rock1.glb'], flipTex: false },
 	//	{ name: "stone3", files: ['models/ElephantScene/rock2.glb'], flipTex: false },
 */
@@ -179,11 +185,7 @@ function main() {
 	// scene setup
 	//addScene(new tutorial());
 	//addScene(new roomScene());
-	//addScene(new elephantScene());
-	addScene(new kangarooScene());
-
-
-
+	addScene(new elephantScene());
 
 	fpsElem = document.getElementById('fps');
 
