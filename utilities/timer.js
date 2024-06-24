@@ -39,7 +39,7 @@ class timer{
 
     getEventTime(index){
         if(!this.eventList.has(index)){
-            console.log("Invalid event");
+            console.error("Invalid event");
             return null;
         }
         return this.eventList.get(index).deltaT;

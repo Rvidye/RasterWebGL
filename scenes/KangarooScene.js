@@ -149,8 +149,8 @@ class kangarooScene extends Scene {
         //Timer
         KangarooScene.timer = new timer([
             [KangarooSceneEventIDS.START_T, [0.0, 1.0]],
-            [KangarooSceneEventIDS.MOVE_T, [1.0, 54.0]],
-            [KangarooSceneEventIDS.END_T, [55.0, 1.0]]
+            [KangarooSceneEventIDS.MOVE_T, [1.0, 34.0]],
+            [KangarooSceneEventIDS.END_T, [34.0, 1.0]]
         ]);
 
         //Setup Grass and other models Position Acoording To Terrain 
@@ -304,7 +304,7 @@ class kangarooScene extends Scene {
         KangarooScene.timer.increment();
 
         if (KangarooScene.timer.isEventStarted(KangarooSceneEventIDS.START_T) && KangarooScene.songStart == 0) {
-            songPlayer.currentTime = 105.0;
+            songPlayer.currentTime = 125.0;
             KangarooScene.songStart = 1;
             postProcessingSettings.enableFog = false;
         }
