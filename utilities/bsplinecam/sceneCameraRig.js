@@ -356,5 +356,3 @@ class SceneCameraRig {
         }
     }
 }
-
-

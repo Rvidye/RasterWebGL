@@ -15,7 +15,8 @@ var ElephantScene = {
 const ElephantSceneEventIDS = {
     START_T: 0,
     MOVE_T: 1,
-    END_T: 2
+    MOVE_ELEPHANT_MOTHER : 2,
+    END_T: 3
 };
 
 class elephantScene extends Scene {
@@ -91,13 +92,11 @@ class elephantScene extends Scene {
         this.stone1Model = setupModel("stone1", false);
         this.stone1ModelMatrixArray = [];
 
-        this.elephantMother = setupModel("elepahntMother", false);
-        this.elephantCub = setupModel("elephantCub", false);
+        //this.elephantMother = setupModel("elephantMother", false);
+        //this.elephantCub = setupModel("elephantCub", false);
 
         this.elephantMotherAnim = setupModel("elephantMother", true);
         this.elephantCubAnim = setupModel("elephantCub", true);
-
-
     }
 
     setupProgram() {
@@ -157,6 +156,20 @@ class elephantScene extends Scene {
         ElephantScene.sceneCameraRig.setRenderPathPoints(true);
         ElephantScene.sceneCameraRig.setRenderPathToFront(true);
         ElephantScene.sceneCameraRig.setScalingFactor(0.1);
+
+        // Spline Path for Elephant can be done in constructor
+        const positions = [
+            [-29,4,126],
+            [-103,4,135],
+            [132,4,94],
+            [-132,4,18],
+        ];
+        
+        this.motherPathSpline = new BsplineInterpolator(positions);
+        this.splineAdjuster = new SplineAdjuster(this.motherPathSpline);
+        this.splineAdjuster.setRenderPath(true);
+        this.splineAdjuster.setRenderPathPoints(true);
+        //this.splineAdjuster.setScalingFactor(0.01);
     }
 
 
@@ -171,6 +184,7 @@ class elephantScene extends Scene {
             //[ElephantSceneEventIDS.MOVE_T, [50.0, 15.0]], baby elephant entry
             //[ElephantSceneEventIDS.MOVE_T, [65.0, .0]], mother elephant entry
             [ElephantSceneEventIDS.MOVE_T, [1.0, 54.0]],
+            [ElephantSceneEventIDS.MOVE_ELEPHANT_MOTHER, [1.0, 25.0]],
             [ElephantSceneEventIDS.END_T, [55.0, 1.0]]
         ]);
 
@@ -430,6 +444,10 @@ class elephantScene extends Scene {
             ElephantScene.sceneCameraRig.render();
         }
 
+        if (DEBUGMODE === SPLINE) {
+            this.splineAdjuster.render();
+        }
+
         // gl.depthMask(gl.FALSE);
         this.myAtmScat.renderAtmScattering();
         // gl.depthMask(gl.TRUE);
@@ -466,19 +484,33 @@ class elephantScene extends Scene {
         //for stone1 model
         this.myModelDraw.renderModels(this.stone1Model, this.terrainTextue, this.stone1ModelMatrixArray, this.lightManager);
 
-        var transformationMatrix = mat4.create();
-        mat4.identity(transformationMatrix);
-        mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(-178.0, 0.00, -14.0));
-        mat4.rotateX(transformationMatrix, transformationMatrix, 0.00);
-        mat4.rotateY(transformationMatrix, transformationMatrix, 1.60);
-        mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00);
-        mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(9.50, 9.50, 9.50));
         ElephantScene.programCelShader.use();
         gl.uniformMatrix4fv(ElephantScene.programCelShader.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
         gl.uniformMatrix4fv(ElephantScene.programCelShader.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
         gl.uniform3fv(ElephantScene.programCelShader.getUniformLocation("viewPos"), currentCamera.getPosition());
         this.lightManager.updateLights(ElephantScene.programCelShader.programObject);
-        gl.uniformMatrix4fv(ElephantScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
+
+        var transformationMatrix = mat4.create();
+        // mat4.identity(transformationMatrix);
+        // mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(-178.0, 0.00, -14.0));
+        // mat4.rotateX(transformationMatrix, transformationMatrix, 0.00);
+        // mat4.rotateY(transformationMatrix, transformationMatrix, 1.60);
+        // mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00);
+        // mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(9.50, 9.50, 9.50));
+        // this will move elephant mother along the spline
+        var t = ElephantScene.timer.getEventTime(ElephantSceneEventIDS.MOVE_ELEPHANT_MOTHER);
+        var position = this.motherPathSpline.interpolateSpline(t - 0.01);
+        var front = this.motherPathSpline.interpolateSpline(t);
+        // Translation matrix
+        let translationMatrix = mat4.create();
+        mat4.translate(translationMatrix, translationMatrix, position);
+        // Orientation matrix using targetat
+        let orientationMatrix = targetat(position, front, vec3.fromValues(0.0, 1.0, 0.0));
+        // Combining the matrices
+        let finalMatrix = mat4.create();
+        mat4.multiply(finalMatrix, translationMatrix, orientationMatrix);
+        mat4.scale(finalMatrix, finalMatrix, vec3.fromValues(9.50, 9.50, 9.50));
+        gl.uniformMatrix4fv(ElephantScene.programCelShader.getUniformLocation("mMat"), false, finalMatrix);
         //renderModel(this.elephantMother, this.myModelDraw.modelProgram, true,true);
         uploadBoneMatrices(this.elephantMotherAnim, ElephantScene.programCelShader, 0);
         renderModel(this.elephantMotherAnim, ElephantScene.programCelShader, true, true);
@@ -629,6 +661,9 @@ class elephantScene extends Scene {
             case LIGHT:
                 this.lightManager.renderUI();
                 break;
+            case SPLINE:
+                this.splineAdjuster.renderUI();
+            break;
             case NONE:
                 break;
         }
@@ -645,6 +680,9 @@ class elephantScene extends Scene {
                 break;
             case LIGHT:
                 break;
+            case SPLINE:
+                this.splineAdjuster.keyboardFunc(key);
+            break;
             case NONE:
                 break;
         }

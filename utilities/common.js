@@ -30,9 +30,10 @@ const NONE = 0;
 const CAMERA = 1;
 const MODEL = 2;
 const LIGHT = 3;
+const SPLINE = 4;
 
 var DEBUGMODE = NONE;
-const debugModes = ["None", "Camera", "Model", "Light"];
+const debugModes = ["None", "Camera", "Model", "Light", "Spline"];
 
 const mat4 = glMatrix.mat4;
 const vec3 = glMatrix.vec3;
