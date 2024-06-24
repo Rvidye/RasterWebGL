@@ -154,6 +154,8 @@ class pageChangeScene extends Scene {
             postProcessingSettings.enableFog = false;
         }
 
+        this.lightManager.getLight(1).color = [lerp(1.0, 0.6, room2Scene.timer.getEventTime(room2SceneEventIDS.BOOK_OPEN_T)),lerp(0.75, 0.6, room2Scene.timer.getEventTime(room2SceneEventIDS.BOOK_OPEN_T)),lerp(0.27, 1.0, room2Scene.timer.getEventTime(room2SceneEventIDS.BOOK_OPEN_T))];
+
         updateModel(room2Scene.modelMother,0,GLOBAL.deltaTime);
         room2Scene.modelBook.lerpAnimations(0, lerp(0.7, 1.0, room2Scene.timer.getEventTime(room2SceneEventIDS.BOOK_OPEN_T)));
         // Fade IN This condition ensures that only change fade when start event is started and it not completed.

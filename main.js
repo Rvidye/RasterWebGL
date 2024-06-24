@@ -16,6 +16,7 @@ var modelList = [
 	{ name: "nightSky", files: ['models/scene1/night/nightSky.gltf',"models/scene1/night/nightSky.bin"], flipTex: true },
 	{ name: "child", files: ['models/scene1/child/child.gltf',"models/scene1/child/child.bin"], flipTex: true },
 	{ name: "mother", files: ['models/scene1/mother/mother.fbx'], flipTex: true },
+	{ name: "earth", files: ['models/earth/earth.gltf', 'models/earth/earth.bin'], flipTex: true },
 	//{ name: "test4", files: ['models/Avocado.glb'], flipTex: true },
 	{ name: "terrain", files: ['models/ElephantScene/elp4_3.glb'], flipTex: true },
 	{ name: "tree1", files: ['models/ElephantScene/TreeSetup/bigTree.glb'], flipTex: true },
@@ -170,7 +171,8 @@ function main() {
 	//addScene(new tutorial());
 	//addScene(new roomScene());
 	//addScene(new elephantScene());
-	addScene(new pageChangeScene());
+	//addScene(new pageChangeScene());
+	addScene(new endRoomScene());
 
 	fpsElem = document.getElementById('fps');
 
