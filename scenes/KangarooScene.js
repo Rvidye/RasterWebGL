@@ -6,8 +6,11 @@ var KangarooScene = {
     sceneCamera: null,
     sceneCameraRig: null,
     timer: null,
-    songStart: 0
+    songStart: 0,
+    programCelShader: null
 };
+
+
 
 const KangarooSceneEventIDS = {
     START_T: 0,
@@ -23,10 +26,10 @@ class kangarooScene extends Scene {
 
         //Lighting Setup
         this.lightManager = new LightManager();
-        const directionalLight = new Light(0, [1.0, 1.0, 1.0], 0.05, [0, 400, 400], [0.0, -1.0, -1.0], 0.0, 0.0, 0.0, false);
+        const directionalLight = new Light(0, [1.0, 1.0, 1.0], 1.0, [0, 400, 400], [0.0, -1.0, -1.0], 0.0, 0.0, 0.0, false);
 
         //For Ambient
-        const directionalLight2 = new Light(0, [1.0, 1.0, 1.0], 0.05, [0, -400, -400], [0.0, -1.0, 1.0], 0.0, 0.0, 0.0, false);
+        const directionalLight2 = new Light(0, [1.0, 1.0, 1.0], 0.15, [0, -400, -400], [0.0, -1.0, 1.0], 0.0, 0.0, 0.0, false);
 
         this.lightManager.addLight(directionalLight);
         this.lightManager.addLight(directionalLight2);
@@ -63,18 +66,20 @@ class kangarooScene extends Scene {
 
         this.whiteTexture = null;
 
+
         this.kangarooMother = setupModel("kangarooMother", false);
         this.kangarooMotherModelMatrix = [];
 
-        this.kangarooBaby = setupModel("kangarooBaby", false);
+        this.kangarooBaby = setupModel("kangarooJoey", false);
         this.kangarooBabyModelMatrix = [];
 
-
-
+        //  this.kangarooMother = setupModel("kangarooMother", true);
+        //this.kangarooJoey = setupModel("kangarooJoey", true);
 
     }
 
     setupProgram() {
+        KangarooScene.programCelShader = new ShaderProgram(gl, ['shaders/model/model.vert', 'shaders/model/celShader.frag']);
 
     }
 
@@ -175,11 +180,11 @@ class kangarooScene extends Scene {
             }
         }
         this.myGrass.GRASS_BLADES = j;
-        //  let baseColor = new Float32Array([0.31, 0.48, 0.0]);
-        // let tipColor = new Float32Array([0.78, 0.96, 0.0]);
+        let baseColor = new Float32Array([0.31, 0.48, 0.0]);
+        let tipColor = new Float32Array([0.78, 0.96, 0.0]);
 
-        let baseColor = new Float32Array([0.06, 0.08, 0.0]);
-        let tipColor = new Float32Array([0.08, 0.10, 0.0]);
+        // let baseColor = new Float32Array([0.06, 0.08, 0.0]);
+        // let tipColor = new Float32Array([0.08, 0.10, 0.0]);
         this.myGrass.initGrass(grassBladesPos, baseColor, tipColor);
 
 

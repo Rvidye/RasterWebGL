@@ -128,7 +128,7 @@ class atmScattering {
         onMyResize();
 
 
-        this.fboColorTexture = loadTexture("textures/nightSky.png", true);
+        // this.fboColorTexture = loadTexture("textures/nightSky.png", true);
 
         //Transformations
         // mat4.translate(modelMatrix, mat4.create(), [0.0, 0.0, 0.0]);
