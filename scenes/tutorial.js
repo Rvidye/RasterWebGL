@@ -24,7 +24,7 @@ class tutorial extends Scene {
     setupProgram() {
         // Load All Shaders here
         tutorialScene.programNodeAnimatedModel = new ShaderProgram(gl, ['shaders/model/model.vert', 'shaders/model/celShader.frag']);
-        tutorialScene.programSkeletalAnimatedModel = new ShaderProgram(gl, ['shaders/model/model.vert', 'shaders/model/celShader.frag']);
+        tutorialScene.programSkeletalAnimatedModel = new ShaderProgram(gl, ['shaders/model/modelanim.vert', 'shaders/model/celShader.frag']);
     }
 
     setupCamera() {
@@ -57,8 +57,13 @@ class tutorial extends Scene {
 
     init() {
         // init all resouces models, texures, buffers etc
-        tutorialScene.modelNodeBased = setupModel("test2", false);
-        tutorialScene.modelSkeletalBased = setupModel("test3", true);
+        tutorialScene.modelNodeBased = setupModel("test3", true);
+        tutorialScene.modelSkeletalBased = setupModel("elephantCubAnim", true);
+        console.log(tutorialScene.modelSkeletalBased);
+
+        for(var i = 0; i < tutorialScene.modelSkeletalBased.meshes.length; i++){
+            console.log(tutorialScene.modelSkeletalBased.meshes[i].count);
+        }
 
         tutorialScene.mytimer = new timer([
             [eventIDS.START_T,[0.0,3.0]],
@@ -67,7 +72,7 @@ class tutorial extends Scene {
         ]);
 
         this.lightManager = new LightManager();
-        const directionalLight = new Light(0, [1.0, 1.0, 1.0], 1.0, [0, 0, 0], [0.0, 0.0, -1.0], 0.0, 0.0, 0.0, true);
+        const directionalLight = new Light(0, [1.0, 1.0, 1.0], 1.0, [0, 0, 0], [0.0, 0.0, -1.0], 0.0, 0.0, 0.0, false);
         const pointLight = new Light(1, [1.0, 0.0, 0.0], 2.0, [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], 20.0, 0.0, 0.0, false);
         const spotLight = new Light(2, [0.0, 1.0, 0.0], 1.0, [1.0, 0.0, -3.0], [0.0, 0.0, -1.0], 5.0, Math.cos(Math.PI / 16), 64, false);
 
@@ -86,17 +91,17 @@ class tutorial extends Scene {
         // Not sure best way to do this and increases extra work on developer side but at this point fuck it ...
         // make sure to keep this and render function transformation in sync ...
 
-        var mMat = mat4.create();
-        mat4.identity(mMat);
-        mat4.translate(mMat, mMat, vec3.fromValues(0.00, 0.00, -6.0));
-        gl.uniformMatrix4fv(shadowProgram.getUniformLocation("mMat"), false, mMat);
-        uploadBoneMatrices(tutorialScene.modelSkeletalBased, shadowProgram, 0);
-        renderModel(tutorialScene.modelSkeletalBased, shadowProgram, false);
+        // var mMat = mat4.create();
+        // mat4.identity(mMat);
+        // mat4.translate(mMat, mMat, vec3.fromValues(0.00, 0.00, -6.0));
+        // gl.uniformMatrix4fv(shadowProgram.getUniformLocation("mMat"), false, mMat);
+        // uploadBoneMatrices(tutorialScene.modelSkeletalBased, shadowProgram, 0);
+        // renderModel(tutorialScene.modelSkeletalBased, shadowProgram, false);
 
-        mat4.translate(mMat, mat4.create(), vec3.fromValues(1.0, 0.0, -5.0));
-        gl.uniformMatrix4fv(shadowProgram.getUniformLocation("mMat"), false, tutorialScene.modelPlacer.getTransformationMatrix());
-        uploadBoneMatrices(tutorialScene.modelSkeletalBased, shadowProgram, 0);
-        renderModel(tutorialScene.modelSkeletalBased, shadowProgram, false);
+        // mat4.translate(mMat, mat4.create(), vec3.fromValues(1.0, 0.0, -5.0));
+        // gl.uniformMatrix4fv(shadowProgram.getUniformLocation("mMat"), false, tutorialScene.modelPlacer.getTransformationMatrix());
+        // uploadBoneMatrices(tutorialScene.modelSkeletalBased, shadowProgram, 0);
+        // renderModel(tutorialScene.modelSkeletalBased, shadowProgram, false);
     }
 
     render() {
@@ -116,8 +121,8 @@ class tutorial extends Scene {
         gl.uniformMatrix4fv(tutorialScene.programNodeAnimatedModel.getUniformLocation("mMat"), false, mMat);
         gl.uniform3fv(tutorialScene.programNodeAnimatedModel.getUniformLocation("viewPos"), currentCamera.getPosition());
         this.lightManager.updateLights(tutorialScene.programNodeAnimatedModel.programObject);
-        uploadBoneMatrices(tutorialScene.modelSkeletalBased, tutorialScene.programNodeAnimatedModel, 0);
-        renderModel(tutorialScene.modelSkeletalBased, tutorialScene.programNodeAnimatedModel, true);
+        uploadBoneMatrices(tutorialScene.modelNodeBased, tutorialScene.programNodeAnimatedModel, 0);
+        renderModel(tutorialScene.modelNodeBased, tutorialScene.programNodeAnimatedModel, true);
 
         mat4.translate(mMat, mat4.create(), vec3.fromValues(1.0, 0.0, -5.0));
         tutorialScene.programSkeletalAnimatedModel.use();
@@ -126,10 +131,10 @@ class tutorial extends Scene {
         gl.uniformMatrix4fv(tutorialScene.programSkeletalAnimatedModel.getUniformLocation("mMat"), false, tutorialScene.modelPlacer.getTransformationMatrix());
         gl.uniform3fv(tutorialScene.programSkeletalAnimatedModel.getUniformLocation("viewPos"), currentCamera.getPosition());
         this.lightManager.updateLights(tutorialScene.programSkeletalAnimatedModel.programObject);
-        uploadBoneMatrices(tutorialScene.modelSkeletalBased, tutorialScene.programSkeletalAnimatedModel, 0);
+        uploadBoneMatrices(tutorialScene.modelSkeletalBased, tutorialScene.programSkeletalAnimatedModel,0);
         renderModel(tutorialScene.modelSkeletalBased, tutorialScene.programSkeletalAnimatedModel, true);
 
-        lightRenderer.renderLights(this.lightManager);
+        //lightRenderer.renderLights(this.lightManager);
     }
 
     update() 
@@ -143,7 +148,7 @@ class tutorial extends Scene {
             globalFade = 1.0 - tutorialScene.mytimer.getEventTime(eventIDS.START_T);
         }
 
-        //updateModel(tutorialScene.modelNodeBased,0,GLOBAL.deltaTime);
+        updateModel(tutorialScene.modelNodeBased,0,GLOBAL.deltaTime);
         updateModel(tutorialScene.modelSkeletalBased,0,GLOBAL.deltaTime);
 
         if(tutorialScene.mytimer.isEventStarted(eventIDS.END_T) && !tutorialScene.mytimer.isEventComplete(eventIDS.END_T)){
@@ -153,7 +158,7 @@ class tutorial extends Scene {
         if(tutorialScene.mytimer.isEventComplete(eventIDS.END_T)){
             this.isComplete = true;
         }
-        console.log(tutorialScene.mytimer.getT());
+        //console.log(tutorialScene.mytimer.getT());
     }
 
     renderUI() {

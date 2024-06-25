@@ -91,7 +91,6 @@ class atmScattering {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
 
-
     }
 
 
@@ -129,6 +128,7 @@ class atmScattering {
         onMyResize();
 
 
+        // this.fboColorTexture = loadTexture("textures/nightSky.png", true);
 
         //Transformations
         // mat4.translate(modelMatrix, mat4.create(), [0.0, 0.0, 0.0]);
@@ -165,6 +165,17 @@ class atmScattering {
     }
 
     uninitAtmScaterring() {
+
+        this.atmScatteringProgramObject = null;
+        this.fbo = null;
+        this.fboColorTexture = null;
+        this.projMatrix = null;
+
+        this.spProgramObject = null;
+
+        //data
+        this.sphere = null;
+        this.vaoSquare = null;
 
     }
 

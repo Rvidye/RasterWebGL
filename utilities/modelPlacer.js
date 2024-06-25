@@ -131,15 +131,15 @@ class ModelPlacer {
     }
 
     generateTransformationCode() {
-        const position = `vec3.fromValues(${this.position[0].toFixed(2)}, ${this.position[1].toFixed(2)}, ${this.position[2].toFixed(2)})`;
-        const rotation = `vec3.fromValues(${this.rotation[0].toFixed(2)}, ${this.rotation[1].toFixed(2)}, ${this.rotation[2].toFixed(2)})`;
-        const scale = `vec3.fromValues(${this.scale[0].toFixed(2)}, ${this.scale[1].toFixed(2)}, ${this.scale[2].toFixed(2)})`;
+        const position = `vec3.fromValues(${this.position[0].toFixed(5)}, ${this.position[1].toFixed(5)}, ${this.position[2].toFixed(5)})`;
+        const rotation = `vec3.fromValues(${this.rotation[0].toFixed(5)}, ${this.rotation[1].toFixed(5)}, ${this.rotation[2].toFixed(5)})`;
+        const scale = `vec3.fromValues(${this.scale[0].toFixed(5)}, ${this.scale[1].toFixed(5)}, ${this.scale[2].toFixed(5)})`;
         return `
         mat4.identity(transformationMatrix);
         mat4.translate(transformationMatrix, transformationMatrix, ${position});
-        mat4.rotateX(transformationMatrix, transformationMatrix, ${this.rotation[0].toFixed(2)});
-        mat4.rotateY(transformationMatrix, transformationMatrix, ${this.rotation[1].toFixed(2)});
-        mat4.rotateZ(transformationMatrix, transformationMatrix, ${this.rotation[2].toFixed(2)});
+        mat4.rotateX(transformationMatrix, transformationMatrix, ${this.rotation[0].toFixed(5)});
+        mat4.rotateY(transformationMatrix, transformationMatrix, ${this.rotation[1].toFixed(5)});
+        mat4.rotateZ(transformationMatrix, transformationMatrix, ${this.rotation[2].toFixed(5)});
         mat4.scale(transformationMatrix, transformationMatrix, ${scale});
         `;
     }

@@ -5,14 +5,18 @@ var ElephantScene = {
     modelPlacer: null,
     sceneCamera: null,
     sceneCameraRig: null,
+    programCelShader: null,
     timer: null,
-    songStart: 0
+    songStart: 0,
+    cubPath: null,
+    cubPathRig: null
 };
 
 const ElephantSceneEventIDS = {
     START_T: 0,
     MOVE_T: 1,
-    END_T: 2
+    MOVE_ELEPHANT_MOTHER : 2,
+    END_T: 3
 };
 
 class elephantScene extends Scene {
@@ -88,13 +92,20 @@ class elephantScene extends Scene {
         this.stone1Model = setupModel("stone1", false);
         this.stone1ModelMatrixArray = [];
 
-        this.elephantMother = setupModel("elepahntMother",false);
-        this.elephantCub = setupModel("elephantCub",false);
+        //this.elephantMother = setupModel("elephantMother", false);
+        //this.elephantCub = setupModel("elephantCub", false);
 
+        this.elephantMotherAnim = setupModel("elephantMother", true);
+        console.log(this.elephantMotherAnim);
+        this.elephantCubAnim = setupModel("elephantCub", true);
+        console.log(this.elephantCubAnim);
+
+        this.currentMotherAnimation = 2;
+        this.currentBabyAnimation = 3;
     }
 
     setupProgram() {
-
+        ElephantScene.programCelShader = new ShaderProgram(gl, ['shaders/model/model.vert', 'shaders/model/celShader.frag']);
     }
 
     setupCamera() {
@@ -151,8 +162,21 @@ class elephantScene extends Scene {
         ElephantScene.sceneCameraRig.setRenderPathToFront(true);
         ElephantScene.sceneCameraRig.setScalingFactor(0.1);
 
-
+        // Spline Path for Elephant can be done in constructor
+        const positions = [
+            [90,0,126],
+            [-60,0,130],
+            [-163,0,111],
+            [-165,0,-2],
+        ];
+        
+        this.motherPathSpline = new BsplineInterpolator(positions);
+        this.splineAdjuster = new SplineAdjuster(this.motherPathSpline);
+        this.splineAdjuster.setRenderPath(true);
+        this.splineAdjuster.setRenderPathPoints(true);
+        //this.splineAdjuster.setScalingFactor(0.01);
     }
+
 
     init() {
 
@@ -165,8 +189,13 @@ class elephantScene extends Scene {
             //[ElephantSceneEventIDS.MOVE_T, [50.0, 15.0]], baby elephant entry
             //[ElephantSceneEventIDS.MOVE_T, [65.0, .0]], mother elephant entry
             [ElephantSceneEventIDS.MOVE_T, [1.0, 54.0]],
+            [ElephantSceneEventIDS.MOVE_ELEPHANT_MOTHER, [1.0, 25.0]],
             [ElephantSceneEventIDS.END_T, [55.0, 1.0]]
         ]);
+
+        // setup callbacks for 1 time events
+        ElephantScene.timer.registerCallback(10.0,()=>{this.currentMotherAnimation = 1});
+        ElephantScene.timer.registerCallback(20.0,()=>{this.currentBabyAnimation = 1});
 
 
         //Setup Grass and other models Position Acoording To Terrain 
@@ -203,6 +232,7 @@ class elephantScene extends Scene {
 
 
             }
+            /*
             //Tree models
             //For Models Setting modelMatrices
             if ((Math.abs(data[i]) > Math.random() * 0.01 + 0.19 || Math.abs(data[i + 2]) > Math.random() * 0.01 + 0.15)) {
@@ -290,35 +320,68 @@ class elephantScene extends Scene {
 
 
             }
-
-
-
-
-
-            //Under Water Rocks
-            if (Math.random() < 0.002 && data[i + 1] < 0.0) {
-                let tempMat = mat4.create();
-                mat4.translate(tempMat, mat4.create(), [data[i] * this.terrainScale, data[i + 1] * this.terrainScale, data[i + 2] * this.terrainScale]);
-                mat4.rotateX(tempMat, tempMat, Math.PI / 2.0);
-                let scaleFactor = Math.random() * 0.1 + 0.05;
-                mat4.scale(tempMat, tempMat, [scaleFactor, scaleFactor, scaleFactor]);
-                this.stone1ModelMatrixArray.push(tempMat);
-            }
-
-            if (Math.random() < 0.02 && data[i + 1] >= 0.0) {
-                let tempMat = mat4.create();
-                mat4.translate(tempMat, mat4.create(), [data[i] * this.terrainScale, data[i + 1] * this.terrainScale, data[i + 2] * this.terrainScale]);
-                mat4.rotateX(tempMat, tempMat, Math.PI / 2.0);
-                let scaleFactor = Math.random() * 0.2 + 0.1;
-                mat4.scale(tempMat, tempMat, [scaleFactor, scaleFactor, scaleFactor]);
-                this.stone1ModelMatrixArray.push(tempMat);
-            }
-
+            
+                        //Under Water Rocks
+                        if (Math.random() < 0.002 && data[i + 1] < 0.0) {
+                            let tempMat = mat4.create();
+                            mat4.translate(tempMat, mat4.create(), [data[i] * this.terrainScale, data[i + 1] * this.terrainScale, data[i + 2] * this.terrainScale]);
+                            mat4.rotateX(tempMat, tempMat, Math.PI / 2.0);
+                            let scaleFactor = Math.random() * 0.1 + 0.05;
+                            mat4.scale(tempMat, tempMat, [scaleFactor, scaleFactor, scaleFactor]);
+                            this.stone1ModelMatrixArray.push(tempMat);
+                        }
+            
+                        if (Math.random() < 0.01 && data[i + 1] >= 0.0) {
+                            let tempMat = mat4.create();
+                            mat4.translate(tempMat, mat4.create(), [data[i] * this.terrainScale, data[i + 1] * this.terrainScale, data[i + 2] * this.terrainScale]);
+                            mat4.rotateX(tempMat, tempMat, Math.PI / 2.0);
+                            let scaleFactor = Math.random() * 0.2 + 0.1;
+                            mat4.scale(tempMat, tempMat, [scaleFactor, scaleFactor, scaleFactor]);
+                            this.stone1ModelMatrixArray.push(tempMat);
+                        }
+            */
 
         }
 
+        /*
+                this.stone1ModelMatrixArray.forEach(matrix => {
+        
+                    console.log(matrix);
+        
+                });
+                // this.writeArrayToFile(this.stone1ModelMatrixArray);
+                //this.readArrayFromFile();
+        */
+        //this.writeArrayToFile(this.tree1ModelMatrixArray, 'tree1');
+        //this.writeArrayToFile(this.tree2ModelMatrixArray, 'tree2');
+        //this.writeArrayToFile(this.tree3ModelMatrixArray, 'tree3');
+        //this.writeArrayToFile(this.treeTrunk1ModelMatrixArray, 'trunk1');
+        // this.writeArrayToFile(this.treeTrunk2ModelMatrixArray, 'trunk2');
+        //this.writeArrayToFile(this.treeLog1ModelMatrixArray, 'log1');
+        //this.writeArrayToFile(this.treeLog2ModelMatrixArray, 'log2');
+
+
+
+
+
+        this.tree1ModelMatrixArray = tree1ModelMatrixArray_data;
+        this.tree2ModelMatrixArray = tree2ModelMatrixArray_data;
+        this.tree3ModelMatrixArray = tree3ModelMatrixArray_data;
+        this.treeTrunk1ModelMatrixArray = treeTrunk1ModelMatrixArray_data;
+        this.treeTrunk2ModelMatrixArray = treeTrunk2ModelMatrixArray_data;
+
+
+        this.treeLog1ModelMatrixArray = treeLog1ModelMatrixArray_data;
+        this.treeLog2ModelMatrixArray = treeLog2ModelMatrixArray_data;
+
+        this.stone1ModelMatrixArray = stone1ModelMatrixArray_data;
+
+
         this.myGrass.GRASS_BLADES = j;
-        this.myGrass.initGrass(grassBladesPos);
+        let baseColor = new Float32Array([0.06, 0.29, 0.02]);
+        let tipColor = new Float32Array([0.07, 1.0, 0.0]);
+        this.myGrass.initGrass(grassBladesPos, baseColor, tipColor);
+
 
         //Terrain modelMatrix
         var modelMatrix = mat4.create();
@@ -355,8 +418,21 @@ class elephantScene extends Scene {
         //Atmospheric Scaterring
         this.myAtmScat.initAtmScattering();
 
-
     }
+
+    writeArrayToFile(myArray, fileName) {
+        const blob = new Blob([JSON.stringify(myArray)], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        a.click();
+
+        // Clean up the URL object (optional)
+        URL.revokeObjectURL(url);
+    }
+
 
     renderShadow(shadowProgram) {
         // Not sure best way to do this and increases extra work on developer side but at this point fuck it ...
@@ -377,10 +453,18 @@ class elephantScene extends Scene {
             ElephantScene.sceneCameraRig.render();
         }
 
-        //gl.depthMask(gl.FALSE);
+        if (DEBUGMODE === SPLINE) {
+            this.splineAdjuster.render();
+        }
+
+        // gl.depthMask(gl.FALSE);
         this.myAtmScat.renderAtmScattering();
-        //  gl.depthMask(gl.TRUE);
+        // gl.depthMask(gl.TRUE);
+
+
+        //RenderGrass
         this.myGrass.renderGrass();
+
 
         // this.myVegetation.renderVegetation();
 
@@ -409,34 +493,40 @@ class elephantScene extends Scene {
         //for stone1 model
         this.myModelDraw.renderModels(this.stone1Model, this.terrainTextue, this.stone1ModelMatrixArray, this.lightManager);
 
-        var transformationMatrix = mat4.create();
-        mat4.identity(transformationMatrix);
-        mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(-178.0, 0.00, -14.0));
-        mat4.rotateX(transformationMatrix, transformationMatrix, 0.00);
-        mat4.rotateY(transformationMatrix, transformationMatrix, 1.60);
-        mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00);
-        mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(9.50, 9.50, 9.50));
-        this.myModelDraw.modelProgram.use();
-        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("pMat"),false, currentCamera.getProjectionMatrix());
-        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("vMat"),false, currentCamera.getViewMatrix());
-        gl.uniform3fv(this.myModelDraw.modelProgram.getUniformLocation("viewPos"), currentCamera.getPosition());
-        this.lightManager.updateLights(this.myModelDraw.modelProgram.programObject);
-        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("mMat"),false, transformationMatrix);
-        renderModel(this.elephantMother, this.myModelDraw.modelProgram, true,true);
+        ElephantScene.programCelShader.use();
+        gl.uniformMatrix4fv(ElephantScene.programCelShader.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
+        gl.uniformMatrix4fv(ElephantScene.programCelShader.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
+        gl.uniform3fv(ElephantScene.programCelShader.getUniformLocation("viewPos"), currentCamera.getPosition());
+        this.lightManager.updateLights(ElephantScene.programCelShader.programObject);
 
+        var t = ElephantScene.timer.getEventTime(ElephantSceneEventIDS.MOVE_ELEPHANT_MOTHER);
+        var position = this.motherPathSpline.interpolateSpline(t - 0.01);
+        var front = this.motherPathSpline.interpolateSpline(t);
+        // Translation matrix
+        let translationMatrix = mat4.create();
+        mat4.translate(translationMatrix, translationMatrix, position);
+        // Orientation matrix using targetat
+        let orientationMatrix = targetat(position, front, vec3.fromValues(0.0, 1.0, 0.0));
+        // Combining the matrices
+        let finalMatrix = mat4.create();
+        mat4.multiply(finalMatrix, translationMatrix, orientationMatrix);
+        mat4.scale(finalMatrix, finalMatrix, vec3.fromValues(9.50, 9.50, 9.50));
+        gl.uniformMatrix4fv(ElephantScene.programCelShader.getUniformLocation("mMat"), false, finalMatrix);
+        //renderModel(this.elephantMother, this.myModelDraw.modelProgram, true,true);
+        uploadBoneMatrices(this.elephantMotherAnim, ElephantScene.programCelShader, this.currentMotherAnimation);
+        renderModel(this.elephantMotherAnim, ElephantScene.programCelShader, true, true);
+
+        var transformationMatrix = mat4.create();
         mat4.identity(transformationMatrix);
         mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(-170.0, 0.00, -35.0));
         mat4.rotateX(transformationMatrix, transformationMatrix, 0.00);
         mat4.rotateY(transformationMatrix, transformationMatrix, 1.60);
         mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00);
         mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(9.50, 9.50, 9.50));
-        this.myModelDraw.modelProgram.use();
-        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("pMat"),false, currentCamera.getProjectionMatrix());
-        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("vMat"),false, currentCamera.getViewMatrix());
-        gl.uniform3fv(this.myModelDraw.modelProgram.getUniformLocation("viewPos"), currentCamera.getPosition());
-        this.lightManager.updateLights(this.myModelDraw.modelProgram.programObject);
-        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("mMat"),false, transformationMatrix);
-        renderModel(this.elephantCub, this.myModelDraw.modelProgram, true, true);
+        let path = this.cubPath;
+        gl.uniformMatrix4fv(ElephantScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
+        uploadBoneMatrices(this.elephantCubAnim, ElephantScene.programCelShader, this.currentBabyAnimation);
+        renderModel(this.elephantCubAnim, ElephantScene.programCelShader, true, true);
 
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -452,12 +542,15 @@ class elephantScene extends Scene {
         this.myVegetation.updateVegetation();
         this.myPondWater.updatePondWater();
 
+        updateModel(this.elephantMotherAnim, this.currentMotherAnimation, GLOBAL.deltaTime);
+        updateModel(this.elephantCubAnim, this.currentBabyAnimation, GLOBAL.deltaTime);
+
         ElephantScene.sceneCamera.setT(ElephantScene.timer.getEventTime(ElephantSceneEventIDS.MOVE_T));
         // updateModel(ElephantScene.modelCat, 0, GLOBAL.deltaTime);
         ElephantScene.timer.increment();
 
         if (ElephantScene.timer.isEventStarted(ElephantSceneEventIDS.START_T) && ElephantScene.songStart == 0) {
-            songPlayer.currentTime = 50.0;
+            //songPlayer.currentTime = 50.0;
             ElephantScene.songStart = 1;
             postProcessingSettings.enableFog = true;
         }
@@ -473,6 +566,8 @@ class elephantScene extends Scene {
 
         if (ElephantScene.timer.isEventComplete(ElephantSceneEventIDS.END_T)) {
             this.isComplete = true;
+
+            //this.uninit();
         }
 
 
@@ -482,8 +577,71 @@ class elephantScene extends Scene {
         // reset stuff like timers and events
     }
 
-    unint() {
+    uninit() {
         // clean eveything created in init
+
+        this.myAtmScat.uninitAtmScaterring();
+        this.myGrass.uninitGrass();
+        this.myModelDraw.uninitDrawModels();
+        this.myPondWater.uninitPondWater();
+        this.myVegetation.unintiVegetation();
+
+
+
+        this.lightManager = null;
+        this.myGrass = null;
+        this.myAtmScat = null;
+        this.myPondWater = null;
+        this.myVegetation = null;
+        this.myModelDraw = null;
+
+
+        //models
+        this.terrainModel = null;
+        this.terrainModelMatrixArray.length = 0;
+        this.terrainTextue = null;
+
+
+        this.whiteTexture = null;
+        //Tree1
+        this.tree1Model = null;
+        this.tree1ModelMatrixArray.length = 0;
+
+
+        //Tree2
+        this.tree2Model = null;
+        this.tree2ModelMatrixArray.length = 0;
+
+        //Tree3
+        this.tree3Model = null;
+        this.tree3ModelMatrixArray.length = 0;
+
+        //Tree Logs
+        this.treeLog1Model = null;
+        this.treeLog1ModelMatrixArray.length = 0;
+
+        this.treeLog2Model = null;
+        this.treeLog2ModelMatrixArray.length = 0;
+
+        //Tree Trunks
+        this.treeTrunk1Model = null;
+        this.treeTrunk1ModelMatrixArray.length = 0;
+
+        this.treeTrunk2Model = null;
+        this.treeTrunk2ModelMatrixArray.length = 0;
+
+
+        //Stones
+        this.stone1Model = null;
+        this.stone1ModelMatrixArray.length = 0;
+
+        this.elephantMother = null;
+        this.elephantCub = null;
+
+        ElephantScene.modelPlacer = null;
+        ElephantScene.sceneCamera = null;
+        ElephantScene.sceneCameraRig = null;
+
     }
 
     renderUI() {
@@ -498,6 +656,9 @@ class elephantScene extends Scene {
             case LIGHT:
                 this.lightManager.renderUI();
                 break;
+            case SPLINE:
+                this.splineAdjuster.renderUI();
+            break;
             case NONE:
                 break;
         }
@@ -514,6 +675,9 @@ class elephantScene extends Scene {
                 break;
             case LIGHT:
                 break;
+            case SPLINE:
+                this.splineAdjuster.keyboardFunc(key);
+            break;
             case NONE:
                 break;
         }
