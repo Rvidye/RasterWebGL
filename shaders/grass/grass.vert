@@ -6,12 +6,13 @@ layout(location = 3) in float windLeanAngle;
 layout(location = 4) in float fAngleY;
 layout(location = 5) in float depthOfBlade;
 
+layout(location = 6) in vec3 aColor;
+
 uniform mat4 pMat;
 uniform mat4 vMat;
 uniform mat4 mMat;
 
 //uniform mat4 uViewMatrix;
-//uniform float uTime;
 
 out vec3 difffuseColor;
 
@@ -26,9 +27,10 @@ float hash12(vec2 p) {
 }
 
 void main(void) {
-    vec3 baseColor = vec3(0.06f, 0.29f, 0.02f);
 
-    vec3 tipColor = vec3(0.07f, 1.0f, 0.0f);
+   // vec3 baseColor = vec3(0.31f, 0.48f, 0.0f);
+
+    //vec3 tipColor = vec3(0.78f, 0.96f, 0.0f);
 
     float bladeVertexHeight = (aBladeVertex.y) / (4.465777f + 1.5f);
 
@@ -45,7 +47,8 @@ void main(void) {
 
     gl_Position = pMat * vMat * mMat * (xRotMatrix2 * yRotMatrix * xRotMatrix * aBladeVertex + aInstancePosition);
 
-    difffuseColor = mix(baseColor, tipColor, bladeVertexHeight);
+    difffuseColor = aColor; //mix(baseColor, tipColor, bladeVertexHeight);
+
 /*
 } else {
 

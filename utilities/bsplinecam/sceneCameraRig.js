@@ -23,8 +23,8 @@ class SceneCameraRig {
         this.vboPathToFront = gl.createBuffer();
 
         this.mountCamera = sceneCamera;
-        this.pathRenderer = new SplineRenderer(this.program,this.mountCamera.m_bspPositions);
-        this.frontRenderer = new SplineRenderer(this.program,this.mountCamera.m_bspFront);
+        this.pathRenderer = new SplineRenderer(this.program, this.mountCamera.m_bspPositions);
+        this.frontRenderer = new SplineRenderer(this.program, this.mountCamera.m_bspFront);
     }
 
     loadGeometry() {
@@ -71,8 +71,8 @@ class SceneCameraRig {
             ];
 
             this.program.use();
-            gl.uniformMatrix4fv(this.program.getUniformLocation("pMat"),false, currentCamera.getProjectionMatrix());
-            gl.uniformMatrix4fv(this.program.getUniformLocation("vMat"),false, currentCamera.getViewMatrix());
+            gl.uniformMatrix4fv(this.program.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
+            gl.uniformMatrix4fv(this.program.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
             gl.uniformMatrix4fv(this.program.getUniformLocation("mMat"), false, mat4.create());
             gl.uniformMatrix4fv(this.program.getUniformLocation("nMat"), false, mat4.create());
             gl.uniform3fv(this.program.getUniformLocation("lightcolor"), [1.0, 0.0, 0.0]);
@@ -134,7 +134,7 @@ class SceneCameraRig {
         return this.mountCamera;
     }
 
-    renderUI(){
+    renderUI() {
         ImGui.Text("Scene Camera Rig Controls");
         // Render settings
         ImGui.Checkbox("Render Path", (value = this.isRenderPath) => this.isRenderPath = value);
@@ -241,6 +241,7 @@ class SceneCameraRig {
     keyboardFunc(key) {
         let refreshPos = false;
         let refreshFront = false;
+        let speed = 1.0;
         switch (key) {
             case 'ArrowLeft':
                 this.mountCamera.updateT(-0.01);
@@ -261,51 +262,51 @@ class SceneCameraRig {
             //     this.selectedPathPoint = (this.selectedPathPoint + 1) % this.mountCamera.m_bspPositions.getPoints().length;
             //     break;
             case 'KeyT':
-                this.mountCamera.m_bspFront.getPoints()[this.selectedFrontPoint][2] += 0.1;
+                this.mountCamera.m_bspFront.getPoints()[this.selectedFrontPoint][2] += speed;
                 refreshFront = true;
                 break;
             case 'KeyG':
-                this.mountCamera.m_bspFront.getPoints()[this.selectedFrontPoint][2] -= 0.1;
+                this.mountCamera.m_bspFront.getPoints()[this.selectedFrontPoint][2] -= speed;
                 refreshFront = true;
                 break;
             case 'KeyH':
-                this.mountCamera.m_bspFront.getPoints()[this.selectedFrontPoint][0] += 0.1;
+                this.mountCamera.m_bspFront.getPoints()[this.selectedFrontPoint][0] += speed;
                 refreshFront = true;
                 break;
             case 'KeyF':
-                this.mountCamera.m_bspFront.getPoints()[this.selectedFrontPoint][0] -= 0.1;
+                this.mountCamera.m_bspFront.getPoints()[this.selectedFrontPoint][0] -= speed;
                 refreshFront = true;
                 break;
             case 'KeyY':
-                this.mountCamera.m_bspFront.getPoints()[this.selectedFrontPoint][1] += 0.1;
+                this.mountCamera.m_bspFront.getPoints()[this.selectedFrontPoint][1] += speed;
                 refreshFront = true;
                 break;
             case 'KeyR':
-                this.mountCamera.m_bspFront.getPoints()[this.selectedFrontPoint][1] -= 0.1;
+                this.mountCamera.m_bspFront.getPoints()[this.selectedFrontPoint][1] -= speed;
                 refreshFront = true;
                 break;
             case 'KeyI':
-                this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint][2] += 0.1;
+                this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint][2] += speed;
                 refreshPos = true;
                 break;
             case 'KeyK':
-                this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint][2] -= 0.1;
+                this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint][2] -= speed;
                 refreshPos = true;
                 break;
             case 'KeyL':
-                this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint][0] += 0.1;
+                this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint][0] += speed;
                 refreshPos = true;
                 break;
             case 'KeyJ':
-                this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint][0] -= 0.1;
+                this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint][0] -= speed;
                 refreshPos = true;
                 break;
             case 'KeyO':
-                this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint][1] += 0.1;
+                this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint][1] += speed;
                 refreshPos = true;
                 break;
             case 'KeyU':
-                this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint][1] -= 0.1;
+                this.mountCamera.m_bspPositions.getPoints()[this.selectedPathPoint][1] -= speed;
                 refreshPos = true;
                 break;
             case 'BracketRight':
@@ -336,24 +337,22 @@ class SceneCameraRig {
                 break;
             case 'Tab':
                 this.mountCamera.printVectors();
-            break;
+                break;
         }
 
         if (refreshPos) {
             this.mountCamera.m_bspPositions.updatePoints(this.mountCamera.m_bspPositions.getPoints());
             this.mountCamera.m_bspPositions.recalculateSpline();
-            this.pathRenderer = new SplineRenderer(this.program,this.mountCamera.m_bspPositions);
+            this.pathRenderer = new SplineRenderer(this.program, this.mountCamera.m_bspPositions);
             //this.pathRenderer.updateGeometry();
             this.pathRenderer.setRenderPoints(this.isRenderPathPoints);
         }
         if (refreshFront) {
             this.mountCamera.m_bspFront.updatePoints(this.mountCamera.m_bspFront.getPoints());
             this.mountCamera.m_bspFront.recalculateSpline();
-            this.frontRenderer = new SplineRenderer(this.program,this.mountCamera.m_bspFront);
+            this.frontRenderer = new SplineRenderer(this.program, this.mountCamera.m_bspFront);
             //this.pathRenderer.updateGeometry();
             this.frontRenderer.setRenderPoints(this.isRenderFrontPoints);
         }
     }
 }
-
-

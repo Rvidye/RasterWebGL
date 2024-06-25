@@ -31,7 +31,7 @@ class drawModels {
         this.setupProgram();
     }
 
-    renderShadow(shadowProgram, model, modelMatrixArray,) {
+    renderShadow(shadowProgram, model, modelMatrixArray) {
 
         modelMatrixArray.forEach(mMat => {
             gl.uniformMatrix4fv(shadowProgram.getUniformLocation("mMat"), false, mMat);
@@ -82,6 +82,12 @@ class drawModels {
 
     }
     uninitDrawModels() {
+
+
+        this.modelProgram = null;
+        this.time = 0.0;
+        this.modelMatrixArray = null;
+        this.modelsArray = null;
 
     }
 }
