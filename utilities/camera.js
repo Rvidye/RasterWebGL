@@ -52,7 +52,7 @@ class camera {
 class DebugCamera extends camera {
     constructor(position, front, up) {
         super(position, front, up);
-        this.speed = 0.3;
+        this.speed = 5.3;
 
         this.cameraYaw = -90.0;
         this.cameraPitch = 0.0;

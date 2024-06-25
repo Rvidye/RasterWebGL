@@ -61,3 +61,35 @@ function colorLerp(start, end, t) {
 
 	return finalColor;
 }
+
+/**
+ * Creates a look-at matrix.
+ * @param {vec3} eye - The position of the eye.
+ * @param {vec3} center - The position to look at.
+ * @param {vec3} up - The up vector.
+ * @returns {mat4} The look-at matrix.
+ */
+function targetat(eye, center, up) {
+    const f = vec3.create();
+    vec3.subtract(f, center, eye);
+    vec3.normalize(f, f);
+
+    const upN = vec3.create();
+    vec3.normalize(upN, up);
+
+    const s = vec3.create();
+    vec3.cross(s, f, upN);
+    vec3.normalize(s, s);
+
+    const u = vec3.create();
+    vec3.cross(u, s, f);
+    vec3.normalize(u, u);
+
+    const M = mat4.create();
+    M[0] = s[0]; M[4] = u[0]; M[8]  = f[0]; M[12] = 0;
+    M[1] = s[1]; M[5] = u[1]; M[9]  = f[1]; M[13] = 0;
+    M[2] = s[2]; M[6] = u[2]; M[10] = f[2]; M[14] = 0;
+    M[3] = 0;    M[7] = 0;    M[11] = 0;    M[15] = 1;
+
+    return M;
+}

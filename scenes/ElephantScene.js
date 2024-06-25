@@ -96,7 +96,12 @@ class elephantScene extends Scene {
         //this.elephantCub = setupModel("elephantCub", false);
 
         this.elephantMotherAnim = setupModel("elephantMother", true);
+        console.log(this.elephantMotherAnim);
         this.elephantCubAnim = setupModel("elephantCub", true);
+        console.log(this.elephantCubAnim);
+
+        this.currentMotherAnimation = 2;
+        this.currentBabyAnimation = 3;
     }
 
     setupProgram() {
@@ -159,10 +164,10 @@ class elephantScene extends Scene {
 
         // Spline Path for Elephant can be done in constructor
         const positions = [
-            [-29,4,126],
-            [-103,4,135],
-            [132,4,94],
-            [-132,4,18],
+            [90,0,126],
+            [-60,0,130],
+            [-163,0,111],
+            [-165,0,-2],
         ];
         
         this.motherPathSpline = new BsplineInterpolator(positions);
@@ -187,6 +192,10 @@ class elephantScene extends Scene {
             [ElephantSceneEventIDS.MOVE_ELEPHANT_MOTHER, [1.0, 25.0]],
             [ElephantSceneEventIDS.END_T, [55.0, 1.0]]
         ]);
+
+        // setup callbacks for 1 time events
+        ElephantScene.timer.registerCallback(10.0,()=>{this.currentMotherAnimation = 1});
+        ElephantScene.timer.registerCallback(20.0,()=>{this.currentBabyAnimation = 1});
 
 
         //Setup Grass and other models Position Acoording To Terrain 
@@ -490,14 +499,6 @@ class elephantScene extends Scene {
         gl.uniform3fv(ElephantScene.programCelShader.getUniformLocation("viewPos"), currentCamera.getPosition());
         this.lightManager.updateLights(ElephantScene.programCelShader.programObject);
 
-        var transformationMatrix = mat4.create();
-        // mat4.identity(transformationMatrix);
-        // mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(-178.0, 0.00, -14.0));
-        // mat4.rotateX(transformationMatrix, transformationMatrix, 0.00);
-        // mat4.rotateY(transformationMatrix, transformationMatrix, 1.60);
-        // mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00);
-        // mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(9.50, 9.50, 9.50));
-        // this will move elephant mother along the spline
         var t = ElephantScene.timer.getEventTime(ElephantSceneEventIDS.MOVE_ELEPHANT_MOTHER);
         var position = this.motherPathSpline.interpolateSpline(t - 0.01);
         var front = this.motherPathSpline.interpolateSpline(t);
@@ -512,25 +513,19 @@ class elephantScene extends Scene {
         mat4.scale(finalMatrix, finalMatrix, vec3.fromValues(9.50, 9.50, 9.50));
         gl.uniformMatrix4fv(ElephantScene.programCelShader.getUniformLocation("mMat"), false, finalMatrix);
         //renderModel(this.elephantMother, this.myModelDraw.modelProgram, true,true);
-        uploadBoneMatrices(this.elephantMotherAnim, ElephantScene.programCelShader, 0);
+        uploadBoneMatrices(this.elephantMotherAnim, ElephantScene.programCelShader, this.currentMotherAnimation);
         renderModel(this.elephantMotherAnim, ElephantScene.programCelShader, true, true);
 
+        var transformationMatrix = mat4.create();
         mat4.identity(transformationMatrix);
         mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(-170.0, 0.00, -35.0));
         mat4.rotateX(transformationMatrix, transformationMatrix, 0.00);
         mat4.rotateY(transformationMatrix, transformationMatrix, 1.60);
         mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00);
         mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(9.50, 9.50, 9.50));
-        ElephantScene.programCelShader.use();
-        gl.uniformMatrix4fv(ElephantScene.programCelShader.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
-        gl.uniformMatrix4fv(ElephantScene.programCelShader.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
-        gl.uniform3fv(ElephantScene.programCelShader.getUniformLocation("viewPos"), currentCamera.getPosition());
-        this.lightManager.updateLights(ElephantScene.programCelShader.programObject);
-
         let path = this.cubPath;
-
         gl.uniformMatrix4fv(ElephantScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
-        uploadBoneMatrices(this.elephantCubAnim, ElephantScene.programCelShader, 0);
+        uploadBoneMatrices(this.elephantCubAnim, ElephantScene.programCelShader, this.currentBabyAnimation);
         renderModel(this.elephantCubAnim, ElephantScene.programCelShader, true, true);
 
         gl.enable(gl.BLEND);
@@ -547,8 +542,8 @@ class elephantScene extends Scene {
         this.myVegetation.updateVegetation();
         this.myPondWater.updatePondWater();
 
-        updateModel(this.elephantMotherAnim, 0, GLOBAL.deltaTime);
-        updateModel(this.elephantCubAnim, 0, GLOBAL.deltaTime);
+        updateModel(this.elephantMotherAnim, this.currentMotherAnimation, GLOBAL.deltaTime);
+        updateModel(this.elephantCubAnim, this.currentBabyAnimation, GLOBAL.deltaTime);
 
         ElephantScene.sceneCamera.setT(ElephantScene.timer.getEventTime(ElephantSceneEventIDS.MOVE_T));
         // updateModel(ElephantScene.modelCat, 0, GLOBAL.deltaTime);
