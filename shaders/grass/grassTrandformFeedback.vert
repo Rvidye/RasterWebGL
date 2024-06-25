@@ -52,9 +52,9 @@ float noise(in vec2 st) {
 void main(void) {
 
     //Increare The below grassBladeMaxDepthLevel value to increase the level of details(wavy effect) of far grass blade
-    float grassBladeMaxDepthLevel = 500.0f;
+   // float grassBladeMaxDepthLevel = 500.0f;
 
-    vec4 tPos = vMat * aInstancePosition;
+ //   vec4 tPos = vMat * aInstancePosition;
 
 //    depthOfBlade = -(vMat * aInstancePosition).z / grassBladeMaxDepthLevel;
 

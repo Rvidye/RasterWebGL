@@ -99,6 +99,14 @@ class pondWater {
 
     uninitPondWater() {
 
+        this.pondWaterProgramObject = null;
+
+
+        this.waterMesh = null;
+        this.normalMapTexture = null;
+        this.dudvMapTexture = null;
+        this.waterTexture = null;
+
     }
 }
 

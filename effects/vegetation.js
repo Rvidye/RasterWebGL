@@ -70,5 +70,13 @@ class vegetation {
         this.time += GLOBAL.deltaTime;
 
     }
+
+    unintiVegetation() {
+        this.programObject = null;
+        this.modelMatrixArray = null;
+        this.leafTexture = null;
+        this.vao = null;
+
+    }
 }
 
