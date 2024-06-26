@@ -249,9 +249,9 @@ class kangarooScene extends Scene {
         //gl.depthMask(gl.TRUE);
 
 
-        this.myModelDraw.renderModels(this.terrainModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager);
-        this.myModelDraw.renderModels(this.objectsModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager);
-        this.myModelDraw.renderModels(this.maountainsModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager);
+        this.myModelDraw.renderModels(this.terrainModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager, false);
+        this.myModelDraw.renderModels(this.objectsModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager,true);
+        this.myModelDraw.renderModels(this.maountainsModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager,false);
 
         // this.myModelDraw.renderModels(this.kangarooMother, this.whiteTexture, KangarooScene.modelPlacer.getTransformationMatrix(), this.lightManager);
         let transformationMatrix = mat4.create();
@@ -284,7 +284,9 @@ class kangarooScene extends Scene {
         renderModel(this.kangarooBaby, KangarooScene.programCelShader, true, true);
 
         //RenderGrass
+        gl.depthMask(false);
         this.myGrass.renderGrass();
+        gl.depthMask(true);
     }
 
     update() {

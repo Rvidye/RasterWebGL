@@ -38,8 +38,6 @@ float readDepth (sampler2D depthSampler, vec2 coord) {
 
 // Helper functions for reading normals and depth of neighboring pixels.
 float getPixelDepth(int x, int y) {
-    // screenSize.zw is pixel size 
-    // vUv is current position
     return readDepth(depthTexture, texCoord + screenSize.zw * vec2(x, y));
 }
 
@@ -63,34 +61,26 @@ float getSufaceIdDiff(vec3 surfaceValue) {
 }
 
 void main(void) {
-
-    vec4 diffuseColor = texture(colorTexture, texCoord);
     float depth = getPixelDepth(0,0);
     vec3 normal = texture(normalTexture,texCoord).rgb;
-
     float depthDiff = 0.0;
     depthDiff += abs(depth - getPixelDepth(1,0));
     depthDiff += abs(depth - getPixelDepth(-1,0));
     depthDiff += abs(depth - getPixelDepth(0,1));
     depthDiff += abs(depth - getPixelDepth(0,-1));
-
     // Get the difference between normals of neighboring pixels and current
     float surfaceValueDiff = getSufaceIdDiff(normal);
-
     float depthBias = multiplierParameters.x;
     float depthMultiplier = multiplierParameters.y;
     float normalBias = multiplierParameters.z;
     float normalMultiplier = multiplierParameters.w;
-
     depthDiff = depthDiff * depthMultiplier;
     depthDiff = clamp(depthDiff,0.0,1.0);
     depthDiff = pow(depthDiff, depthBias);
-
     surfaceValueDiff = surfaceValueDiff * normalMultiplier;
     surfaceValueDiff = clamp(surfaceValueDiff,0.0,1.0);
     surfaceValueDiff = pow(surfaceValueDiff, normalBias);
     float outline = clamp(surfaceValueDiff + depthDiff,0.0,1.0);
     vec4 outlineColor = vec4(outlineColor, 1.0);
-	FragColor = vec4(vec3(outline * outlineColor),1.0);//vec4(mix(diffuseColor,outlineColor,outline));
-    //FragColor = vec4(vec3(depth),1.0);
+    FragColor = vec4(vec3(outline * outlineColor),1.0);//vec4(mix(diffuseColor,outlineColor,outline));
 }

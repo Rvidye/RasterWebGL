@@ -7,8 +7,6 @@ class grass {
 
         this.programTransformFeedbackGrass = null;
         this.programRenderGrass = null;
-
-
         this.NUM_GRASS_BLADES_X = grassBladeNumX;
         this.NUM_GRASS_BLADES_Y = grassBladeNumY;
 
@@ -40,18 +38,12 @@ class grass {
         this.tfbo_windLeanAngle = null;
         this.tfbo_fAngleY = null;
         this.tfbo_depthOfBlade = null;
-
-
-
-
     }
 
     setupProgram() {
         this.programRenderGrass = new ShaderProgram(gl, ['shaders/grass/grass.vert', 'shaders/grass/grass.frag']);
 
         this.programTransformFeedbackGrass = new ShaderProgram(gl, ['shaders/grass/grassTrandformFeedback.vert', 'shaders/grass/grassTrandformFeedback.frag']);
-
-
         //Set out Varying Attributes
         const varyings = [
             "windDir",
@@ -212,87 +204,47 @@ class grass {
     }
 
     renderGrass() {
-
-        //code
-
-        //Transform Feedback To CalCulate Per Blade Instance Attributes
-        this.programTransformFeedbackGrass.use();
-
-
-        //Bind the TFO to which you want to store the out attributes
-        gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, this.tfo);
-        gl.enable(gl.RASTERIZER_DISCARD);
-
-
-
-        // var modelMatrix = mat4.create();
-        //mat4.scale(modelMatrix, modelMatrix, [500.0, 500.0, 500.0]);
-
-        //Set Unifroms
-        gl.uniform1f(this.programTransformFeedbackGrass.getUniformLocation("uTime"), this.time);
-        gl.uniformMatrix4fv(this.programTransformFeedbackGrass.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
-        gl.uniformMatrix4fv(this.programTransformFeedbackGrass.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
-
-
-        //Bind vao
-        gl.bindVertexArray(this.tf_vao);
-
-        gl.beginTransformFeedback(gl.POINTS);
-        gl.drawArrays(gl.POINTS, 0, this.GRASS_BLADES);
-        gl.endTransformFeedback();
-
-        gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, null);
-
-        gl.disable(gl.RASTERIZER_DISCARD);
-
-        //Transfer The Per Blade Attributes to Respective vbos
-        function copyBufferDataFrom_TFBO_To_VBO(tfbo, vbo, size) {
-
-            gl.bindBuffer(gl.TRANSFORM_FEEDBACK_BUFFER, tfbo);
-            gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-            gl.copyBufferSubData(gl.TRANSFORM_FEEDBACK_BUFFER, gl.ARRAY_BUFFER, 0, 0, size);
-
-        }
-
-        copyBufferDataFrom_TFBO_To_VBO(this.tfbo_windDir, this.vboWinDir, this.GRASS_BLADES * 4);
-        copyBufferDataFrom_TFBO_To_VBO(this.tfbo_windLeanAngle, this.vboWinLeanAngle, this.GRASS_BLADES * 4);
-        copyBufferDataFrom_TFBO_To_VBO(this.tfbo_fAngleY, this.vbofAngleY, this.GRASS_BLADES * 4);
-        copyBufferDataFrom_TFBO_To_VBO(this.tfbo_depthOfBlade, this.vboDepthOfBlade, this.GRASS_BLADES * 4);
-
-        gl.bindBuffer(gl.TRANSFORM_FEEDBACK_BUFFER, null);
-        gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-
-
-        ////////////////////////////////
-
         // Render Grass
-
         this.programRenderGrass.use();
-
-        //Transformations
-        //Set Uniforms
         gl.uniformMatrix4fv(this.programRenderGrass.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
         gl.uniformMatrix4fv(this.programRenderGrass.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
         gl.uniformMatrix4fv(this.programRenderGrass.getUniformLocation("mMat"), false, mat4.create());
-
-
-        //Grass Blade Colors
-        //  gl.uniform3fv(this.programRenderGrass.getUniformLocation("baseColor"), baseColor);
-        // gl.uniform3fv(this.programRenderGrass.getUniformLocation("tipColor"), tipColor);
-
         gl.bindVertexArray(this.vaoGrass);
         gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, this.GRASS_BLADES_VERTICES, this.GRASS_BLADES);
-        gl.bindVertexArray(null);
+    }
 
-        gl.useProgram(null);
-
-
-
+    copyBufferDataFrom_TFBO_To_VBO(tfbo, vbo, size) {
+        gl.bindBuffer(gl.TRANSFORM_FEEDBACK_BUFFER, tfbo);
+        gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+        gl.copyBufferSubData(gl.TRANSFORM_FEEDBACK_BUFFER, gl.ARRAY_BUFFER, 0, 0, size);
     }
 
     updateGrass() {
         this.time += GLOBAL.deltaTime;
+
+        //Transform Feedback To CalCulate Per Blade Instance Attributes
+        this.programTransformFeedbackGrass.use();
+        //Bind the TFO to which you want to store the out attributes
+        gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, this.tfo);
+        gl.enable(gl.RASTERIZER_DISCARD);
+        //Set Unifroms
+        gl.uniform1f(this.programTransformFeedbackGrass.getUniformLocation("uTime"), this.time);
+        gl.uniformMatrix4fv(this.programTransformFeedbackGrass.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
+        gl.uniformMatrix4fv(this.programTransformFeedbackGrass.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
+        //Bind vao
+        gl.bindVertexArray(this.tf_vao);
+        gl.beginTransformFeedback(gl.POINTS);
+        gl.drawArrays(gl.POINTS, 0, this.GRASS_BLADES);
+        gl.endTransformFeedback();
+        gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, null);
+        gl.disable(gl.RASTERIZER_DISCARD);
+        //Transfer The Per Blade Attributes to Respective vbos
+        this.copyBufferDataFrom_TFBO_To_VBO(this.tfbo_windDir, this.vboWinDir, this.GRASS_BLADES * 4);
+        this.copyBufferDataFrom_TFBO_To_VBO(this.tfbo_windLeanAngle, this.vboWinLeanAngle, this.GRASS_BLADES * 4);
+        this.copyBufferDataFrom_TFBO_To_VBO(this.tfbo_fAngleY, this.vbofAngleY, this.GRASS_BLADES * 4);
+        this.copyBufferDataFrom_TFBO_To_VBO(this.tfbo_depthOfBlade, this.vboDepthOfBlade, this.GRASS_BLADES * 4);
+        gl.bindBuffer(gl.TRANSFORM_FEEDBACK_BUFFER, null);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
     }
 
     uninitGrass() {
@@ -310,7 +262,6 @@ class grass {
 
         this.time = 0.0;
 
-
         //Tranform FeedBack
         this.transformFeedBackShaderProgram = null;
         this.tfo = null;
@@ -319,7 +270,6 @@ class grass {
         this.tfbo_windLeanAngle = null;
         this.tfbo_fAngleY = null;
         this.tfbo_depthOfBlade = null;
-
     }
 }
 

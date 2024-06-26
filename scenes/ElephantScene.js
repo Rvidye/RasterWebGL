@@ -464,27 +464,27 @@ class elephantScene extends Scene {
         // this.myVegetation.renderVegetation();
 
         //for Terrain
-        this.myModelDraw.renderModels(this.terrainModel, this.terrainTextue, this.terrainModelMatrixArray, this.lightManager);
+        this.myModelDraw.renderModels(this.terrainModel, this.terrainTextue, this.terrainModelMatrixArray, this.lightManager, false);
 
         //For tree1 model
-        this.myModelDraw.renderModels(this.tree1Model, this.whiteTexture, this.tree1ModelMatrixArray, this.lightManager);
+        this.myModelDraw.renderModels(this.tree1Model, this.whiteTexture, this.tree1ModelMatrixArray, this.lightManager, false);
 
         //For tree2 model
-        this.myModelDraw.renderModels(this.tree2Model, this.whiteTexture, this.tree2ModelMatrixArray, this.lightManager);
+        this.myModelDraw.renderModels(this.tree2Model, this.whiteTexture, this.tree2ModelMatrixArray, this.lightManager, false);
 
         //For tree3 model
-        this.myModelDraw.renderModels(this.tree3Model, this.whiteTexture, this.tree3ModelMatrixArray, this.lightManager);
+        this.myModelDraw.renderModels(this.tree3Model, this.whiteTexture, this.tree3ModelMatrixArray, this.lightManager,false);
 
         //Tree Logs
-        this.myModelDraw.renderModels(this.treeLog1Model, this.whiteTexture, this.treeLog1ModelMatrixArray, this.lightManager);
-        this.myModelDraw.renderModels(this.treeLog2Model, this.whiteTexture, this.treeLog2ModelMatrixArray, this.lightManager);
+        this.myModelDraw.renderModels(this.treeLog1Model, this.whiteTexture, this.treeLog1ModelMatrixArray, this.lightManager,false);
+        this.myModelDraw.renderModels(this.treeLog2Model, this.whiteTexture, this.treeLog2ModelMatrixArray, this.lightManager,false);
 
         //Tree Trunks
-        this.myModelDraw.renderModels(this.treeTrunk1Model, this.whiteTexture, this.treeTrunk1ModelMatrixArray, this.lightManager);
-        this.myModelDraw.renderModels(this.treeTrunk2Model, this.whiteTexture, this.treeTrunk2ModelMatrixArray, this.lightManager);
+        this.myModelDraw.renderModels(this.treeTrunk1Model, this.whiteTexture, this.treeTrunk1ModelMatrixArray, this.lightManager,false);
+        this.myModelDraw.renderModels(this.treeTrunk2Model, this.whiteTexture, this.treeTrunk2ModelMatrixArray, this.lightManager,false);
 
         //for stone1 model
-        this.myModelDraw.renderModels(this.stone1Model, this.terrainTextue, this.stone1ModelMatrixArray, this.lightManager);
+        this.myModelDraw.renderModels(this.stone1Model, this.terrainTextue, this.stone1ModelMatrixArray, this.lightManager,false);
 
         ElephantScene.programCelShader.use();
         gl.uniformMatrix4fv(ElephantScene.programCelShader.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
@@ -521,13 +521,15 @@ class elephantScene extends Scene {
         renderModel(this.elephantCubAnim, ElephantScene.programCelShader, true, true);
 
         //RenderGrass
+        // Disable depth mask before rendering grass
+        gl.depthMask(false);
         this.myGrass.renderGrass();
+        gl.depthMask(true);
 
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         this.myPondWater.renderPondWater(this.lightManager);
         gl.disable(gl.BLEND);
-
     }
 
     update() {

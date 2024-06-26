@@ -164,7 +164,6 @@ function main() {
 	programFSQ = new ShaderProgram(gl, ['shaders/common/FSQ.vert', 'shaders/common/FSQ.frag']);
 	programShadowMap = new ShaderProgram(gl, ['shaders/shadows/shadowcast.vert', 'shaders/shadows/shadowcast.frag']);
 	programShadowCubeMap = new ShaderProgram(gl, ['shaders/shadows/shadowcastpoint.vert', 'shaders/shadows/shadowcastpoint.frag']);
-	programFSQ = new ShaderProgram(gl, ['shaders/common/FSQ.vert', 'shaders/common/FSQ.frag']);
 	tonemap = new ToneMap(gl, "shaders/hdr.vert", "shaders/hdr.frag", 2048, 2048);
 	bloom = new Bloom(gl, "shaders/common/FSQ.vert", "shaders/bloom/downsample.frag", 2048, 2048);
 	fog = new Fog(gl, "shaders/common/FSQ.vert", "shaders/fog/fog.frag", 2048, 2048);
@@ -330,6 +329,15 @@ function handleUI() {
 			}
 		}
 		ImGui.EndCombo();
+	}
+
+	if(postProcessingSettings.enableOutline){
+		ImGui.Text("Outline Shader Options:");
+		ImGui.SliderFloat("Depth Bias", (value = outlineShaderOptions.depthBias) => outlineShaderOptions.depthBias = value, 0.0, 10.0);
+		ImGui.SliderFloat("Depth Multiplier", (value = outlineShaderOptions.depthMultiplier) => outlineShaderOptions.depthMultiplier = value, 0.0, 50.0);
+		ImGui.SliderFloat("Normal Bias", (value = outlineShaderOptions.normalBias) => outlineShaderOptions.normalBias = value, 0.0, 10.0);
+		ImGui.SliderFloat("Normal Multiplier", (value = outlineShaderOptions.normalMultiplier) => outlineShaderOptions.normalMultiplier = value, 0.0, 10.0);
+		ImGui.ColorEdit3("Outline Color", outlineShaderOptions.outlineColor);
 	}
 }
 
@@ -666,6 +674,8 @@ function createGBuffer(gl, width, height) {
 	gl.bindTexture(gl.TEXTURE_2D, depthTexture);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	gl.bindTexture(gl.TEXTURE_2D, null);
 
 
@@ -700,6 +710,8 @@ function createTexture(gl, width, height, format, type = gl.UNSIGNED_BYTE, inter
 	gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, null);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	gl.bindTexture(gl.TEXTURE_2D, null);
 	return texture;
 }

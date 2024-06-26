@@ -39,7 +39,7 @@ class drawModels {
         gl.bufferData(gl.ARRAY_BUFFER, flattenedMatrices, gl.DYNAMIC_DRAW);
     }
 
-    renderModels(model, diffuseTexture, modelMatrixArray, lightManager) {
+    renderModels(model, diffuseTexture, modelMatrixArray, lightManager, outlines = false) {
 
         this.updateInstanceBuffer(modelMatrixArray);
 
@@ -62,7 +62,7 @@ class drawModels {
         //     gl.uniformMatrix4fv(this.modelProgram.getUniformLocation("mMat"), false, mMat);
         //     renderModel(model, this.modelProgram, true, false);
         // });
-        renderModel(model, this.modelProgram, true, false, modelMatrixArray.length, this.instanceBuffer);
+        renderModel(model, this.modelProgram, true, outlines, modelMatrixArray.length, this.instanceBuffer);
     }
 
     updateDrawModels() {
