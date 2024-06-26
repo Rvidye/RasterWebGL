@@ -11,6 +11,8 @@ var modelList = [
 	{ name: "cone", files: ['models/lightmesh/cone.obj'], flipTex: false },
 	{ name: "point", files: ['models/lightmesh/point.obj'], flipTex: false },
 	//{ name: "cat", files: ['models/scene1/cat/cat.gltf', "models/scene1/cat/cat.bin"], flipTex: true },
+
+
 	{ name: "room1", files: ['models/scene1/room/room3.gltf', "models/scene1/room/room3.bin"], flipTex: true },
 	{ name: "book", files: ['models/scene1/book/book.gltf', "models/scene1/book/book.bin"], flipTex: true },
 	{ name: "AMC", files: ['models/scene1/intro/amc.glb'], flipTex: false },
@@ -20,6 +22,7 @@ var modelList = [
 	{ name: "mother", files: ['models/scene1/mother/mother.gltf','models/scene1/mother/mother.bin'], flipTex: true },
 	{ name: "earth", files: ['models/earth/earth.gltf', 'models/earth/earth.bin'], flipTex: true },
 	//{ name: "test4", files: ['models/Avocado.glb'], flipTex: true },
+
 
 	//Elephant Scene Models
 	{ name: "terrain", files: ['models/ElephantScene/elp4_3.glb'], flipTex: true },
@@ -32,18 +35,23 @@ var modelList = [
 	{ name: "treeTrunk2", files: ['models/ElephantScene/TreeSetup/mediumTrunk.glb'], flipTex: true },
 	{ name: "pondWaterMesh", files: ['models/ElephantScene/pondWaterMesh4.glb'], flipTex: true },
 	{ name: "stone1", files: ['models/ElephantScene/stone1/stone1.gltf', 'models/ElephantScene/stone1/stone1.bin'], flipTex: true },
+	//{ name: "elephantMother", files: ['models/ElephantScene/elephant1/mother.gltf', 'models/ElephantScene/elephant1/mother.bin'], flipTex: true },
+	//{ name: "elephantCub", files: ['models/ElephantScene/elephant1/baby.gltf', 'models/ElephantScene/elephant1/baby.bin'], flipTex: true },
 	{ name: "elephantMother", files: ['models/ElephantScene/elephant1/mother.gltf', 'models/ElephantScene/elephant1/mother.bin'], flipTex: true },
 	{ name: "elephantCub", files: ['models/ElephantScene/elephant1/baby.gltf', 'models/ElephantScene/elephant1/baby.bin'], flipTex: true },
-	{ name: "elephantMother", files: ['models/ElephantScene/elephant1/mother.gltf', 'models/ElephantScene/elephant1/mother.bin'], flipTex: true },
-	{ name: "elephantCub", files: ['models/ElephantScene/elephant1/baby.gltf', 'models/ElephantScene/elephant1/baby.bin'], flipTex: true },
+
+
 
 	//Kangaroo Scene Models
 	{ name: "kangarooTerrain", files: ['models/KangarooScene/terrain/terrain.gltf', 'models/KangarooScene/terrain/terrain.bin'], flipTex: true },
 	{ name: "kangarooSceneObjects", files: ['models/KangarooScene/objects/objects.gltf', 'models/KangarooScene/objects/objects.bin'], flipTex: true },
 	{ name: "kangarooSceneMountains", files: ['models/KangarooScene/mountains/mountains.gltf', 'models/KangarooScene/mountains/mountains.bin'], flipTex: true },
 
-	{ name: "kangarooMother", files: ['models/KangarooScene/kangarooMother/kangarooMother.gltf', 'models/KangarooScene/kangarooMother/kangarooMother.bin'], flipTex: true },
-	{ name: "kangarooJoey", files: ['models/KangarooScene/kangarooBaby/kangarooBaby.gltf', 'models/KangarooScene/kangarooBaby/kangarooBaby.bin'], flipTex: true },
+	{ name: "kangarooMother", files: ['models/kangaroo/mother.gltf', 'models/kangaroo/mother.bin'], flipTex: true },
+	{ name: "kangarooJoey", files: ['models/kangaroo/joey.gltf', 'models/kangaroo/joey.bin'], flipTex: true },
+
+
+
 ]
 
 var scenes = [];
@@ -133,6 +141,7 @@ function main() {
 	canvas.height = window.innerHeight;
 	//document.body.style.margin = "0";
 	document.body.appendChild(canvas);
+	ImGui_Impl.Init(gl);
 
 	// setup event listners
 	window.addEventListener('resize', () => onMyResize());
@@ -164,7 +173,6 @@ function main() {
 	programFSQ = new ShaderProgram(gl, ['shaders/common/FSQ.vert', 'shaders/common/FSQ.frag']);
 	programShadowMap = new ShaderProgram(gl, ['shaders/shadows/shadowcast.vert', 'shaders/shadows/shadowcast.frag']);
 	programShadowCubeMap = new ShaderProgram(gl, ['shaders/shadows/shadowcastpoint.vert', 'shaders/shadows/shadowcastpoint.frag']);
-	programFSQ = new ShaderProgram(gl, ['shaders/common/FSQ.vert', 'shaders/common/FSQ.frag']);
 	tonemap = new ToneMap(gl, "shaders/hdr.vert", "shaders/hdr.frag", 2048, 2048);
 	bloom = new Bloom(gl, "shaders/common/FSQ.vert", "shaders/bloom/downsample.frag", 2048, 2048);
 	fog = new Fog(gl, "shaders/common/FSQ.vert", "shaders/fog/fog.frag", 2048, 2048);
@@ -185,7 +193,6 @@ function main() {
 
 	fpsElem = document.getElementById('fps');
 
-	ImGui_Impl.Init(gl);
 	initScenes();
 	window.requestAnimationFrame(renderFrame);
 }
@@ -330,6 +337,15 @@ function handleUI() {
 			}
 		}
 		ImGui.EndCombo();
+	}
+
+	if(postProcessingSettings.enableOutline){
+		ImGui.Text("Outline Shader Options:");
+		ImGui.SliderFloat("Depth Bias", (value = outlineShaderOptions.depthBias) => outlineShaderOptions.depthBias = value, 0.0, 10.0);
+		ImGui.SliderFloat("Depth Multiplier", (value = outlineShaderOptions.depthMultiplier) => outlineShaderOptions.depthMultiplier = value, 0.0, 50.0);
+		ImGui.SliderFloat("Normal Bias", (value = outlineShaderOptions.normalBias) => outlineShaderOptions.normalBias = value, 0.0, 10.0);
+		ImGui.SliderFloat("Normal Multiplier", (value = outlineShaderOptions.normalMultiplier) => outlineShaderOptions.normalMultiplier = value, 0.0, 10.0);
+		ImGui.ColorEdit3("Outline Color", outlineShaderOptions.outlineColor);
 	}
 }
 
@@ -666,6 +682,8 @@ function createGBuffer(gl, width, height) {
 	gl.bindTexture(gl.TEXTURE_2D, depthTexture);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	gl.bindTexture(gl.TEXTURE_2D, null);
 
 
@@ -700,6 +718,8 @@ function createTexture(gl, width, height, format, type = gl.UNSIGNED_BYTE, inter
 	gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, null);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	gl.bindTexture(gl.TEXTURE_2D, null);
 	return texture;
 }

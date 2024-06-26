@@ -666,7 +666,7 @@ function updateModel(model, i, delta) {
     model.updateAnimations(i, delta);
 }
 
-function renderModel(model, program, useMaterial, drawOutline = false) {
+function renderModel(model, program, useMaterial, drawOutline = false, instanceCount = 1, instanceBuffer = undefined) {
     function recursiveRenderNode(node, parentTransform) {
         const globalTransform = mat4.create();
         mat4.multiply(globalTransform, parentTransform, node.globalTransform);
@@ -695,7 +695,23 @@ function renderModel(model, program, useMaterial, drawOutline = false) {
                 gl.uniform4fv(program.getUniformLocation("objectID"),[0.0,0.0,0.0,0.0]);
             gl.uniform1i(program.getUniformLocation("useSkinning"),model.skin);
             gl.bindVertexArray(mesh.vao);
-            gl.drawElements(gl.TRIANGLES, mesh.count, gl.UNSIGNED_SHORT, 0);
+
+            if(instanceBuffer){
+                gl.bindBuffer(gl.ARRAY_BUFFER, instanceBuffer);
+                for (let i = 0; i < 4; i++) {
+                    const location = 5 + i; // instanceMatrix takes up 4 attribute locations
+                    gl.enableVertexAttribArray(location);
+                    gl.vertexAttribPointer(location, 4, gl.FLOAT, false, 64, i * 16);
+                    gl.vertexAttribDivisor(location, 1); // Advancing per instance
+                }
+            }
+
+            // Use instanced rendering if instanceBuffer is provided
+            if (instanceBuffer) {
+                gl.drawElementsInstanced(gl.TRIANGLES, mesh.count, gl.UNSIGNED_SHORT, 0, instanceCount);
+            } else {
+                gl.drawElements(gl.TRIANGLES, mesh.count, gl.UNSIGNED_SHORT, 0);
+            }
 
             if (useMaterial) {
                 if (material.diffuseTextures != undefined) {
@@ -703,6 +719,17 @@ function renderModel(model, program, useMaterial, drawOutline = false) {
                     gl.bindTexture(gl.TEXTURE_2D, null);
                 }
             }
+
+            // Cleanup instance attributes
+            if (instanceBuffer) {
+                for (let i = 0; i < 4; i++) {
+                    const location = 5 + i;
+                    gl.disableVertexAttribArray(location);
+                    gl.vertexAttribDivisor(location, 0);
+                }
+                gl.bindBuffer(gl.ARRAY_BUFFER, null);
+            }
+
         });
 
         node.children.forEach((child) => {

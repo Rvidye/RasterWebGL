@@ -16,11 +16,12 @@ class Outline extends PostProcessingEffect {
         gl.activeTexture(gl.TEXTURE2);
         gl.bindTexture(gl.TEXTURE_2D, depthTexture);
         gl.uniform1i(this.program.getUniformLocation(`depthTexture`), 2);
-        gl.uniform1f(this.program.getUniformLocation("cameraNear"), 0.1);
+        gl.uniform1f(this.program.getUniformLocation("cameraNear"), 1.0);
         gl.uniform1f(this.program.getUniformLocation("cameraFar"), 1000.0);
-        gl.uniform4fv(this.program.getUniformLocation("screenSize"),[2048,2048,1/2048,1/2048]);        
-        gl.uniform4fv(this.program.getUniformLocation("multiplierParameters"),[1.0,20.0,1.0,1.0]);
-        gl.uniform3fv(this.program.getUniformLocation("outlineColor"),[1.0,1.0,1.0]);
+        gl.uniform4fv(this.program.getUniformLocation("screenSize"),[2048,2048,1/2048,1/2048]);
+        gl.uniform4fv(this.program.getUniformLocation("multiplierParameters"),[5.0,20.0,1.0,1.0]);
+        gl.uniform3fv(this.program.getUniformLocation("outlineColor"),[0.5,0.5,0.5]);
+        gl.uniform1i(this.program.getUniformLocation(`debugVisualize`), 0);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         return this.fbo.texture;
     }
