@@ -19,7 +19,7 @@ var modelList = [
 	{ name: "RASTER", files: ['models/scene1/intro/raster.glb'], flipTex: false },
 	{ name: "nightSky", files: ['models/scene1/night/nightSky.gltf', "models/scene1/night/nightSky.bin"], flipTex: true },
 	{ name: "child", files: ['models/scene1/child/child.gltf', "models/scene1/child/child.bin"], flipTex: true },
-	{ name: "mother", files: ['models/scene1/mother/mother.fbx'], flipTex: true },
+	{ name: "mother", files: ['models/scene1/mother/mother.gltf','models/scene1/mother/mother.bin'], flipTex: true },
 	{ name: "earth", files: ['models/earth/earth.gltf', 'models/earth/earth.bin'], flipTex: true },
 	//{ name: "test4", files: ['models/Avocado.glb'], flipTex: true },
 
@@ -35,8 +35,8 @@ var modelList = [
 	{ name: "treeTrunk2", files: ['models/ElephantScene/TreeSetup/mediumTrunk.glb'], flipTex: true },
 	{ name: "pondWaterMesh", files: ['models/ElephantScene/pondWaterMesh4.glb'], flipTex: true },
 	{ name: "stone1", files: ['models/ElephantScene/stone1/stone1.gltf', 'models/ElephantScene/stone1/stone1.bin'], flipTex: true },
-	// { name: "elepahntMother", files: ['models/ElephantScene/elephant/mother.gltf', 'models/ElephantScene/elephant/mother.bin'], flipTex: true },
-	// { name: "elephantCub", files: ['models/ElephantScene/elephant/cub.gltf', 'models/ElephantScene/elephant/cub.bin'], flipTex: true },
+	{ name: "elephantMother", files: ['models/ElephantScene/elephant1/mother.gltf', 'models/ElephantScene/elephant1/mother.bin'], flipTex: true },
+	{ name: "elephantCub", files: ['models/ElephantScene/elephant1/baby.gltf', 'models/ElephantScene/elephant1/baby.bin'], flipTex: true },
 	{ name: "elephantMother", files: ['models/ElephantScene/elephant1/mother.gltf', 'models/ElephantScene/elephant1/mother.bin'], flipTex: true },
 	{ name: "elephantCub", files: ['models/ElephantScene/elephant1/baby.gltf', 'models/ElephantScene/elephant1/baby.bin'], flipTex: true },
 
@@ -213,10 +213,10 @@ function onMyKeyPress(event) {
 			break;
 		case "Space":
 			isAnimating = !isAnimating;
-			if (isAnimating) {
+			if(isAnimating){
 				songPlayer.play();
 			}
-			else {
+			else{
 				songPlayer.pause();
 			}
 			break;
