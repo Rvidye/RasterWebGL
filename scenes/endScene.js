@@ -47,15 +47,21 @@ class endRoomScene extends Scene {
         const positionKeyFrames = [
             [3.8000000000000016,1.2999999999999998,0.5999999999999971],
             [1.6,2.0000000000000004,0.400000000000001],
-            [-0.1000000000000002,2.400000000000001,1.2000000000000046],
-            [-2.800000000000001,2.400000000000001,1.2000000000000082]
+            [-0.1000000000000002,2.400000000000001,1.5000000000000049],
+            [2.1000000000000005,2.500000000000001,5.20000000000001],
+            [5.099999999999998,2.600000000000001,4.100000000000017],
+            [7.39999999999999,2.9000000000000012,3.400000000000021],
+            [8.199999999999987,3.600000000000002,3.500000000000021]
         ];
 
         const frontKeyFrames = [
-            [4.300000000000002,0.6,0.6999999999999975],
-            [3.0000000000000018,1.0999999999999996,0.600000000000001],
+            [4.200000000000002,0.7,0.6999999999999975],
+            [2.7000000000000015,1.2999999999999998,0.600000000000001],
             [1.1,1.7000000000000002,0.8000000000000045],
-            [-1.3999999999999995,2.1000000000000005,1.3000000000000083],
+            [2.200000000000001,2.3000000000000007,4.000000000000014],
+            [6.899999999999993,3.200000000000001,3.4000000000000172],
+            [8.699999999999987,3.5000000000000013,2.70000000000002],
+            [9.199999999999985,5.799999999999995,4.40000000000002]
         ];
 
         endScene.sceneCamera = new SceneCamera(positionKeyFrames, frontKeyFrames);
@@ -81,8 +87,8 @@ class endRoomScene extends Scene {
 
         endScene.timer = new timer([
             [endSceneEventIDS.START_T, [0.0, 1.0]],
-            [endSceneEventIDS.CAMERA1_T, [1.0, 19.0]],
-            [endSceneEventIDS.BOOK_OPEN_T, [1.0, 5.0]],
+            [endSceneEventIDS.CAMERA1_T, [0.0, 23.0]],
+            [endSceneEventIDS.BOOK_OPEN_T, [0.0, 6.0]],
             [endSceneEventIDS.END_T, [23.0, 1.0]]
         ]);
 
@@ -104,15 +110,15 @@ class endRoomScene extends Scene {
 
     render() {
 
-        if(endScene.timer.getT() < 19.00)
-        {
+        // if(endScene.timer.getT() < 19.00)
+        // {
             gl.disable(gl.DEPTH_TEST);
             endScene.programSkyRender.use();
             gl.uniformMatrix4fv(endScene.programSkyRender.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
             gl.uniformMatrix4fv(endScene.programSkyRender.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
             renderModel(endScene.modelNightSky, endScene.programSkyRender, true, false);
             gl.enable(gl.DEPTH_TEST);
-        }
+        // }
         if (DEBUGMODE === CAMERA) {
             endScene.sceneCameraRig.render();
         }
@@ -123,51 +129,27 @@ class endRoomScene extends Scene {
         gl.uniformMatrix4fv(endScene.programCelShader.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
         gl.uniform3fv(endScene.programCelShader.getUniformLocation("viewPos"), currentCamera.getPosition());
         this.lightManager.updateLights(endScene.programCelShader.programObject);
+        
+        gl.uniformMatrix4fv(endScene.programCelShader.getUniformLocation("mMat"), false, mat4.create());
+        renderModel(endScene.modelRoom, endScene.programCelShader, true, true);
 
-        if(endScene.timer.getT() < 19.00)
-        {
-            gl.uniformMatrix4fv(endScene.programCelShader.getUniformLocation("mMat"), false, mat4.create());
-            renderModel(endScene.modelRoom, endScene.programCelShader, true, true);
-    
-            mat4.identity(transformationMatrix);
-            mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(4.18000, 0.60000, 0.77000));
-            mat4.rotateX(transformationMatrix, transformationMatrix, 0.00000);
-            mat4.rotateY(transformationMatrix, transformationMatrix, 1.50000);
-            mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00000);
-            mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(0.04000, 0.04000, 0.04000));
-            gl.uniformMatrix4fv(endScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
-            uploadBoneMatrices(endScene.modelBook, endScene.programCelShader, 0);
-            renderModel(endScene.modelBook, endScene.programCelShader, true);
-
-            mat4.identity(transformationMatrix);
-            mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(4.47000, 0.80000, 2.27000));
-            mat4.rotateX(transformationMatrix, transformationMatrix, 0.30000);
-            mat4.rotateY(transformationMatrix, transformationMatrix, -3.20000);
-            mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00000);
-            mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(1.40000, 1.40000, 1.40000));
-            gl.uniformMatrix4fv(endScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
-            renderModel(endScene.modelChild, endScene.programCelShader, true);
-        }
-        else{
-            mat4.identity(transformationMatrix);
-            mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(3.77, 1.10, 2.27));
-            mat4.rotateX(transformationMatrix, transformationMatrix, 0.0);
-            mat4.rotateY(transformationMatrix, transformationMatrix, test);
-            mat4.rotateZ(transformationMatrix, transformationMatrix, 0.0);
-            mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(0.03, 0.03, 0.03));
-            gl.uniformMatrix4fv(endScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
-            renderModel(endScene.modelEarth, endScene.programCelShader, true, true);
-        }
-
-        // mat4.identity(transformationMatrix);
-        // mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(4.84, -0.22, 2.62));
-        // mat4.rotateX(transformationMatrix, transformationMatrix, 0.00);
-        // mat4.rotateY(transformationMatrix, transformationMatrix, -2.50);
-        // mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00);
-        // mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(0.017, 0.017, 0.017));
-        // gl.uniformMatrix4fv(endScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
-        // uploadBoneMatrices(endScene.modelMother, endScene.programCelShader, 0);
-        // renderModel(endScene.modelMother, endScene.programCelShader, true);
+        mat4.identity(transformationMatrix);
+        mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(4.18000, 0.60000, 0.77000));
+        mat4.rotateX(transformationMatrix, transformationMatrix, 0.00000);
+        mat4.rotateY(transformationMatrix, transformationMatrix, 1.50000);
+        mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00000);
+        mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(0.04000, 0.04000, 0.04000));
+        gl.uniformMatrix4fv(endScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
+        uploadBoneMatrices(endScene.modelBook, endScene.programCelShader, 0);
+        renderModel(endScene.modelBook, endScene.programCelShader, true);
+        mat4.identity(transformationMatrix);
+        mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(4.47000, 0.80000, 2.27000));
+        mat4.rotateX(transformationMatrix, transformationMatrix, 0.30000);
+        mat4.rotateY(transformationMatrix, transformationMatrix, -3.20000);
+        mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00000);
+        mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(1.40000, 1.40000, 1.40000));
+        gl.uniformMatrix4fv(endScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
+        renderModel(endScene.modelChild, endScene.programCelShader, true);
 
         //gl.uniformMatrix4fv(endScene.programCelShader.getUniformLocation("mMat"), false, endScene.modelPlacer.getTransformationMatrix());
         //lightRenderer.renderLights(this.lightManager);
@@ -181,17 +163,8 @@ class endRoomScene extends Scene {
         //updateModel(endScene.modelMother,0,GLOBAL.deltaTime);
 
         if (endScene.timer.isEventStarted(endSceneEventIDS.START_T) && endScene.songStart == 0) {
-            //songPlayer.currentTime = 161.0;
+            songPlayer.currentTime = 161.0;
             endScene.songStart = 1;
-        }
-
-        if(endScene.timer.getT() > 19.00)
-        {
-            this.lightManager.getLight(0).color = [1.0,1.0,1.0];
-            this.lightManager.getLight(0).direction = [3.0,-1.0,-1.0];
-            this.lightManager.getLight(0).intensity = 1.0;
-            this.lightManager.getLight(1).color = [1.0,1.0,1.0];
-            this.lightManager.getLight(1).intensity = 0.0;
         }
 
         endScene.modelBook.lerpAnimations(0, lerp(1.0, 0.0, endScene.timer.getEventTime(endSceneEventIDS.BOOK_OPEN_T)));
