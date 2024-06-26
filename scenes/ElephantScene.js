@@ -1,6 +1,5 @@
 "use strict"
 
-
 var ElephantScene = {
     modelPlacer: null,
     sceneCamera: null,
@@ -15,8 +14,12 @@ var ElephantScene = {
 const ElephantSceneEventIDS = {
     START_T: 0,
     MOVE_T: 1,
-    MOVE_ELEPHANT_MOTHER : 2,
-    END_T: 3
+    MOVE_ELEPHANT_MOTHER_1: 2,
+    MOVE_ELEPHANT_BABY_1: 3,
+    MOVE_ELEPHANT_BABY_2: 4,
+    MOVE_ELEPHANT_BABY_3: 5,
+    MOVE_ELEPHANT_MOTHER_2: 6,
+    END_T: 7
 };
 
 class elephantScene extends Scene {
@@ -24,6 +27,72 @@ class elephantScene extends Scene {
     constructor() {
         super();
         this.isComplete = false;
+    }
+
+    setupProgram() {
+        ElephantScene.programCelShader = new ShaderProgram(gl, ['shaders/model/model.vert', 'shaders/model/celShader.frag']);
+    }
+
+    setupCamera() {
+
+        // Setup All Cameras here
+        // Setup All Cameras here
+        const positionKeyFrames = [
+
+            [-172, 50, 343],
+            [-173, 50, 273],
+            [-174, 42.7999999999999, 209],
+            [-226, 28.399999999999693, 25],
+            [-309, 21.299999999999578, -117],
+            [-300, 35.69999999999953, -169],
+            [-262, 31.899999999999615, -213],
+            [-239, 20.999999999999588, -210],
+            [-223, 4.799999999999544, -164.49999999999997],
+            [-228, 5.099999999999557, -56],
+            [-125, 8.599999999999767, 23],
+            [-46, 5, -1],
+            [0, 42, -118],
+            [-34, 40, -183],
+            [-119, 36, -185],
+            [-167, 12.19999999999969, -127],
+            [-75, -1.2000000000004418, -58.099999999999966],
+
+
+        ];
+
+        const frontKeyFrames = [
+
+            [-163, 42, 319],
+            [-161, 50, 218],
+            [-164, 35.6999999999998, 154],
+            [-228, 18.799999999999557, -41],
+            [-229, 14.699999999999626, -86],
+            [-248, 13.09999999999959, -137],
+            [-226, 12.099999999999532, -165],
+            [-224, 12.799999999999523, -104],
+            [-219, 4.1999999999995605, -68],
+            [-140, 8.999999999999858, 13],
+            [-56, 7, 3],
+            [-15, 27, -85],
+            [-39, 31, -123],
+            [-86, 24, -146],
+            [-118, 5.799999999999558, -138],
+            [-126, 3.1999999999995583, -113],
+            [-84, 4.599999999999561, -79],
+        ];
+
+        ElephantScene.sceneCamera = new SceneCamera(positionKeyFrames, frontKeyFrames);
+        ElephantScene.sceneCameraRig = new SceneCameraRig(ElephantScene.sceneCamera);
+        ElephantScene.sceneCameraRig.setRenderFront(true);
+        ElephantScene.sceneCameraRig.setRenderFrontPoints(true);
+        ElephantScene.sceneCameraRig.setRenderPath(true);
+        ElephantScene.sceneCameraRig.setRenderPathPoints(true);
+        ElephantScene.sceneCameraRig.setRenderPathToFront(true);
+        ElephantScene.sceneCameraRig.setScalingFactor(0.1);
+    }
+
+
+    init() {
 
         //Lighting Setup
         this.lightManager = new LightManager();
@@ -31,11 +100,8 @@ class elephantScene extends Scene {
 
         //For Ambient
         const directionalLight2 = new Light(0, [1.0, 1.0, 1.0], 0.15, [0, -400, -400], [0.0, -1.0, 1.0], 0.0, 0.0, 0.0, false);
-
         this.lightManager.addLight(directionalLight);
         this.lightManager.addLight(directionalLight2);
-
-
 
         //Grass Rendering class object
         this.myGrass = new grass(1500, 1500, 1500);
@@ -52,7 +118,6 @@ class elephantScene extends Scene {
         //PondWater
         this.myPondWater = new pondWater();
 
-
         //Load Models
         //Terrain
         this.terrainScale = 1000.0;
@@ -60,7 +125,6 @@ class elephantScene extends Scene {
         this.terrainModel = setupModel(this.terrainModelName, false);
         this.terrainModelMatrixArray = [];
         this.terrainTextue = null;
-
 
         this.whiteTexture = null;
         //Tree1
@@ -87,7 +151,6 @@ class elephantScene extends Scene {
         this.treeTrunk2Model = setupModel("treeTrunk2", false);
         this.treeTrunk2ModelMatrixArray = [];
 
-
         //Stones
         this.stone1Model = setupModel("stone1", false);
         this.stone1ModelMatrixArray = [];
@@ -102,83 +165,79 @@ class elephantScene extends Scene {
 
         this.currentMotherAnimation = 2;
         this.currentBabyAnimation = 3;
-    }
-
-    setupProgram() {
-        ElephantScene.programCelShader = new ShaderProgram(gl, ['shaders/model/model.vert', 'shaders/model/celShader.frag']);
-    }
-
-    setupCamera() {
-
-        // Setup All Cameras here
-        // Setup All Cameras here
-        const positionKeyFrames = [
-            [136, 50, 332],
-            [46, 50, 273],
-            [-34, 42.7999999999999, 209],
-            [-138, 28.399999999999693, 120],
-            [-229, 20.299999999999578, 13],
-            [-215, 16.699999999999527, -112],
-            [-111, 22.899999999999615, -45],
-            [-77, 20.999999999999588, 100],
-            [-158, 8.799999999999544, 163.50000000000003],
-            [-325, 5.099999999999557, 54],
-            [-215, 33.59999999999977, -208],
-            [0, 50, -300],
-            [181, 50, -305],
-            [306, 50, -4],
-            [61, 50, 249],
-            [-24, 28.19999999999969, 132],
-            [0, -1.2000000000004418, 0.9000000000000329]
-
-        ];
-
-        const frontKeyFrames = [
-            [129, 42, 319],
-            [17, 50, 245],
-            [-79, 35.6999999999998, 154],
-            [-191, 18.799999999999557, 9],
-            [-157, 23.699999999999626, 16],
-            [-165, 21.09999999999959, 26],
-            [-177, 17.099999999999532, 0],
-            [-139, 14.799999999999523, 10],
-            [-325, 4.1999999999995605, 38],
-            [-119, 39.99999999999986, -251],
-            [230, 50, -247],
-            [262, 50, 81],
-            [140, 50, 187],
-            [-7, 50, 148],
-            [12, -1.2000000000004418, -34],
-            [15, -0.8000000000004416, -48],
-            [22, -5.400000000000439, -66]
-        ];
-
-        ElephantScene.sceneCamera = new SceneCamera(positionKeyFrames, frontKeyFrames);
-        ElephantScene.sceneCameraRig = new SceneCameraRig(ElephantScene.sceneCamera);
-        ElephantScene.sceneCameraRig.setRenderFront(true);
-        ElephantScene.sceneCameraRig.setRenderFrontPoints(true);
-        ElephantScene.sceneCameraRig.setRenderPath(true);
-        ElephantScene.sceneCameraRig.setRenderPathPoints(true);
-        ElephantScene.sceneCameraRig.setRenderPathToFront(true);
-        ElephantScene.sceneCameraRig.setScalingFactor(0.1);
 
         // Spline Path for Elephant can be done in constructor
-        const positions = [
-            [90,0,126],
-            [-60,0,130],
-            [-163,0,111],
-            [-165,0,-2],
+        const motherPositions_1 = [
+            [-137, 0, 209],
+            [-125, 0, 130],
+            [-142, 0, 45],
+            [-205, 0, -44],
         ];
-        
-        this.motherPathSpline = new BsplineInterpolator(positions);
-        this.splineAdjuster = new SplineAdjuster(this.motherPathSpline);
-        this.splineAdjuster.setRenderPath(true);
-        this.splineAdjuster.setRenderPathPoints(true);
+
+        this.motherPathSpline_1 = new BsplineInterpolator(motherPositions_1);
+        this.splineMotherAdjuster_1 = new SplineAdjuster(this.motherPathSpline_1);
+        this.splineMotherAdjuster_1.setRenderPath(true);
+        this.splineMotherAdjuster_1.setRenderPathPoints(true);
         //this.splineAdjuster.setScalingFactor(0.01);
-    }
+
+        //First Baby Movement
+        const babyPositions_1 = [
+            [-161, 0, 175],
+            [-159, 0, 104],
+            [-191, 0, 19],
+            [-234, 0, -65],
+        ];
+
+        this.babyPathSpline_1 = new BsplineInterpolator(babyPositions_1);
+        this.splineBabyAdjuster_1 = new SplineAdjuster(this.babyPathSpline_1);
+        this.splineBabyAdjuster_1.setRenderPath(true);
+        this.splineBabyAdjuster_1.setRenderPathPoints(true);
+        //this.splineAdjuster.setScalingFactor(0.01);
+
+        //Second Baby Movement -> only baby moves,mother standing
+        const babyPositions_2 = [
+            [-234, 0, -64],
+            [-283, 0, -126],
+            [-268, 0, -176],
+            [-240, 0, -194],
+        ];
 
 
-    init() {
+        this.babyPathSpline_2 = new BsplineInterpolator(babyPositions_2);
+        this.splineBabyAdjuster_2 = new SplineAdjuster(this.babyPathSpline_2);
+        this.splineBabyAdjuster_2.setRenderPath(true);
+        this.splineBabyAdjuster_2.setRenderPathPoints(true);
+        //this.splineAdjuster.setScalingFactor(0.01);
+
+
+        //Third movement->both mother and baby moves
+        // Spline Path for Elephant can be done in constructor
+        const motherPositions_2 = [
+            [-205, 0, -44],
+            [-180, 0, -76],
+            [-150, 0, -122],
+            [-111, 0, -128],
+        ];
+
+        this.motherPathSpline_2 = new BsplineInterpolator(motherPositions_2);
+        this.splineMotherAdjuster_2 = new SplineAdjuster(this.motherPathSpline_2);
+        this.splineMotherAdjuster_2.setRenderPath(true);
+        this.splineMotherAdjuster_2.setRenderPathPoints(true);
+
+        //Third Baby Movement
+        const babyPositions_3 = [
+            [-231, 0, -189],
+            [-201, 0, -176],
+            [-167, 0, -173],
+            [-99, 0, -164],
+        ];
+
+        this.babyPathSpline_3 = new BsplineInterpolator(babyPositions_3);
+        this.splineBabyAdjuster_3 = new SplineAdjuster(this.babyPathSpline_3);
+        this.splineBabyAdjuster_3.setRenderPath(true);
+        this.splineBabyAdjuster_3.setRenderPathPoints(true);
+        //this.splineAdjuster.setScalingFactor(0.01);
+        this.splineAdjuster = this.splineBabyAdjuster_3;
 
         //model Placer
         ElephantScene.modelPlacer = new ModelPlacer();
@@ -189,13 +248,31 @@ class elephantScene extends Scene {
             //[ElephantSceneEventIDS.MOVE_T, [50.0, 15.0]], baby elephant entry
             //[ElephantSceneEventIDS.MOVE_T, [65.0, .0]], mother elephant entry
             [ElephantSceneEventIDS.MOVE_T, [1.0, 54.0]],
-            [ElephantSceneEventIDS.MOVE_ELEPHANT_MOTHER, [1.0, 25.0]],
+
+            //First Movement(both)
+            [ElephantSceneEventIDS.MOVE_ELEPHANT_MOTHER_1, [0.0, 15.0]],
+            [ElephantSceneEventIDS.MOVE_ELEPHANT_BABY_1, [0.0, 15.0]],
+
+            //Second Movement(only baby)
+            [ElephantSceneEventIDS.MOVE_ELEPHANT_BABY_2, [15.0, 10.0]],
+
+            //Third movement(both)
+            [ElephantSceneEventIDS.MOVE_ELEPHANT_BABY_3, [40.0, 8.0]],
+            [ElephantSceneEventIDS.MOVE_ELEPHANT_MOTHER_2, [40.0, 8.0]],
+
             [ElephantSceneEventIDS.END_T, [55.0, 1.0]]
         ]);
 
         // setup callbacks for 1 time events
-        ElephantScene.timer.registerCallback(10.0,()=>{this.currentMotherAnimation = 1});
-        ElephantScene.timer.registerCallback(20.0,()=>{this.currentBabyAnimation = 1});
+        //Elephant mother movement callback
+        ElephantScene.timer.registerCallback(15.0, () => { this.currentMotherAnimation = 1 }); //Standing
+        ElephantScene.timer.registerCallback(40.0, () => { this.currentMotherAnimation = 2 }); //Walking
+        ElephantScene.timer.registerCallback(48.0, () => { this.currentMotherAnimation = 0 }); //standing
+
+        //Elephant cub movement callback
+        ElephantScene.timer.registerCallback(25.0, () => { this.currentBabyAnimation = 1 }); //Playing
+        ElephantScene.timer.registerCallback(40.0, () => { this.currentBabyAnimation = 3 }); //Walking
+        ElephantScene.timer.registerCallback(48.0, () => { this.currentBabyAnimation = 1 }); //Playing
 
 
         //Setup Grass and other models Position Acoording To Terrain 
@@ -484,17 +561,53 @@ class elephantScene extends Scene {
         this.myModelDraw.renderModels(this.treeTrunk2Model, this.whiteTexture, this.treeTrunk2ModelMatrixArray, this.lightManager,false);
 
         //for stone1 model
-        this.myModelDraw.renderModels(this.stone1Model, this.terrainTextue, this.stone1ModelMatrixArray, this.lightManager,false);
+        this.myModelDraw.renderModels(this.stone1Model, this.terrainTextue, this.stone1ModelMatrixArray, this.lightManager);
 
+
+        //Elephants
         ElephantScene.programCelShader.use();
         gl.uniformMatrix4fv(ElephantScene.programCelShader.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
         gl.uniformMatrix4fv(ElephantScene.programCelShader.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
         gl.uniform3fv(ElephantScene.programCelShader.getUniformLocation("viewPos"), currentCamera.getPosition());
         this.lightManager.updateLights(ElephantScene.programCelShader.programObject);
 
-        var t = ElephantScene.timer.getEventTime(ElephantSceneEventIDS.MOVE_ELEPHANT_MOTHER);
-        var position = this.motherPathSpline.interpolateSpline(t - 0.01);
-        var front = this.motherPathSpline.interpolateSpline(t);
+        if (ElephantScene.timer.currentTime <= 15.0) {
+            //both moving
+            //Mother
+            this.renderElephantMother(ElephantSceneEventIDS.MOVE_ELEPHANT_MOTHER_1, this.motherPathSpline_1);
+            //Cub
+            this.renderElephantBaby(ElephantSceneEventIDS.MOVE_ELEPHANT_BABY_1, this.babyPathSpline_1);
+        }
+        else if (ElephantScene.timer.currentTime <= 40.0) {
+            //cub moving and mother standing
+            //Mother
+            this.renderElephantMother(ElephantSceneEventIDS.MOVE_ELEPHANT_MOTHER_1, this.motherPathSpline_1);
+            //Cub
+            this.renderElephantBaby(ElephantSceneEventIDS.MOVE_ELEPHANT_BABY_2, this.babyPathSpline_2);
+        }
+        else if (ElephantScene.timer.currentTime <= 56.0) {
+
+            //both moving
+            //Mother
+            this.renderElephantMother(ElephantSceneEventIDS.MOVE_ELEPHANT_MOTHER_2, this.motherPathSpline_2);
+            //Cub
+            this.renderElephantBaby(ElephantSceneEventIDS.MOVE_ELEPHANT_BABY_3, this.babyPathSpline_3);
+        }
+
+        gl.depthMask(false);
+        this.myGrass.renderGrass();
+        gl.depthMask(true);
+
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        this.myPondWater.renderPondWater(this.lightManager);
+        gl.disable(gl.BLEND);
+    }
+
+    renderElephantMother(eventID, pathSpline) {
+        var t = ElephantScene.timer.getEventTime(eventID);
+        var position = pathSpline.interpolateSpline(t - 0.01);
+        var front = pathSpline.interpolateSpline(t);
         // Translation matrix
         let translationMatrix = mat4.create();
         mat4.translate(translationMatrix, translationMatrix, position);
@@ -505,32 +618,30 @@ class elephantScene extends Scene {
         mat4.multiply(finalMatrix, translationMatrix, orientationMatrix);
         mat4.scale(finalMatrix, finalMatrix, vec3.fromValues(9.50, 9.50, 9.50));
         gl.uniformMatrix4fv(ElephantScene.programCelShader.getUniformLocation("mMat"), false, finalMatrix);
+        //renderModel(this.elephantMother, this.myModelDraw.modelProgram, true,true);
         uploadBoneMatrices(this.elephantMotherAnim, ElephantScene.programCelShader, this.currentMotherAnimation);
         renderModel(this.elephantMotherAnim, ElephantScene.programCelShader, true, true);
+    }
 
-        var transformationMatrix = mat4.create();
-        mat4.identity(transformationMatrix);
-        mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(-170.0, 0.00, -35.0));
-        mat4.rotateX(transformationMatrix, transformationMatrix, 0.00);
-        mat4.rotateY(transformationMatrix, transformationMatrix, 1.60);
-        mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00);
-        mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(9.50, 9.50, 9.50));
-        let path = this.cubPath;
-        gl.uniformMatrix4fv(ElephantScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
+    renderElephantBaby(eventID, pathSpline) {
+        var t = ElephantScene.timer.getEventTime(eventID);
+        var position = pathSpline.interpolateSpline(t - 0.01);
+        var front = pathSpline.interpolateSpline(t);
+        // Translation matrix
+        let translationMatrix = mat4.create();
+        mat4.translate(translationMatrix, translationMatrix, position);
+        // Orientation matrix using targetat
+        let orientationMatrix = targetat(position, front, vec3.fromValues(0.0, 1.0, 0.0));
+        // Combining the matrices
+        let finalMatrix = mat4.create();
+        mat4.multiply(finalMatrix, translationMatrix, orientationMatrix);
+        mat4.scale(finalMatrix, finalMatrix, vec3.fromValues(9.50, 9.50, 9.50));
+        gl.uniformMatrix4fv(ElephantScene.programCelShader.getUniformLocation("mMat"), false, finalMatrix);
+        //renderModel(this.elephantMother, this.myModelDraw.modelProgram, true,true);
         uploadBoneMatrices(this.elephantCubAnim, ElephantScene.programCelShader, this.currentBabyAnimation);
         renderModel(this.elephantCubAnim, ElephantScene.programCelShader, true, true);
-
-        //RenderGrass
-        // Disable depth mask before rendering grass
-        gl.depthMask(false);
-        this.myGrass.renderGrass();
-        gl.depthMask(true);
-
-        gl.enable(gl.BLEND);
-        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-        this.myPondWater.renderPondWater(this.lightManager);
-        gl.disable(gl.BLEND);
     }
+
 
     update() {
 
@@ -547,7 +658,7 @@ class elephantScene extends Scene {
         ElephantScene.timer.increment();
 
         if (ElephantScene.timer.isEventStarted(ElephantSceneEventIDS.START_T) && ElephantScene.songStart == 0) {
-            //songPlayer.currentTime = 50.0;
+            songPlayer.currentTime = 50.0;
             ElephantScene.songStart = 1;
             postProcessingSettings.enableFog = true;
         }
@@ -563,6 +674,7 @@ class elephantScene extends Scene {
 
         if (ElephantScene.timer.isEventComplete(ElephantSceneEventIDS.END_T)) {
             this.isComplete = true;
+            //this.uninit();
         }
     }
 
@@ -651,7 +763,7 @@ class elephantScene extends Scene {
                 break;
             case SPLINE:
                 this.splineAdjuster.renderUI();
-            break;
+                break;
             case NONE:
                 break;
         }
@@ -670,7 +782,7 @@ class elephantScene extends Scene {
                 break;
             case SPLINE:
                 this.splineAdjuster.keyboardFunc(key);
-            break;
+                break;
             case NONE:
                 break;
         }
