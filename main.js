@@ -141,6 +141,7 @@ function main() {
 	canvas.height = window.innerHeight;
 	//document.body.style.margin = "0";
 	document.body.appendChild(canvas);
+	ImGui_Impl.Init(gl);
 
 	// setup event listners
 	window.addEventListener('resize', () => onMyResize());
@@ -193,7 +194,6 @@ function main() {
 
 	fpsElem = document.getElementById('fps');
 
-	ImGui_Impl.Init(gl);
 	initScenes();
 	window.requestAnimationFrame(renderFrame);
 }

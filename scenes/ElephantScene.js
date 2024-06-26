@@ -1,6 +1,5 @@
 "use strict"
 
-
 var ElephantScene = {
     modelPlacer: null,
     sceneCamera: null,
@@ -20,175 +19,14 @@ const ElephantSceneEventIDS = {
     MOVE_ELEPHANT_BABY_2: 4,
     MOVE_ELEPHANT_BABY_3: 5,
     MOVE_ELEPHANT_MOTHER_2: 6,
-
     END_T: 7
 };
-
 
 class elephantScene extends Scene {
 
     constructor() {
         super();
         this.isComplete = false;
-
-        //Lighting Setup
-        this.lightManager = new LightManager();
-        const directionalLight = new Light(0, [1.0, 1.0, 1.0], 1.0, [0, 400, 400], [0.0, -1.0, -1.0], 0.0, 0.0, 0.0, false);
-
-        //For Ambient
-        const directionalLight2 = new Light(0, [1.0, 1.0, 1.0], 0.15, [0, -400, -400], [0.0, -1.0, 1.0], 0.0, 0.0, 0.0, false);
-
-        this.lightManager.addLight(directionalLight);
-        this.lightManager.addLight(directionalLight2);
-
-
-
-        //Grass Rendering class object
-        this.myGrass = new grass(1500, 1500, 1500);
-
-        //Atmospheric Scattering Class Object
-        this.myAtmScat = new atmScattering();
-
-        //Vegetation
-        this.myVegetation = new vegetation();
-
-        //Models(Terrain,Tree,Stones)
-        this.myModelDraw = new drawModels();
-
-        //PondWater
-        this.myPondWater = new pondWater();
-
-
-        //Load Models
-        //Terrain
-        this.terrainScale = 1000.0;
-        this.terrainModelName = "terrain";
-        this.terrainModel = setupModel(this.terrainModelName, false);
-        this.terrainModelMatrixArray = [];
-        this.terrainTextue = null;
-
-
-        this.whiteTexture = null;
-        //Tree1
-        this.tree1Model = setupModel("tree1", false);
-        this.tree1ModelMatrixArray = [];
-        //Tree2
-        this.tree2Model = setupModel("tree2", false);
-        this.tree2ModelMatrixArray = [];
-        //Tree3
-        this.tree3Model = setupModel("tree3", false);
-        this.tree3ModelMatrixArray = [];
-
-        //Tree Logs
-        this.treeLog1Model = setupModel("treeLog1", false);
-        this.treeLog1ModelMatrixArray = [];
-
-        this.treeLog2Model = setupModel("treeLog2", false);
-        this.treeLog2ModelMatrixArray = [];
-
-        //Tree Trunks
-        this.treeTrunk1Model = setupModel("treeTrunk1", false);
-        this.treeTrunk1ModelMatrixArray = [];
-
-        this.treeTrunk2Model = setupModel("treeTrunk2", false);
-        this.treeTrunk2ModelMatrixArray = [];
-
-
-        //Stones
-        this.stone1Model = setupModel("stone1", false);
-        this.stone1ModelMatrixArray = [];
-
-        //this.elephantMother = setupModel("elephantMother", false);
-        //this.elephantCub = setupModel("elephantCub", false);
-
-        this.elephantMotherAnim = setupModel("elephantMother", true);
-        console.log(this.elephantMotherAnim);
-        this.elephantCubAnim = setupModel("elephantCub", true);
-        console.log(this.elephantCubAnim);
-
-        this.currentMotherAnimation = 2;
-        this.currentBabyAnimation = 3;
-
-        // Spline Path for Elephant can be done in constructor
-        const motherPositions_1 = [
-            [-137, 0, 209],
-            [-125, 0, 130],
-            [-142, 0, 45],
-            [-205, 0, -44],
-
-        ];
-
-        this.motherPathSpline_1 = new BsplineInterpolator(motherPositions_1);
-        this.splineMotherAdjuster_1 = new SplineAdjuster(this.motherPathSpline_1);
-        this.splineMotherAdjuster_1.setRenderPath(true);
-        this.splineMotherAdjuster_1.setRenderPathPoints(true);
-        //this.splineAdjuster.setScalingFactor(0.01);
-
-        //First Baby Movement
-        const babyPositions_1 = [
-            [-161, 0, 175],
-            [-159, 0, 104],
-            [-191, 0, 19],
-            [-234, 0, -65],
-        ];
-
-        this.babyPathSpline_1 = new BsplineInterpolator(babyPositions_1);
-        this.splineBabyAdjuster_1 = new SplineAdjuster(this.babyPathSpline_1);
-        this.splineBabyAdjuster_1.setRenderPath(true);
-        this.splineBabyAdjuster_1.setRenderPathPoints(true);
-        //this.splineAdjuster.setScalingFactor(0.01);
-
-        //Second Baby Movement -> only baby moves,mother standing
-        const babyPositions_2 = [
-            [-234, 0, -64],
-            [-283, 0, -126],
-            [-268, 0, -176],
-            [-240, 0, -194],
-        ];
-
-
-        this.babyPathSpline_2 = new BsplineInterpolator(babyPositions_2);
-        this.splineBabyAdjuster_2 = new SplineAdjuster(this.babyPathSpline_2);
-        this.splineBabyAdjuster_2.setRenderPath(true);
-        this.splineBabyAdjuster_2.setRenderPathPoints(true);
-        //this.splineAdjuster.setScalingFactor(0.01);
-
-
-        //Third movement->both mother and baby moves
-        // Spline Path for Elephant can be done in constructor
-        const motherPositions_2 = [
-            [-205, 0, -44],
-            [-180, 0, -76],
-            [-150, 0, -122],
-            [-111, 0, -128],
-
-
-        ];
-
-        this.motherPathSpline_2 = new BsplineInterpolator(motherPositions_2);
-        this.splineMotherAdjuster_2 = new SplineAdjuster(this.motherPathSpline_2);
-        this.splineMotherAdjuster_2.setRenderPath(true);
-        this.splineMotherAdjuster_2.setRenderPathPoints(true);
-
-        //Third Baby Movement
-        const babyPositions_3 = [
-            [-231, 0, -189],
-            [-201, 0, -176],
-            [-167, 0, -173],
-            [-99, 0, -164],
-
-        ];
-
-
-        this.babyPathSpline_3 = new BsplineInterpolator(babyPositions_3);
-        this.splineBabyAdjuster_3 = new SplineAdjuster(this.babyPathSpline_3);
-        this.splineBabyAdjuster_3.setRenderPath(true);
-        this.splineBabyAdjuster_3.setRenderPathPoints(true);
-        //this.splineAdjuster.setScalingFactor(0.01);
-
-
-
-        this.splineAdjuster = this.splineBabyAdjuster_3;
     }
 
     setupProgram() {
@@ -251,12 +89,155 @@ class elephantScene extends Scene {
         ElephantScene.sceneCameraRig.setRenderPathPoints(true);
         ElephantScene.sceneCameraRig.setRenderPathToFront(true);
         ElephantScene.sceneCameraRig.setScalingFactor(0.1);
-
-
     }
 
 
     init() {
+
+        //Lighting Setup
+        this.lightManager = new LightManager();
+        const directionalLight = new Light(0, [1.0, 1.0, 1.0], 1.0, [0, 400, 400], [0.0, -1.0, -1.0], 0.0, 0.0, 0.0, false);
+
+        //For Ambient
+        const directionalLight2 = new Light(0, [1.0, 1.0, 1.0], 0.15, [0, -400, -400], [0.0, -1.0, 1.0], 0.0, 0.0, 0.0, false);
+        this.lightManager.addLight(directionalLight);
+        this.lightManager.addLight(directionalLight2);
+
+        //Grass Rendering class object
+        this.myGrass = new grass(1500, 1500, 1500);
+
+        //Atmospheric Scattering Class Object
+        this.myAtmScat = new atmScattering();
+
+        //Vegetation
+        this.myVegetation = new vegetation();
+
+        //Models(Terrain,Tree,Stones)
+        this.myModelDraw = new drawModels();
+
+        //PondWater
+        this.myPondWater = new pondWater();
+
+        //Load Models
+        //Terrain
+        this.terrainScale = 1000.0;
+        this.terrainModelName = "terrain";
+        this.terrainModel = setupModel(this.terrainModelName, false);
+        this.terrainModelMatrixArray = [];
+        this.terrainTextue = null;
+
+        this.whiteTexture = null;
+        //Tree1
+        this.tree1Model = setupModel("tree1", false);
+        this.tree1ModelMatrixArray = [];
+        //Tree2
+        this.tree2Model = setupModel("tree2", false);
+        this.tree2ModelMatrixArray = [];
+        //Tree3
+        this.tree3Model = setupModel("tree3", false);
+        this.tree3ModelMatrixArray = [];
+
+        //Tree Logs
+        this.treeLog1Model = setupModel("treeLog1", false);
+        this.treeLog1ModelMatrixArray = [];
+
+        this.treeLog2Model = setupModel("treeLog2", false);
+        this.treeLog2ModelMatrixArray = [];
+
+        //Tree Trunks
+        this.treeTrunk1Model = setupModel("treeTrunk1", false);
+        this.treeTrunk1ModelMatrixArray = [];
+
+        this.treeTrunk2Model = setupModel("treeTrunk2", false);
+        this.treeTrunk2ModelMatrixArray = [];
+
+        //Stones
+        this.stone1Model = setupModel("stone1", false);
+        this.stone1ModelMatrixArray = [];
+
+        //this.elephantMother = setupModel("elephantMother", false);
+        //this.elephantCub = setupModel("elephantCub", false);
+
+        this.elephantMotherAnim = setupModel("elephantMother", true);
+        console.log(this.elephantMotherAnim);
+        this.elephantCubAnim = setupModel("elephantCub", true);
+        console.log(this.elephantCubAnim);
+
+        this.currentMotherAnimation = 2;
+        this.currentBabyAnimation = 3;
+
+        // Spline Path for Elephant can be done in constructor
+        const motherPositions_1 = [
+            [-137, 0, 209],
+            [-125, 0, 130],
+            [-142, 0, 45],
+            [-205, 0, -44],
+        ];
+
+        this.motherPathSpline_1 = new BsplineInterpolator(motherPositions_1);
+        this.splineMotherAdjuster_1 = new SplineAdjuster(this.motherPathSpline_1);
+        this.splineMotherAdjuster_1.setRenderPath(true);
+        this.splineMotherAdjuster_1.setRenderPathPoints(true);
+        //this.splineAdjuster.setScalingFactor(0.01);
+
+        //First Baby Movement
+        const babyPositions_1 = [
+            [-161, 0, 175],
+            [-159, 0, 104],
+            [-191, 0, 19],
+            [-234, 0, -65],
+        ];
+
+        this.babyPathSpline_1 = new BsplineInterpolator(babyPositions_1);
+        this.splineBabyAdjuster_1 = new SplineAdjuster(this.babyPathSpline_1);
+        this.splineBabyAdjuster_1.setRenderPath(true);
+        this.splineBabyAdjuster_1.setRenderPathPoints(true);
+        //this.splineAdjuster.setScalingFactor(0.01);
+
+        //Second Baby Movement -> only baby moves,mother standing
+        const babyPositions_2 = [
+            [-234, 0, -64],
+            [-283, 0, -126],
+            [-268, 0, -176],
+            [-240, 0, -194],
+        ];
+
+
+        this.babyPathSpline_2 = new BsplineInterpolator(babyPositions_2);
+        this.splineBabyAdjuster_2 = new SplineAdjuster(this.babyPathSpline_2);
+        this.splineBabyAdjuster_2.setRenderPath(true);
+        this.splineBabyAdjuster_2.setRenderPathPoints(true);
+        //this.splineAdjuster.setScalingFactor(0.01);
+
+
+        //Third movement->both mother and baby moves
+        // Spline Path for Elephant can be done in constructor
+        const motherPositions_2 = [
+            [-205, 0, -44],
+            [-180, 0, -76],
+            [-150, 0, -122],
+            [-111, 0, -128],
+        ];
+
+        this.motherPathSpline_2 = new BsplineInterpolator(motherPositions_2);
+        this.splineMotherAdjuster_2 = new SplineAdjuster(this.motherPathSpline_2);
+        this.splineMotherAdjuster_2.setRenderPath(true);
+        this.splineMotherAdjuster_2.setRenderPathPoints(true);
+
+        //Third Baby Movement
+        const babyPositions_3 = [
+            [-231, 0, -189],
+            [-201, 0, -176],
+            [-167, 0, -173],
+            [-99, 0, -164],
+        ];
+
+        this.babyPathSpline_3 = new BsplineInterpolator(babyPositions_3);
+        this.splineBabyAdjuster_3 = new SplineAdjuster(this.babyPathSpline_3);
+        this.splineBabyAdjuster_3.setRenderPath(true);
+        this.splineBabyAdjuster_3.setRenderPathPoints(true);
+        //this.splineAdjuster.setScalingFactor(0.01);
+        this.splineAdjuster = this.splineBabyAdjuster_3;
 
         //model Placer
         ElephantScene.modelPlacer = new ModelPlacer();
@@ -698,7 +679,6 @@ class elephantScene extends Scene {
 
         if (ElephantScene.timer.isEventComplete(ElephantSceneEventIDS.END_T)) {
             this.isComplete = true;
-
             //this.uninit();
         }
 
