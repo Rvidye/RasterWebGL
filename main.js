@@ -11,6 +11,8 @@ var modelList = [
 	{ name: "cone", files: ['models/lightmesh/cone.obj'], flipTex: false },
 	{ name: "point", files: ['models/lightmesh/point.obj'], flipTex: false },
 	//{ name: "cat", files: ['models/scene1/cat/cat.gltf', "models/scene1/cat/cat.bin"], flipTex: true },
+
+
 	{ name: "room1", files: ['models/scene1/room/room3.gltf', "models/scene1/room/room3.bin"], flipTex: true },
 	{ name: "book", files: ['models/scene1/book/book.gltf', "models/scene1/book/book.bin"], flipTex: true },
 	{ name: "AMC", files: ['models/scene1/intro/amc.glb'], flipTex: false },
@@ -20,6 +22,7 @@ var modelList = [
 	{ name: "mother", files: ['models/scene1/mother/mother.fbx'], flipTex: true },
 	{ name: "earth", files: ['models/earth/earth.gltf', 'models/earth/earth.bin'], flipTex: true },
 	//{ name: "test4", files: ['models/Avocado.glb'], flipTex: true },
+
 
 	//Elephant Scene Models
 	{ name: "terrain", files: ['models/ElephantScene/elp4_3.glb'], flipTex: true },
@@ -36,10 +39,7 @@ var modelList = [
 	// { name: "elephantCub", files: ['models/ElephantScene/elephant/cub.gltf', 'models/ElephantScene/elephant/cub.bin'], flipTex: true },
 	{ name: "elephantMother", files: ['models/ElephantScene/elephant1/mother.gltf', 'models/ElephantScene/elephant1/mother.bin'], flipTex: true },
 	{ name: "elephantCub", files: ['models/ElephantScene/elephant1/baby.gltf', 'models/ElephantScene/elephant1/baby.bin'], flipTex: true },
-	//{ name: "kangarooMother", files: ['models/kangaroo/mother.gltf', 'models/kangaroo/mother.bin'], flipTex: true },
-	//	{ name: "kangarooJoey", files: ['models/kangaroo/joey.gltf', 'models/kangaroo/joey.bin'], flipTex: true },
-	//	{ name: "stone2", files: ['models/ElephantScene/rock1.glb'], flipTex: false },
-	//	{ name: "stone3", files: ['models/ElephantScene/rock2.glb'], flipTex: false },
+
 
 
 	//Kangaroo Scene Models
@@ -47,8 +47,8 @@ var modelList = [
 	{ name: "kangarooSceneObjects", files: ['models/KangarooScene/objects/objects.gltf', 'models/KangarooScene/objects/objects.bin'], flipTex: true },
 	{ name: "kangarooSceneMountains", files: ['models/KangarooScene/mountains/mountains.gltf', 'models/KangarooScene/mountains/mountains.bin'], flipTex: true },
 
-	{ name: "kangarooMother", files: ['models/KangarooScene/kangarooMother/kangarooMother.gltf', 'models/KangarooScene/kangarooMother/kangarooMother.bin'], flipTex: true },
-	{ name: "kangarooJoey", files: ['models/KangarooScene/kangarooBaby/kangarooBaby.gltf', 'models/KangarooScene/kangarooBaby/kangarooBaby.bin'], flipTex: true },
+	{ name: "kangarooMother", files: ['models/kangaroo/mother.gltf', 'models/kangaroo/mother.bin'], flipTex: true },
+	{ name: "kangarooJoey", files: ['models/kangaroo/joey.gltf', 'models/kangaroo/joey.bin'], flipTex: true },
 
 
 
@@ -185,11 +185,11 @@ function main() {
 
 	// scene setup
 	//addScene(new tutorial());
-	//addScene(new roomScene());
+	addScene(new roomScene());
 	addScene(new elephantScene());
-	// addScene(new pageChangeScene());
-	// addScene(new kangarooScene());
-	// addScene(new endRoomScene());
+	addScene(new pageChangeScene());
+	addScene(new kangarooScene());
+	addScene(new endRoomScene());
 
 	fpsElem = document.getElementById('fps');
 
