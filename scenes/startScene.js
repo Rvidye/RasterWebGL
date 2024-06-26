@@ -51,7 +51,7 @@ class roomScene extends Scene {
         const positionKeyFrames = [
             //  [15.899999999999999, 2.9999999999999987, 2.4999999999999996],
             //  [13.200000000000003, 3.4999999999999996, 2.5999999999999996],
-            [10.900000000000007, 3.8, 2.8],
+            [10.900000000000007,2.8,2.8,],
             [7.19999999999999, 3.5000000000000018, 3.400000000000021],
             [4.899999999999999, 2.600000000000001, 4.000000000000018],
             [2.1000000000000005, 2.500000000000001, 5.20000000000001],
@@ -64,7 +64,7 @@ class roomScene extends Scene {
         const frontKeyFrames = [
             // [17.70000000000002, 2.5999999999999983, 2.4000000000000004],
             //  [14.7, 3.0999999999999988, 2.5000000000000004],
-            [12.100000000000003, 3.8, 2.7000000000000006],
+            [12.100000000000003,2.8,2.7000000000000006],
             [8.599999999999987, 3.7000000000000015, 3.1000000000000205],
             [6.599999999999994, 3.300000000000001, 3.4000000000000172],
             [3.100000000000002, 2.3000000000000007, 4.000000000000014],
@@ -115,9 +115,9 @@ class roomScene extends Scene {
         //this.lightManager.addLight(spotLight);
 
         startScene.modelPlacer = new ModelPlacer();
-        startScene.modelPlacer.position = vec3.fromValues(4.02000, 0.60000, 1.89000);
-        startScene.modelPlacer.rotation = vec3.fromValues(0.00, 1.50, 0.00);
-        startScene.modelPlacer.scale = vec3.fromValues(0.04000, 0.04000, 0.04000);
+        startScene.modelPlacer.position = vec3.fromValues(3.77000, 1.10000, 2.27000);
+        startScene.modelPlacer.rotation = vec3.fromValues(0.00, -2.80, 0.00);
+        startScene.modelPlacer.scale = vec3.fromValues(1.50000, 1.50000, 1.50000);
     }
 
     renderShadow(shadowProgram) {
@@ -183,11 +183,11 @@ class roomScene extends Scene {
         renderModel(startScene.modelBook, startScene.programCelShader, true);
 
         mat4.identity(transformationMatrix);
-        mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(3.77, 1.10, 2.27));
-        mat4.rotateX(transformationMatrix, transformationMatrix, 0.00);
-        mat4.rotateY(transformationMatrix, transformationMatrix, -3.30);
-        mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00);
-        mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(1.40, 1.40, 1.40));
+        mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(4.07000, 1.00000, 2.67000));
+        mat4.rotateX(transformationMatrix, transformationMatrix, 0.00000);
+        mat4.rotateY(transformationMatrix, transformationMatrix, -2.80000);
+        mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00000);
+        mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(1.50000, 1.50000, 1.50000))
         gl.uniformMatrix4fv(startScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
         renderModel(startScene.modelChild, startScene.programCelShader, true);
 
@@ -201,11 +201,11 @@ class roomScene extends Scene {
         // renderModel(startScene.modelMother, startScene.programCelShader, true);
 
         mat4.identity(transformationMatrix);
-        mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(4.84, -0.22, 2.62));
-        mat4.rotateX(transformationMatrix, transformationMatrix, 0.00);
-        mat4.rotateY(transformationMatrix, transformationMatrix, -2.50);
-        mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00);
-        mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(0.017, 0.017, 0.017));
+        mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(5.00000, -0.40000, 3.20000));
+        mat4.rotateX(transformationMatrix, transformationMatrix, 0.00000);
+        mat4.rotateY(transformationMatrix, transformationMatrix, -2.50000);
+        mat4.rotateZ(transformationMatrix, transformationMatrix, 0.20000);
+        mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(1.70000, 1.70000, 1.70000));
         gl.uniformMatrix4fv(startScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
         uploadBoneMatrices(startScene.modelMother, startScene.programCelShader, 0);
         renderModel(startScene.modelMother, startScene.programCelShader, true);
