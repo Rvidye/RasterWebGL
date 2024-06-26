@@ -23,7 +23,15 @@ const postProcessingSettings = {
 	enableGodRays: false,
 	enableFog: false,
 	debugShaow: false,
-	enableOutline: false
+	enableOutline: true
+};
+
+const outlineShaderOptions = {
+    depthBias : 1.0,
+    depthMultiplier : 20.0,
+    normalBias : 1.0,
+    normalMultiplier : 1.0,
+    outlineColor : [1.0,1.0,1.0]
 };
 
 const NONE = 0;
