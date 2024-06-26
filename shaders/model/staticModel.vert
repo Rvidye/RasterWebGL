@@ -3,6 +3,7 @@
 layout(location = 0)in vec4 vPos;
 layout(location = 1)in vec3 vNor;
 layout(location = 2)in vec2 vTex;
+layout(location = 5) in mat4 instanceMatrix; // Instance-specific model matrix
 
 uniform mat4 pMat;
 uniform mat4 vMat;
@@ -15,10 +16,9 @@ out vec2 v_tex;
 
 void main(void){
     gl_PointSize = 1.0;
-    vec4 pos = mMat * nMat * vPos;
+    vec4 pos = instanceMatrix * mMat * nMat * vPos;
     v_pos = vec3(pos.xyz) / pos.w;
-    v_normal = mat3(mMat) * vNor;
+    v_normal = mat3(instanceMatrix) * mat3(mMat) * vNor;
     v_tex = vTex;
     gl_Position = pMat * vMat * pos;
 }
-

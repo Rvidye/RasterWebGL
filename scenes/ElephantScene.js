@@ -461,16 +461,10 @@ class elephantScene extends Scene {
         this.myAtmScat.renderAtmScattering();
         // gl.depthMask(gl.TRUE);
 
-
-        //RenderGrass
-        this.myGrass.renderGrass();
-
-
         // this.myVegetation.renderVegetation();
 
         //for Terrain
         this.myModelDraw.renderModels(this.terrainModel, this.terrainTextue, this.terrainModelMatrixArray, this.lightManager);
-
 
         //For tree1 model
         this.myModelDraw.renderModels(this.tree1Model, this.whiteTexture, this.tree1ModelMatrixArray, this.lightManager);
@@ -488,7 +482,6 @@ class elephantScene extends Scene {
         //Tree Trunks
         this.myModelDraw.renderModels(this.treeTrunk1Model, this.whiteTexture, this.treeTrunk1ModelMatrixArray, this.lightManager);
         this.myModelDraw.renderModels(this.treeTrunk2Model, this.whiteTexture, this.treeTrunk2ModelMatrixArray, this.lightManager);
-
 
         //for stone1 model
         this.myModelDraw.renderModels(this.stone1Model, this.terrainTextue, this.stone1ModelMatrixArray, this.lightManager);
@@ -512,7 +505,6 @@ class elephantScene extends Scene {
         mat4.multiply(finalMatrix, translationMatrix, orientationMatrix);
         mat4.scale(finalMatrix, finalMatrix, vec3.fromValues(9.50, 9.50, 9.50));
         gl.uniformMatrix4fv(ElephantScene.programCelShader.getUniformLocation("mMat"), false, finalMatrix);
-        //renderModel(this.elephantMother, this.myModelDraw.modelProgram, true,true);
         uploadBoneMatrices(this.elephantMotherAnim, ElephantScene.programCelShader, this.currentMotherAnimation);
         renderModel(this.elephantMotherAnim, ElephantScene.programCelShader, true, true);
 
@@ -527,6 +519,9 @@ class elephantScene extends Scene {
         gl.uniformMatrix4fv(ElephantScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
         uploadBoneMatrices(this.elephantCubAnim, ElephantScene.programCelShader, this.currentBabyAnimation);
         renderModel(this.elephantCubAnim, ElephantScene.programCelShader, true, true);
+
+        //RenderGrass
+        this.myGrass.renderGrass();
 
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -566,11 +561,7 @@ class elephantScene extends Scene {
 
         if (ElephantScene.timer.isEventComplete(ElephantSceneEventIDS.END_T)) {
             this.isComplete = true;
-
-            //this.uninit();
         }
-
-
     }
 
     reset() {

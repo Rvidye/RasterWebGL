@@ -262,14 +262,14 @@ class kangarooScene extends Scene {
         mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00);
         mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(3.10, 3.10, 3.10));
 
-        this.myModelDraw.modelProgram.use();
-        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
-        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
-        gl.uniform3fv(this.myModelDraw.modelProgram.getUniformLocation("viewPos"), currentCamera.getPosition());
-        this.lightManager.updateLights(this.myModelDraw.modelProgram.programObject);
-        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("mMat"), false, transformationMatrix);
-        renderModel(this.kangarooMother, this.myModelDraw.modelProgram, true, true);
-
+        KangarooScene.programCelShader.use();
+        gl.uniformMatrix4fv(KangarooScene.programCelShader.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
+        gl.uniformMatrix4fv(KangarooScene.programCelShader.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
+        gl.uniform3fv(KangarooScene.programCelShader.getUniformLocation("viewPos"), currentCamera.getPosition());
+        this.lightManager.updateLights(KangarooScene.programCelShader.programObject);
+        gl.uniformMatrix4fv(KangarooScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
+        //uploadBoneMatrices(this.kangarooMother, KangarooScene.programCelShader, 0);
+        renderModel(this.kangarooMother, KangarooScene.programCelShader, true, true);
 
         transformationMatrix = mat4.create();
         mat4.identity(transformationMatrix);
@@ -279,29 +279,24 @@ class kangarooScene extends Scene {
         mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00);
         mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(6.50, 6.50, 6.50));
 
-        this.myModelDraw.modelProgram.use();
-        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
-        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
-        gl.uniform3fv(this.myModelDraw.modelProgram.getUniformLocation("viewPos"), currentCamera.getPosition());
-        this.lightManager.updateLights(this.myModelDraw.modelProgram.programObject);
-        gl.uniformMatrix4fv(this.myModelDraw.modelProgram.getUniformLocation("mMat"), false, transformationMatrix);
-        renderModel(this.kangarooBaby, this.myModelDraw.modelProgram, true, true);
-
+        gl.uniformMatrix4fv(KangarooScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
+        //uploadBoneMatrices(this.kangarooBaby, KangarooScene.programCelShader, 0);
+        renderModel(this.kangarooBaby, KangarooScene.programCelShader, true, true);
 
         //RenderGrass
         this.myGrass.renderGrass();
-
-
     }
 
     update() {
 
         this.myGrass.updateGrass();
 
-
         KangarooScene.sceneCamera.setT(KangarooScene.timer.getEventTime(KangarooSceneEventIDS.MOVE_T));
         // updateModel(KangarooScene.modelCat, 0, GLOBAL.deltaTime);
         KangarooScene.timer.increment();
+
+        //updateModel(this.kangarooMother, 0, GLOBAL.deltaTime);
+        //updateModel(this.kangarooBaby, 0, GLOBAL.deltaTime);
 
         if (KangarooScene.timer.isEventStarted(KangarooSceneEventIDS.START_T) && KangarooScene.songStart == 0) {
             //songPlayer.currentTime = 125.0;
