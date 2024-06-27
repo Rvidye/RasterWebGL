@@ -13,16 +13,17 @@ var modelList = [
 	//{ name: "cat", files: ['models/scene1/cat/cat.gltf', "models/scene1/cat/cat.bin"], flipTex: true },
 
 
+/*
 	{ name: "room1", files: ['models/scene1/room/room3.gltf', "models/scene1/room/room3.bin"], flipTex: true },
 	{ name: "book", files: ['models/scene1/book/book.gltf', "models/scene1/book/book.bin"], flipTex: true },
 	{ name: "AMC", files: ['models/scene1/intro/amc.glb'], flipTex: false },
 	{ name: "RASTER", files: ['models/scene1/intro/raster.glb'], flipTex: false },
 	{ name: "nightSky", files: ['models/scene1/night/nightSky.gltf', "models/scene1/night/nightSky.bin"], flipTex: true },
 	{ name: "child", files: ['models/scene1/child/child.gltf', "models/scene1/child/child.bin"], flipTex: true },
-	{ name: "mother", files: ['models/scene1/mother/mother.gltf','models/scene1/mother/mother.bin'], flipTex: true },
+	{ name: "mother", files: ['models/scene1/mother/mother.gltf', 'models/scene1/mother/mother.bin'], flipTex: true },
 	{ name: "earth", files: ['models/earth/earth.gltf', 'models/earth/earth.bin'], flipTex: true },
 	//{ name: "test4", files: ['models/Avocado.glb'], flipTex: true },
-
+*/
 
 	//Elephant Scene Models
 	{ name: "terrain", files: ['models/ElephantScene/elp4_3.glb'], flipTex: true },
@@ -185,11 +186,11 @@ function main() {
 
 	// scene setup
 	//addScene(new tutorial());
-	addScene(new roomScene());
+	//addScene(new roomScene());
 	addScene(new elephantScene());
-	addScene(new pageChangeScene());
+	//addScene(new pageChangeScene());
 	addScene(new kangarooScene());
-	addScene(new endRoomScene());
+	//addScene(new endRoomScene());
 
 	fpsElem = document.getElementById('fps');
 
@@ -212,10 +213,10 @@ function onMyKeyPress(event) {
 			break;
 		case "Space":
 			isAnimating = !isAnimating;
-			if(isAnimating){
+			if (isAnimating) {
 				songPlayer.play();
 			}
-			else{
+			else {
 				songPlayer.pause();
 			}
 			break;
@@ -339,7 +340,7 @@ function handleUI() {
 		ImGui.EndCombo();
 	}
 
-	if(postProcessingSettings.enableOutline){
+	if (postProcessingSettings.enableOutline) {
 		ImGui.Text("Outline Shader Options:");
 		ImGui.SliderFloat("Depth Bias", (value = outlineShaderOptions.depthBias) => outlineShaderOptions.depthBias = value, 0.0, 10.0);
 		ImGui.SliderFloat("Depth Multiplier", (value = outlineShaderOptions.depthMultiplier) => outlineShaderOptions.depthMultiplier = value, 0.0, 50.0);
