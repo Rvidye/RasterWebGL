@@ -2,6 +2,7 @@
 precision mediump float;
 uniform sampler2D srcTexture;
 uniform float filterRadius;
+uniform float bloomIntensity;
 
 in vec2 texCoord;
 out vec3 upsample;
@@ -24,4 +25,5 @@ void main() {
     upsample += (b + d + f + h) * 2.0;
     upsample += (a + c + g + i);
     upsample *= 1.0 / 16.0;
+    upsample += upsample * bloomIntensity;
 }

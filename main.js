@@ -12,17 +12,15 @@ var modelList = [
 	{ name: "point", files: ['models/lightmesh/point.obj'], flipTex: false },
 	//{ name: "cat", files: ['models/scene1/cat/cat.gltf', "models/scene1/cat/cat.bin"], flipTex: true },
 
-
 	{ name: "room1", files: ['models/scene1/room/room3.gltf', "models/scene1/room/room3.bin"], flipTex: true },
 	{ name: "book", files: ['models/scene1/book/book.gltf', "models/scene1/book/book.bin"], flipTex: true },
 	{ name: "AMC", files: ['models/scene1/intro/amc.glb'], flipTex: false },
 	{ name: "RASTER", files: ['models/scene1/intro/raster.glb'], flipTex: false },
 	{ name: "nightSky", files: ['models/scene1/night/nightSky.gltf', "models/scene1/night/nightSky.bin"], flipTex: true },
 	{ name: "child", files: ['models/scene1/child/child.gltf', "models/scene1/child/child.bin"], flipTex: true },
-	{ name: "mother", files: ['models/scene1/mother/mother.gltf','models/scene1/mother/mother.bin'], flipTex: true },
+	{ name: "mother", files: ['models/scene1/mother/mother.gltf', 'models/scene1/mother/mother.bin'], flipTex: true },
 	{ name: "earth", files: ['models/earth/earth.gltf', 'models/earth/earth.bin'], flipTex: true },
 	//{ name: "test4", files: ['models/Avocado.glb'], flipTex: true },
-
 
 	//Elephant Scene Models
 	{ name: "terrain", files: ['models/ElephantScene/elp4_3.glb'], flipTex: true },
@@ -40,8 +38,6 @@ var modelList = [
 	{ name: "elephantMother", files: ['models/ElephantScene/elephant1/mother.gltf', 'models/ElephantScene/elephant1/mother.bin'], flipTex: true },
 	{ name: "elephantCub", files: ['models/ElephantScene/elephant1/baby.gltf', 'models/ElephantScene/elephant1/baby.bin'], flipTex: true },
 
-
-
 	//Kangaroo Scene Models
 	{ name: "kangarooTerrain", files: ['models/KangarooScene/terrain/terrain.gltf', 'models/KangarooScene/terrain/terrain.bin'], flipTex: true },
 	{ name: "kangarooSceneObjects", files: ['models/KangarooScene/objects/objects.gltf', 'models/KangarooScene/objects/objects.bin'], flipTex: true },
@@ -49,9 +45,6 @@ var modelList = [
 
 	{ name: "kangarooMother", files: ['models/kangaroo/mother.gltf', 'models/kangaroo/mother.bin'], flipTex: true },
 	{ name: "kangarooJoey", files: ['models/kangaroo/joey.gltf', 'models/kangaroo/joey.bin'], flipTex: true },
-
-
-
 ]
 
 var scenes = [];
@@ -190,6 +183,7 @@ function main() {
 	addScene(new pageChangeScene());
 	addScene(new kangarooScene());
 	addScene(new endRoomScene());
+	addScene(new credits());
 
 	fpsElem = document.getElementById('fps');
 
@@ -212,10 +206,10 @@ function onMyKeyPress(event) {
 			break;
 		case "Space":
 			isAnimating = !isAnimating;
-			if(isAnimating){
+			if (isAnimating) {
 				songPlayer.play();
 			}
-			else{
+			else {
 				songPlayer.pause();
 			}
 			break;
@@ -286,6 +280,9 @@ function initScenes() {
 }
 
 function resetScene() {
+	if (currentSceneIndex < scenes.length) {
+		scenes[currentSceneIndex].reset();
+	}
 }
 
 function handleUI() {
@@ -302,6 +299,16 @@ function handleUI() {
 		}
 		else {
 			songPlayer.pause();
+		}
+	}
+
+	if (ImGui.Button(mute ? "UnMute" : "Mute")) {
+		mute = !mute;
+		if (mute) {
+			songPlayer.muted = true;
+		}
+		else {
+			songPlayer.muted = false;
 		}
 	}
 
@@ -339,7 +346,7 @@ function handleUI() {
 		ImGui.EndCombo();
 	}
 
-	if(postProcessingSettings.enableOutline){
+	if (postProcessingSettings.enableOutline) {
 		ImGui.Text("Outline Shader Options:");
 		ImGui.SliderFloat("Depth Bias", (value = outlineShaderOptions.depthBias) => outlineShaderOptions.depthBias = value, 0.0, 10.0);
 		ImGui.SliderFloat("Depth Multiplier", (value = outlineShaderOptions.depthMultiplier) => outlineShaderOptions.depthMultiplier = value, 0.0, 50.0);
@@ -537,7 +544,6 @@ function update() {
 		currentScene.update();
 	}
 }
-
 
 function loadTexture(path, isTexFlipped) {
 	if (loadedTextures[path] == undefined) {

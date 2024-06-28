@@ -97,27 +97,37 @@ class roomScene extends Scene {
         startScene.modelNightSky = setupModel("nightSky", false);
         //console.log(startScene.modelTest);
 
+        startScene.modelRoom.meshes[3].meshID = vec4.fromValues(0.0,0.0,0.0,0.0);
+        startScene.modelRoom.meshes[4].meshID = vec4.fromValues(0.0,0.0,0.0,0.0);
+        startScene.modelRoom.meshes[5].meshID = vec4.fromValues(0.0,0.0,0.0,0.0);
+        startScene.modelRoom.meshes[6].meshID = vec4.fromValues(0.0,0.0,0.0,0.0);
+        startScene.modelRoom.meshes[7].meshID = vec4.fromValues(0.0,0.0,0.0,0.0);
+        startScene.modelRoom.meshes[8].meshID = vec4.fromValues(0.0,0.0,0.0,0.0);
+
         startScene.timer = new timer([
             [startSceneEventIDS.START_T, [0.0, 1.0]],
             [startSceneEventIDS.AMC_TITLE_T, [1.0, 5.0]],
             [startSceneEventIDS.GRP_TITLE_T, [4.0, 5.0]],
-            [startSceneEventIDS.CAMERA1_T, [8.0, 44.0]],
-            [startSceneEventIDS.BOOK_OPEN_T, [44.0, 5.0]],
+            [startSceneEventIDS.CAMERA1_T, [7.0, 43.0]],
+            [startSceneEventIDS.BOOK_OPEN_T, [44.0, 3.0]],
             [startSceneEventIDS.END_T, [49.0, 1.0]]
         ]);
 
+        startScene.timer.registerCallback(0.0, () => { postProcessingSettings.enableOutline = false; postProcessingSettings.enableBloom = true;});
+
         this.lightManager = new LightManager();
         const directionalLight = new Light(0, [1.0, 1.0, 1.0], 0.1, [0, 0, 0], [0.0, -1.0, -1.0], 0.0, 0.0, 0.0, false);
-        const pointLight = new Light(1, [1.0, 0.75, 0.27], 0.515, [2.0, 1.0, 0.0], [0.0, 0.0, 0.0], 20.0, 0.0, 0.0, false);
+        const pointLight = new Light(1, [1.0, 0.75, 0.27], 0.825, [2.0, 1.0, 0.0], [0.0, 0.0, 0.0], 20.0, 0.0, 0.0, false);
+        //const spotLight = new Light(2, [0.0, 1.0, 0.0], 1.0, [1.0, 0.0, -3.0], [0.0, 0.0, -1.0], 5.0, Math.cos(Math.PI / 16), 64, false);
 
         this.lightManager.addLight(directionalLight);
         this.lightManager.addLight(pointLight);
         //this.lightManager.addLight(spotLight);
 
         startScene.modelPlacer = new ModelPlacer();
-        startScene.modelPlacer.position = vec3.fromValues(3.77000, 1.10000, 2.27000);
-        startScene.modelPlacer.rotation = vec3.fromValues(0.00, -2.80, 0.00);
-        startScene.modelPlacer.scale = vec3.fromValues(1.50000, 1.50000, 1.50000);
+        startScene.modelPlacer.position = vec3.fromValues(4.18000, 0.60000, 0.77000);
+        startScene.modelPlacer.rotation = vec3.fromValues(0.00, 1.50, 0.00);
+        startScene.modelPlacer.scale = vec3.fromValues(0.04000, 0.04000, 0.04000);
     }
 
     renderShadow(shadowProgram) {
@@ -178,7 +188,7 @@ class roomScene extends Scene {
         mat4.rotateY(transformationMatrix, transformationMatrix, 1.50000);
         mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00000);
         mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(0.04000, 0.04000, 0.04000));
-        gl.uniformMatrix4fv(startScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
+        gl.uniformMatrix4fv(startScene.programCelShader.getUniformLocation("mMat"), false, startScene.modelPlacer.getTransformationMatrix());
         uploadBoneMatrices(startScene.modelBook, startScene.programCelShader, 0);
         renderModel(startScene.modelBook, startScene.programCelShader, true);
 
@@ -211,7 +221,7 @@ class roomScene extends Scene {
         renderModel(startScene.modelMother, startScene.programCelShader, true);
 
         //gl.uniformMatrix4fv(startScene.programCelShader.getUniformLocation("mMat"), false, startScene.modelPlacer.getTransformationMatrix());
-        //lightRenderer.renderLights(this.lightManager);
+        lightRenderer.renderLights(this.lightManager);
     }
 
     update() {

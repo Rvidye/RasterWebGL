@@ -241,7 +241,7 @@ class SceneCameraRig {
     keyboardFunc(key) {
         let refreshPos = false;
         let refreshFront = false;
-        let speed = 0.1;
+        let speed = 1.1;
         switch (key) {
             case 'ArrowLeft':
                 this.mountCamera.updateT(-0.01);
