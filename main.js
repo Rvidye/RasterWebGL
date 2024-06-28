@@ -280,6 +280,9 @@ function initScenes() {
 }
 
 function resetScene() {
+	if (currentSceneIndex < scenes.length) {
+		scenes[currentSceneIndex].reset();
+	}
 }
 
 function handleUI() {
@@ -541,7 +544,6 @@ function update() {
 		currentScene.update();
 	}
 }
-
 
 function loadTexture(path, isTexFlipped) {
 	if (loadedTextures[path] == undefined) {
