@@ -15,7 +15,8 @@ const KangarooSceneEventIDS = {
     MOVE_KANGAROO_MOTHER_1: 2,
     MOVE_KANGAROO_JOEY_1: 3,
     MOVE_KANGAROO_JOEY_2: 5,
-    END_T: 6
+    MOVE_KANGAROO_MOTHER_2: 6,
+    END_T: 7
 };
 
 class kangarooScene extends Scene {
@@ -32,31 +33,31 @@ class kangarooScene extends Scene {
     setupCamera() {
         // Setup All Cameras here
         const positionKeyFrames = [
-            [-208, 63, 272],
-            [-125, 43, 230],
-            [-96, 38, 204],
-            [-79, 29, 153],
-            [-68, 18.799999999999898, 88],
-            [-60, 13.399999999999693, 19],
-            [-41, 15.299999999999578, -122],
-            [-3, 17.699999999999527, -1],
-            [-46, 18.899999999999615, 12],
-            [-49, 19.999999999999588, -111],
-            [-33, 7.799999999999544, -27.49999999999997],
+            [14.199999999999317, 15.69999999999994, 212.5999999999999],
+            [4.799999999999747, 16.599999999999966, 167.30000000000032],
+            [0.7999999999998928, 17.099999999999973, 107.2000000000005],
+            [-30.60000000000003, 15.799999999999985, 69.40000000000043],
+            [-45.99999999999999, 12.199999999999896, 63.80000000000012],
+            [-80.89999999999992, 23.299999999999702, 57.50000000000005],
+            [-119.09999999999974, 28.499999999999595, 84.79999999999971],
+            [-84.39999999999995, 9.999999999999527, 118.89999999999978],
+            [-40.49999999999999, 10.099999999999614, 101.09999999999987],
+            [-40.19999999999999, 6.799999999999587, 14.399999999999817],
+            [-50.60000000000002, 7.799999999999544, -13.199999999999958],
         ];
 
         const frontKeyFrames = [
-            [-52, 55, 254],
-            [-41, 20, 191],
-            [-48, 16, 148],
-            [-48, 15, 105],
-            [-47, 12.799999999999898, 52],
-            [-44, 15.399999999999693, -11],
-            [-33, 16.299999999999578, -97,],
-            [-39, 6.699999999999527, -10],
-            [-35, 11.899999999999615, -37],
-            [-47, 4.999999999999588, -62],
-            [-32, 3.1999999999995623, -16],
+            [-47.599999999999994, 2.199999999999954, 182.50000000000037],
+            [-49.80000000000001, 3.4999999999999996, 154.7000000000002],
+            [-51.300000000000004, 3.9000000000000035, 120.50000000000014],
+            [-53.50000000000001, 2.9000000000000035, 95.10000000000005],
+            [-67.9, 6.1999999999999, 70.69999999999997],
+            [-55.000000000000014, 7.6999999999996955, 76.99999999999999],
+            [-63.80000000000003, 3.0999999999995818, 85.59999999999984],
+            [-53.30000000000002, 5.599999999999527, 62.60000000000005],
+            [-46.000000000000014, 7.499999999999616, 35.600000000000044],
+            [-49.2, 4.999999999999588, 23.80000000000006],
+            [-57.30000000000003, 5.399999999999562, 41.200000000000024],
         ];
 
         KangarooScene.sceneCamera = new SceneCamera(positionKeyFrames, frontKeyFrames);
@@ -73,105 +74,122 @@ class kangarooScene extends Scene {
 
     init() {
 
-                //Lighting Setup
-                this.lightManager = new LightManager();
-                const directionalLight = new Light(0, [1.0, 1.0, 1.0], 1.0, [0, 400, 400], [0.0, -1.0, -1.0], 0.0, 0.0, 0.0, false);
-                //For Ambient
-                const directionalLight2 = new Light(0, [1.0, 1.0, 1.0], 0.15, [0, -400, -400], [0.0, -1.0, 1.0], 0.0, 0.0, 0.0, false);
-                this.lightManager.addLight(directionalLight);
-                this.lightManager.addLight(directionalLight2);
-                //Grass Rendering class object
-                this.myGrass = new grass(1500, 1500, 1500);
-                //Atmospheric Scattering Class Object
-                this.myAtmScat = new atmScattering();
-                //Vegetation
-                this.myVegetation = new vegetation();
-                //Models(Terrain,Tree,Stones)
-                this.myModelDraw = new drawModels();
-                //Load Models
-                //Terrain
-                this.terrainScale = 1000.0;
-                this.terrainModelName = "kangarooTerrain";
-                this.terrainModel = setupModel(this.terrainModelName, false);
-                this.terrainModelMatrixArray = [];
-                this.terrainTextue = null;
-                //Objects -> trees and stones
-                this.objectsModel = setupModel("kangarooSceneObjects", false);
-                //Mountains
-                this.maountainsModel = setupModel("kangarooSceneMountains", false);
-                this.whiteTexture = null;
+        //Lighting Setup
+        this.lightManager = new LightManager();
+        const directionalLight = new Light(0, [1.0, 1.0, 1.0], 1.0, [0, 400, 400], [0.0, -1.0, -1.0], 0.0, 0.0, 0.0, false);
+        //For Ambient
+        const directionalLight2 = new Light(0, [1.0, 1.0, 1.0], 0.15, [0, -400, -400], [0.0, -1.0, 1.0], 0.0, 0.0, 0.0, false);
+        this.lightManager.addLight(directionalLight);
+        this.lightManager.addLight(directionalLight2);
+        //Grass Rendering class object
+        this.myGrass = new grass(1500, 1500, 1500);
+        //Atmospheric Scattering Class Object
+        this.myAtmScat = new atmScattering();
+        //Vegetation
+        this.myVegetation = new vegetation();
+        //Models(Terrain,Tree,Stones)
+        this.myModelDraw = new drawModels();
+        //Load Models
+        //Terrain
+        this.terrainScale = 1000.0;
+        this.terrainModelName = "kangarooTerrain";
+        this.terrainModel = setupModel(this.terrainModelName, false);
+        this.terrainModelMatrixArray = [];
+        this.terrainTextue = null;
+        //Objects -> trees and stones
+        this.objectsModel = setupModel("kangarooSceneObjects", false);
+        //Mountains
+        this.maountainsModel = setupModel("kangarooSceneMountains", false);
+        this.whiteTexture = null;
 
-                this.kangarooMother = setupModel("kangarooMother", true);
-                this.kangarooJoey = setupModel("kangarooJoey", true);
-                // Spline Path for Elephant can be done in constructor
+        this.kangarooMother = setupModel("kangarooMother", true);
+        this.kangarooJoey = setupModel("kangarooJoey", true);
+        // Spline Path for Elephant can be done in constructor
 
-                this.currentMotherAnimation = 2; //Running
-                this.currentBabyAnimation = 3; //Running
-                const motherPositions = [
-                    [-52, 0, 205],
-                    [-40, 0, 115],
-                    [-18, 0, 40],
-                    [-29, 0, -25],
-                ];
+        this.currentMotherAnimation = 2; //Running
+        this.currentBabyAnimation = 3; //Running
 
-                this.motherPathSpline = new BsplineInterpolator(motherPositions);
-                this.splineMotherAdjuster = new SplineAdjuster(this.motherPathSpline);
-                this.splineMotherAdjuster.setRenderPath(true);
-                this.splineMotherAdjuster.setRenderPathPoints(true);
-                //this.splineAdjuster.setScalingFactor(0.01);
+        const motherPositions_1 = [
+            [-120, 0, 79],
+            [-96, 0, 74],
+            [-72, 0, 78],
+            [-60, 0, 89],
 
-                //For First Movement Of Joey
-                const joeyPositions_1 = [
-                    [-85, 0, 205],
-                    [-75, 0, 114],
-                    [-66, 0, 39],
-                    [-63, 0, -24],
-                ];
+        ];
 
-                this.joeyPathSpline_1 = new BsplineInterpolator(joeyPositions_1);
-                this.splineJoeyAdjuster_1 = new SplineAdjuster(this.joeyPathSpline_1);
-                this.splineJoeyAdjuster_1.setRenderPath(true);
-                this.splineJoeyAdjuster_1.setRenderPathPoints(true);
+        this.motherPathSpline_1 = new BsplineInterpolator(motherPositions_1);
+        this.splineMotherAdjuster_1 = new SplineAdjuster(this.motherPathSpline_1);
+        this.splineMotherAdjuster_1.setRenderPath(true);
+        this.splineMotherAdjuster_1.setRenderPathPoints(true);
 
-                //For Second Movment of Joey
-                const joeyPositions_2 = [
-                    [-63, 0, -24],
-                    [-61, 0, -53],
-                    [-50, 0, -77],
-                    [-31, 0, -94]
-                ];
+        const motherPositions_2 = [
+            [-58, 0, 89],
+            [-55, 0, 71],
+            [-55, 0, 57],
+            [-56, 0, 44],
+        ];
 
-                this.joeyPathSpline_2 = new BsplineInterpolator(joeyPositions_2);
-                this.splineJoeyAdjuster_2 = new SplineAdjuster(this.joeyPathSpline_2);
-                this.splineJoeyAdjuster_2.setRenderPath(true);
-                this.splineJoeyAdjuster_2.setRenderPathPoints(true);
+        this.motherPathSpline_2 = new BsplineInterpolator(motherPositions_2);
+        this.splineMotherAdjuster_2 = new SplineAdjuster(this.motherPathSpline_2);
+        this.splineMotherAdjuster_2.setRenderPath(true);
+        this.splineMotherAdjuster_2.setRenderPathPoints(true);
 
-                //Extra Kangaroos_1
-                const kangarooPositions_1 = [
-                    [-92, 0, 189],
-                    [-77, 0, 115],
-                    [-90, 0, 40],
-                    [-107, 0, -35]
-                ];
+        //For First Movement Of Joey
+        const joeyPositions_1 = [
+            [-72, 0, 189],
+            [-73, 0, 161],
+            [-73, 0, 131],
+            [-77, 0, 100],
 
-                this.kangarooPathSpline_1 = new BsplineInterpolator(kangarooPositions_1);
-                this.splineKangarooAdjuster_1 = new SplineAdjuster(this.kangarooPathSpline_1);
-                this.splineKangarooAdjuster_1.setRenderPath(true);
-                this.splineKangarooAdjuster_1.setRenderPathPoints(true);
-                //Extra Kangaroos_2
-                const kangarooPositions_2 = [
-                    [-33, 0, 199],
-                    [-14, 0, 115],
-                    [-6, 0, 40],
-                    [28, 0, -34],
-                ];
+        ];
 
-                this.kangarooPathSpline_2 = new BsplineInterpolator(kangarooPositions_2);
-                this.splineKangarooAdjuster_2 = new SplineAdjuster(this.kangarooPathSpline_2);
-                this.splineKangarooAdjuster_2.setRenderPath(true);
-                this.splineKangarooAdjuster_2.setRenderPathPoints(true);
-                //change Spline Adjuster mother/joey
-                this.splineAdjuster = this.splineKangarooAdjuster_2;
+        this.joeyPathSpline_1 = new BsplineInterpolator(joeyPositions_1);
+        this.splineJoeyAdjuster_1 = new SplineAdjuster(this.joeyPathSpline_1);
+        this.splineJoeyAdjuster_1.setRenderPath(true);
+        this.splineJoeyAdjuster_1.setRenderPathPoints(true);
+
+        //For Second Movment of Joey
+        const joeyPositions_2 = [
+            [-77, 0, 100],
+            [-74, 0, 64],
+            [-75, 0, 41],
+            [-77, 0, 18],
+        ];
+
+        this.joeyPathSpline_2 = new BsplineInterpolator(joeyPositions_2);
+        this.splineJoeyAdjuster_2 = new SplineAdjuster(this.joeyPathSpline_2);
+        this.splineJoeyAdjuster_2.setRenderPath(true);
+        this.splineJoeyAdjuster_2.setRenderPathPoints(true);
+
+        /*
+        //Extra Kangaroos_1
+        const kangarooPositions_1 = [
+            [-92, 0, 189],
+            [-77, 0, 115],
+            [-90, 0, 40],
+            [-107, 0, -35]
+        ];
+
+        this.kangarooPathSpline_1 = new BsplineInterpolator(kangarooPositions_1);
+        this.splineKangarooAdjuster_1 = new SplineAdjuster(this.kangarooPathSpline_1);
+        this.splineKangarooAdjuster_1.setRenderPath(true);
+        this.splineKangarooAdjuster_1.setRenderPathPoints(true);
+        //Extra Kangaroos_2
+        const kangarooPositions_2 = [
+            [-33, 0, 199],
+            [-14, 0, 115],
+            [-6, 0, 40],
+            [28, 0, -34],
+        ];
+
+        this.kangarooPathSpline_2 = new BsplineInterpolator(kangarooPositions_2);
+        this.splineKangarooAdjuster_2 = new SplineAdjuster(this.kangarooPathSpline_2);
+        this.splineKangarooAdjuster_2.setRenderPath(true);
+        this.splineKangarooAdjuster_2.setRenderPathPoints(true);
+*/
+
+        //change Spline Adjuster mother/joey
+        this.splineAdjuster = this.splineJoeyAdjuster_2;
 
         //model Placer
         KangarooScene.modelPlacer = new ModelPlacer();
@@ -182,22 +200,34 @@ class kangarooScene extends Scene {
             [KangarooSceneEventIDS.MOVE_T, [1.0, 35.0]],
 
             //First Movement -> both moving
-            [KangarooSceneEventIDS.MOVE_KANGAROO_MOTHER_1, [0.0, 20.0]],
-            [KangarooSceneEventIDS.MOVE_KANGAROO_JOEY_1, [0.0, 20.0]],
+            [KangarooSceneEventIDS.MOVE_KANGAROO_MOTHER_1, [10.0, 10.0]],
+            [KangarooSceneEventIDS.MOVE_KANGAROO_JOEY_1, [0.0, 10.0]],
 
             //Third movement movement -> joey moving, mother standing
             [KangarooSceneEventIDS.MOVE_KANGAROO_JOEY_2, [25.0, 10.0]],
+            [KangarooSceneEventIDS.MOVE_KANGAROO_MOTHER_2, [25.0, 6.0]],
+
             [KangarooSceneEventIDS.END_T, [35.0, 1.0]]
         ]);
 
         // setup callbacks for 1 time events
         //2nd move ->both standing
-        KangarooScene.timer.registerCallback(21.0, () => { this.currentMotherAnimation = 1 }); //Standing
-        KangarooScene.timer.registerCallback(21.0, () => { this.currentBabyAnimation = 1 }); //standing
+
+        KangarooScene.timer.registerCallback(10.0, () => { this.currentBabyAnimation = 1 }); //standing
+        KangarooScene.timer.registerCallback(25.0, () => { this.currentBabyAnimation = 3 }); //Running
+
+
+        KangarooScene.timer.registerCallback(10.0, () => { this.currentMotherAnimation = 2 }); //Running
+        KangarooScene.timer.registerCallback(20.0, () => { this.currentMotherAnimation = 0 }); //Standing
+        KangarooScene.timer.registerCallback(25.0, () => { this.currentMotherAnimation = 2 }); //Running
+        KangarooScene.timer.registerCallback(31.0, () => { this.currentMotherAnimation = 1 }); //Standing
+
+
+
 
         //3rd move ->mother standing, joey moving
-        KangarooScene.timer.registerCallback(25.0, () => { this.currentMotherAnimation = 0 });//standing action
-        KangarooScene.timer.registerCallback(25.0, () => { this.currentBabyAnimation = 3 }); //Running
+        //   KangarooScene.timer.registerCallback(25.0, () => { this.currentMotherAnimation = 0 });//standing action
+        //   KangarooScene.timer.registerCallback(25.0, () => { this.currentBabyAnimation = 3 }); //Running
 
 
         //Setup Grass and other models Position Acoording To Terrain 
@@ -268,6 +298,7 @@ class kangarooScene extends Scene {
             this.splineAdjuster.render();
         }
 
+
         //gl.depthMask(gl.FALSE);
         this.myAtmScat.renderAtmScattering();
         //gl.depthMask(gl.TRUE);
@@ -284,19 +315,30 @@ class kangarooScene extends Scene {
         this.lightManager.updateLights(KangarooScene.programCelShader.programObject);
 
         if (KangarooScene.timer.currentTime < 25.0) {
-            this.renderKangarooMother(KangarooSceneEventIDS.MOVE_KANGAROO_MOTHER_1, this.motherPathSpline);
+            this.renderKangarooJoey(KangarooSceneEventIDS.MOVE_KANGAROO_JOEY_1, this.joeyPathSpline_1);
+            this.renderKangarooMother(KangarooSceneEventIDS.MOVE_KANGAROO_MOTHER_1, this.motherPathSpline_1);
+        }
+        else if (KangarooScene.timer.currentTime < 45.0) {
+
+            this.renderKangarooJoey(KangarooSceneEventIDS.MOVE_KANGAROO_JOEY_2, this.joeyPathSpline_2);
+            this.renderKangarooMother(KangarooSceneEventIDS.MOVE_KANGAROO_MOTHER_2, this.motherPathSpline_2);
+        }
+        /*
+        if (KangarooScene.timer.currentTime < 25.0) {
+            this.renderKangarooMother(KangarooSceneEventIDS.MOVE_KANGAROO_MOTHER_1, this.motherPathSpline_1);
             this.renderKangarooJoey(KangarooSceneEventIDS.MOVE_KANGAROO_JOEY_1, this.joeyPathSpline_1);
             //Extra Kangaroo
             this.renderKangarooMother(KangarooSceneEventIDS.MOVE_KANGAROO_MOTHER_1, this.kangarooPathSpline_1);
             this.renderKangarooMother(KangarooSceneEventIDS.MOVE_KANGAROO_MOTHER_1, this.kangarooPathSpline_2);
         }
         else if (KangarooScene.timer.currentTime >= 25.0) {
-            this.renderKangarooMother(KangarooSceneEventIDS.MOVE_KANGAROO_MOTHER_1, this.motherPathSpline);
+            this.renderKangarooMother(KangarooSceneEventIDS.MOVE_KANGAROO_MOTHER_1, this.motherPathSpline_1);
             this.renderKangarooJoey(KangarooSceneEventIDS.MOVE_KANGAROO_JOEY_2, this.joeyPathSpline_2);
             //Extra Kangaroo
             this.renderKangarooMother(KangarooSceneEventIDS.MOVE_KANGAROO_MOTHER_1, this.kangarooPathSpline_1);
             this.renderKangarooMother(KangarooSceneEventIDS.MOVE_KANGAROO_MOTHER_1, this.kangarooPathSpline_2);
         }
+*/
 
         //RenderGrass
         gl.depthMask(false);
@@ -317,7 +359,7 @@ class kangarooScene extends Scene {
         // Combining the matrices
         let finalMatrix = mat4.create();
         mat4.multiply(finalMatrix, translationMatrix, orientationMatrix);
-        mat4.scale(finalMatrix, finalMatrix, vec3.fromValues(5.50, 5.50, 5.50));
+        mat4.scale(finalMatrix, finalMatrix, vec3.fromValues(4.50, 4.50, 4.50));
         gl.uniformMatrix4fv(KangarooScene.programCelShader.getUniformLocation("mMat"), false, finalMatrix);
         //renderModel(this.elephantMother, this.myModelDraw.modelProgram, true,true);
         uploadBoneMatrices(this.kangarooMother, KangarooScene.programCelShader, this.currentMotherAnimation);

@@ -13,7 +13,7 @@ var modelList = [
 	//{ name: "cat", files: ['models/scene1/cat/cat.gltf', "models/scene1/cat/cat.bin"], flipTex: true },
 
 
-/*
+
 	{ name: "room1", files: ['models/scene1/room/room3.gltf', "models/scene1/room/room3.bin"], flipTex: true },
 	{ name: "book", files: ['models/scene1/book/book.gltf', "models/scene1/book/book.bin"], flipTex: true },
 	{ name: "AMC", files: ['models/scene1/intro/amc.glb'], flipTex: false },
@@ -23,7 +23,7 @@ var modelList = [
 	{ name: "mother", files: ['models/scene1/mother/mother.gltf', 'models/scene1/mother/mother.bin'], flipTex: true },
 	{ name: "earth", files: ['models/earth/earth.gltf', 'models/earth/earth.bin'], flipTex: true },
 	//{ name: "test4", files: ['models/Avocado.glb'], flipTex: true },
-*/
+
 
 	//Elephant Scene Models
 	{ name: "terrain", files: ['models/ElephantScene/elp4_3.glb'], flipTex: true },
@@ -187,7 +187,7 @@ function main() {
 	// scene setup
 	//addScene(new tutorial());
 	//addScene(new roomScene());
-	addScene(new elephantScene());
+	//	addScene(new elephantScene());
 	//addScene(new pageChangeScene());
 	addScene(new kangarooScene());
 	//addScene(new endRoomScene());
