@@ -555,25 +555,24 @@ class elephantScene extends Scene {
         this.myModelDraw.renderModels(this.terrainModel, this.terrainTextue, this.terrainModelMatrixArray, this.lightManager, false);
 
         //For tree1 model
-        this.myModelDraw.renderModels(this.tree1Model, this.whiteTexture, this.tree1ModelMatrixArray, this.lightManager, false);
+        this.myModelDraw.renderModels(this.tree1Model, this.whiteTexture, this.tree1ModelMatrixArray, this.lightManager, true);
 
         //For tree2 model
-        this.myModelDraw.renderModels(this.tree2Model, this.whiteTexture, this.tree2ModelMatrixArray, this.lightManager, false);
+        this.myModelDraw.renderModels(this.tree2Model, this.whiteTexture, this.tree2ModelMatrixArray, this.lightManager, true);
 
         //For tree3 model
-        this.myModelDraw.renderModels(this.tree3Model, this.whiteTexture, this.tree3ModelMatrixArray, this.lightManager, false);
+        this.myModelDraw.renderModels(this.tree3Model, this.whiteTexture, this.tree3ModelMatrixArray, this.lightManager, true);
 
         //Tree Logs
-        this.myModelDraw.renderModels(this.treeLog1Model, this.whiteTexture, this.treeLog1ModelMatrixArray, this.lightManager, false);
-        this.myModelDraw.renderModels(this.treeLog2Model, this.whiteTexture, this.treeLog2ModelMatrixArray, this.lightManager, false);
+        this.myModelDraw.renderModels(this.treeLog1Model, this.whiteTexture, this.treeLog1ModelMatrixArray, this.lightManager, true);
+        this.myModelDraw.renderModels(this.treeLog2Model, this.whiteTexture, this.treeLog2ModelMatrixArray, this.lightManager, true);
 
         //Tree Trunks
-        this.myModelDraw.renderModels(this.treeTrunk1Model, this.whiteTexture, this.treeTrunk1ModelMatrixArray, this.lightManager, false);
-        this.myModelDraw.renderModels(this.treeTrunk2Model, this.whiteTexture, this.treeTrunk2ModelMatrixArray, this.lightManager, false);
+        this.myModelDraw.renderModels(this.treeTrunk1Model, this.whiteTexture, this.treeTrunk1ModelMatrixArray, this.lightManager, true);
+        this.myModelDraw.renderModels(this.treeTrunk2Model, this.whiteTexture, this.treeTrunk2ModelMatrixArray, this.lightManager, true);
 
         //for stone1 model
-        this.myModelDraw.renderModels(this.stone1Model, this.terrainTextue, this.stone1ModelMatrixArray, this.lightManager);
-
+        this.myModelDraw.renderModels(this.stone1Model, this.terrainTextue, this.stone1ModelMatrixArray, this.lightManager,true);
 
         //Elephants
         ElephantScene.programCelShader.use();
@@ -593,7 +592,6 @@ class elephantScene extends Scene {
             this.renderElephantMother(ElephantSceneEventIDS.MOVE_ELEPHANT_MOTHER_2, this.motherPathSpline_2);
 
         }
-
 
         gl.depthMask(false);
         this.myGrass.renderGrass();
@@ -659,9 +657,11 @@ class elephantScene extends Scene {
         ElephantScene.timer.increment();
 
         if (ElephantScene.timer.isEventStarted(ElephantSceneEventIDS.START_T) && ElephantScene.songStart == 0) {
-            songPlayer.currentTime = 50.0;
+            //songPlayer.currentTime = 50.0;
             ElephantScene.songStart = 1;
             postProcessingSettings.enableFog = true;
+            postProcessingSettings.enableOutline = true;
+            postProcessingSettings.enableBloom = false;
         }
 
         // Fade IN This condition ensures that only change fade when start event is started and it not completed.

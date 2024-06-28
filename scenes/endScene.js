@@ -99,6 +99,8 @@ class endRoomScene extends Scene {
             [endSceneEventIDS.END_T, [23.0, 1.0]]
         ]);
 
+        endScene.timer.registerCallback(0.0, () => { postProcessingSettings.enableOutline = false; postProcessingSettings.enableBloom = true; postProcessingSettings.enableFog = false;});
+
         this.lightManager = new LightManager();
         const directionalLight = new Light(0, [0.0, 0.0, 1.0], 0.1, [0, 0, 0], [0.0, -1.0, -1.0], 0.0, 0.0, 0.0, false);
         const pointLight = new Light(1, [0.4, 0.8, 1.0], 0.515, [2.0, 1.0, 0.0], [0.0, 0.0, 0.0], 20.0, 0.0, 0.0, false);

@@ -113,6 +113,8 @@ class roomScene extends Scene {
             [startSceneEventIDS.END_T, [49.0, 1.0]]
         ]);
 
+        startScene.timer.registerCallback(0.0, () => { postProcessingSettings.enableOutline = false; postProcessingSettings.enableBloom = true;});
+
         this.lightManager = new LightManager();
         const directionalLight = new Light(0, [1.0, 1.0, 1.0], 0.1, [0, 0, 0], [0.0, -1.0, -1.0], 0.0, 0.0, 0.0, false);
         const pointLight = new Light(1, [1.0, 0.75, 0.27], 0.825, [2.0, 1.0, 0.0], [0.0, 0.0, 0.0], 20.0, 0.0, 0.0, false);

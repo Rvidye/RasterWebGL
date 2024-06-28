@@ -303,9 +303,9 @@ class kangarooScene extends Scene {
         this.myAtmScat.renderAtmScattering();
         //gl.depthMask(gl.TRUE);
 
-        this.myModelDraw.renderModels(this.terrainModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager);
-        this.myModelDraw.renderModels(this.objectsModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager);
-        this.myModelDraw.renderModels(this.maountainsModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager);
+        this.myModelDraw.renderModels(this.terrainModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager, false);
+        this.myModelDraw.renderModels(this.objectsModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager, true);
+        this.myModelDraw.renderModels(this.maountainsModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager,true);
 
         // this.myModelDraw.renderModels(this.kangarooMother, this.whiteTexture, KangarooScene.modelPlacer.getTransformationMatrix(), this.lightManager);
         KangarooScene.programCelShader.use();
@@ -396,9 +396,10 @@ class kangarooScene extends Scene {
         // updateModel(KangarooScene.modelCat, 0, GLOBAL.deltaTime);
         KangarooScene.timer.increment();
         if (KangarooScene.timer.isEventStarted(KangarooSceneEventIDS.START_T) && KangarooScene.songStart == 0) {
-            songPlayer.currentTime = 125.0;
+            //songPlayer.currentTime = 125.0;
             KangarooScene.songStart = 1;
             postProcessingSettings.enableFog = false;
+            postProcessingSettings.enableOutline = true;
         }
         // Fade IN This condition ensures that only change fade when start event is started and it not completed.
         if (KangarooScene.timer.isEventStarted(KangarooSceneEventIDS.START_T) && !KangarooScene.timer.isEventComplete(KangarooSceneEventIDS.START_T)) {

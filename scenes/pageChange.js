@@ -83,6 +83,9 @@ class pageChangeScene extends Scene {
             [room2SceneEventIDS.END_T, [17.0, 2.0]]
         ]);
 
+        room2Scene.timer.registerCallback(0.0, () => { postProcessingSettings.enableOutline = false; postProcessingSettings.enableBloom = true; postProcessingSettings.enableFog = false;});
+
+
         this.lightManager = new LightManager();
         const directionalLight = new Light(0, [1.0, 1.0, 1.0], 0.1, [0, 0, 0], [0.0, -1.0, -1.0], 0.0, 0.0, 0.0, false);
         const pointLight = new Light(1, [1.0, 0.75, 0.27], 0.515, [2.0, 1.0, 0.0], [0.0, 0.0, 0.0], 20.0, 0.0, 0.0, false);
@@ -147,7 +150,7 @@ class pageChangeScene extends Scene {
         if (room2Scene.timer.isEventStarted(room2SceneEventIDS.START_T) && room2Scene.songStart == 0) {
             //songPlayer.currentTime = 105.0;
             room2Scene.songStart = 1;
-            postProcessingSettings.enableFog = false;
+            //postProcessingSettings.enableFog = false;
         }
 
         this.lightManager.getLight(1).color = [lerp(1.0, 0.6, room2Scene.timer.getEventTime(room2SceneEventIDS.BOOK_OPEN_T)),lerp(0.75, 0.6, room2Scene.timer.getEventTime(room2SceneEventIDS.BOOK_OPEN_T)),lerp(0.27, 1.0, room2Scene.timer.getEventTime(room2SceneEventIDS.BOOK_OPEN_T))];
