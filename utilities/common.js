@@ -5,6 +5,7 @@ var GLOBAL = {
 };
 
 var isAnimating = false;
+var mute = false;
 
 var currentCamera = null;
 var isDebugCameraOn = true;

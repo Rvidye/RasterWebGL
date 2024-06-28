@@ -12,8 +12,6 @@ var modelList = [
 	{ name: "point", files: ['models/lightmesh/point.obj'], flipTex: false },
 	//{ name: "cat", files: ['models/scene1/cat/cat.gltf', "models/scene1/cat/cat.bin"], flipTex: true },
 
-
-/*
 	{ name: "room1", files: ['models/scene1/room/room3.gltf', "models/scene1/room/room3.bin"], flipTex: true },
 	{ name: "book", files: ['models/scene1/book/book.gltf', "models/scene1/book/book.bin"], flipTex: true },
 	{ name: "AMC", files: ['models/scene1/intro/amc.glb'], flipTex: false },
@@ -23,7 +21,6 @@ var modelList = [
 	{ name: "mother", files: ['models/scene1/mother/mother.gltf', 'models/scene1/mother/mother.bin'], flipTex: true },
 	{ name: "earth", files: ['models/earth/earth.gltf', 'models/earth/earth.bin'], flipTex: true },
 	//{ name: "test4", files: ['models/Avocado.glb'], flipTex: true },
-*/
 
 	//Elephant Scene Models
 	{ name: "terrain", files: ['models/ElephantScene/elp4_3.glb'], flipTex: true },
@@ -41,8 +38,6 @@ var modelList = [
 	{ name: "elephantMother", files: ['models/ElephantScene/elephant1/mother.gltf', 'models/ElephantScene/elephant1/mother.bin'], flipTex: true },
 	{ name: "elephantCub", files: ['models/ElephantScene/elephant1/baby.gltf', 'models/ElephantScene/elephant1/baby.bin'], flipTex: true },
 
-
-
 	//Kangaroo Scene Models
 	{ name: "kangarooTerrain", files: ['models/KangarooScene/terrain/terrain.gltf', 'models/KangarooScene/terrain/terrain.bin'], flipTex: true },
 	{ name: "kangarooSceneObjects", files: ['models/KangarooScene/objects/objects.gltf', 'models/KangarooScene/objects/objects.bin'], flipTex: true },
@@ -50,9 +45,6 @@ var modelList = [
 
 	{ name: "kangarooMother", files: ['models/kangaroo/mother.gltf', 'models/kangaroo/mother.bin'], flipTex: true },
 	{ name: "kangarooJoey", files: ['models/kangaroo/joey.gltf', 'models/kangaroo/joey.bin'], flipTex: true },
-
-
-
 ]
 
 var scenes = [];
@@ -186,11 +178,12 @@ function main() {
 
 	// scene setup
 	//addScene(new tutorial());
-	//addScene(new roomScene());
+	addScene(new roomScene());
 	addScene(new elephantScene());
-	//addScene(new pageChangeScene());
+	addScene(new pageChangeScene());
 	addScene(new kangarooScene());
-	//addScene(new endRoomScene());
+	addScene(new endRoomScene());
+	addScene(new credits());
 
 	fpsElem = document.getElementById('fps');
 
@@ -303,6 +296,16 @@ function handleUI() {
 		}
 		else {
 			songPlayer.pause();
+		}
+	}
+
+	if (ImGui.Button(mute ? "UnMute" : "Mute")) {
+		mute = !mute;
+		if (mute) {
+			songPlayer.muted = true;
+		}
+		else {
+			songPlayer.muted = false;
 		}
 	}
 
