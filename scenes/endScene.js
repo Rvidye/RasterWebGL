@@ -85,12 +85,21 @@ class endRoomScene extends Scene {
         endScene.modelEarth = setupModel("earth", false);
         //console.log(endScene.modelTest);
 
+        endScene.modelRoom.meshes[3].meshID = vec4.fromValues(0.0,0.0,0.0,0.0);
+        endScene.modelRoom.meshes[4].meshID = vec4.fromValues(0.0,0.0,0.0,0.0);
+        endScene.modelRoom.meshes[5].meshID = vec4.fromValues(0.0,0.0,0.0,0.0);
+        endScene.modelRoom.meshes[6].meshID = vec4.fromValues(0.0,0.0,0.0,0.0);
+        endScene.modelRoom.meshes[7].meshID = vec4.fromValues(0.0,0.0,0.0,0.0);
+        endScene.modelRoom.meshes[8].meshID = vec4.fromValues(0.0,0.0,0.0,0.0);
+
         endScene.timer = new timer([
             [endSceneEventIDS.START_T, [0.0, 1.0]],
             [endSceneEventIDS.CAMERA1_T, [0.0, 23.0]],
             [endSceneEventIDS.BOOK_OPEN_T, [0.0, 6.0]],
             [endSceneEventIDS.END_T, [23.0, 1.0]]
         ]);
+
+        endScene.timer.registerCallback(0.0, () => { postProcessingSettings.enableOutline = false; postProcessingSettings.enableBloom = true; postProcessingSettings.enableFog = false;});
 
         this.lightManager = new LightManager();
         const directionalLight = new Light(0, [0.0, 0.0, 1.0], 0.1, [0, 0, 0], [0.0, -1.0, -1.0], 0.0, 0.0, 0.0, false);

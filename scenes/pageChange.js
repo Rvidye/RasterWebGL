@@ -67,8 +67,14 @@ class pageChangeScene extends Scene {
         room2Scene.modelRoom = setupModel("room1", false)
         room2Scene.modelBook = setupModel("book", true);
         room2Scene.modelChild = setupModel("child", false);
-        room2Scene.modelMother = setupModel("mother", true);
         //console.log(room2Scene.modelTest);
+
+        room2Scene.modelRoom.meshes[3].meshID = vec4.fromValues(0.0,0.0,0.0,0.0);
+        room2Scene.modelRoom.meshes[4].meshID = vec4.fromValues(0.0,0.0,0.0,0.0);
+        room2Scene.modelRoom.meshes[5].meshID = vec4.fromValues(0.0,0.0,0.0,0.0);
+        room2Scene.modelRoom.meshes[6].meshID = vec4.fromValues(0.0,0.0,0.0,0.0);
+        room2Scene.modelRoom.meshes[7].meshID = vec4.fromValues(0.0,0.0,0.0,0.0);
+        room2Scene.modelRoom.meshes[8].meshID = vec4.fromValues(0.0,0.0,0.0,0.0);
 
         room2Scene.timer = new timer([
             [room2SceneEventIDS.START_T, [0.0, 2.0]],
@@ -76,6 +82,9 @@ class pageChangeScene extends Scene {
             [room2SceneEventIDS.BOOK_OPEN_T, [2.0, 15.0]],
             [room2SceneEventIDS.END_T, [17.0, 2.0]]
         ]);
+
+        room2Scene.timer.registerCallback(0.0, () => { postProcessingSettings.enableOutline = false; postProcessingSettings.enableBloom = true; postProcessingSettings.enableFog = false;});
+
 
         this.lightManager = new LightManager();
         const directionalLight = new Light(0, [1.0, 1.0, 1.0], 0.1, [0, 0, 0], [0.0, -1.0, -1.0], 0.0, 0.0, 0.0, false);
@@ -129,16 +138,6 @@ class pageChangeScene extends Scene {
         gl.uniformMatrix4fv(room2Scene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
         renderModel(room2Scene.modelChild, room2Scene.programCelShader, true);
 
-        mat4.identity(transformationMatrix);
-        mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(4.84, -0.22, 2.62));
-        mat4.rotateX(transformationMatrix, transformationMatrix, 0.00);
-        mat4.rotateY(transformationMatrix, transformationMatrix, -2.50);
-        mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00);
-        mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(0.017, 0.017, 0.017));
-        gl.uniformMatrix4fv(room2Scene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
-        uploadBoneMatrices(room2Scene.modelMother, room2Scene.programCelShader, 0);
-        renderModel(room2Scene.modelMother, room2Scene.programCelShader, true);
-
         //gl.uniformMatrix4fv(room2Scene.programCelShader.getUniformLocation("mMat"), false, room2Scene.modelPlacer.getTransformationMatrix());
         //lightRenderer.renderLights(this.lightManager);
     }
@@ -151,12 +150,11 @@ class pageChangeScene extends Scene {
         if (room2Scene.timer.isEventStarted(room2SceneEventIDS.START_T) && room2Scene.songStart == 0) {
             //songPlayer.currentTime = 105.0;
             room2Scene.songStart = 1;
-            postProcessingSettings.enableFog = false;
+            //postProcessingSettings.enableFog = false;
         }
 
         this.lightManager.getLight(1).color = [lerp(1.0, 0.6, room2Scene.timer.getEventTime(room2SceneEventIDS.BOOK_OPEN_T)),lerp(0.75, 0.6, room2Scene.timer.getEventTime(room2SceneEventIDS.BOOK_OPEN_T)),lerp(0.27, 1.0, room2Scene.timer.getEventTime(room2SceneEventIDS.BOOK_OPEN_T))];
 
-        updateModel(room2Scene.modelMother,0,GLOBAL.deltaTime);
         room2Scene.modelBook.lerpAnimations(0, lerp(0.7, 1.0, room2Scene.timer.getEventTime(room2SceneEventIDS.BOOK_OPEN_T)));
         // Fade IN This condition ensures that only change fade when start event is started and it not completed.
         if (room2Scene.timer.isEventStarted(room2SceneEventIDS.START_T) && !room2Scene.timer.isEventComplete(room2SceneEventIDS.START_T)) {
