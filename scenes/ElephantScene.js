@@ -53,6 +53,7 @@ class elephantScene extends Scene {
             [-117.49999999999974, 0.6000000000000001, -93.3999999999999],
 
 
+
         ];
 
         const frontKeyFrames = [
@@ -230,7 +231,7 @@ class elephantScene extends Scene {
         //this.splineAdjuster.setScalingFactor(0.01);
 
 
-        this.splineAdjuster = this.splineBabyAdjuster_1;
+        this.splineAdjuster = this.splineMotherAdjuster_1;
 
 
         //model Placer
@@ -239,8 +240,6 @@ class elephantScene extends Scene {
         //Timer
         ElephantScene.timer = new timer([
             [ElephantSceneEventIDS.START_T, [0.0, 1.0]],
-            //[ElephantSceneEventIDS.MOVE_T, [50.0, 15.0]], baby elephant entry
-            //[ElephantSceneEventIDS.MOVE_T, [65.0, .0]], mother elephant entry
             [ElephantSceneEventIDS.MOVE_T, [1.0, 54.0]],
 
             //First Movement(both)
@@ -266,26 +265,15 @@ class elephantScene extends Scene {
         ElephantScene.timer.registerCallback(30.0, () => { this.currentBabyAnimation = 3 }); //Walking
         ElephantScene.timer.registerCallback(50.0, () => { this.currentBabyAnimation = 1 }); //Walking
 
-        //ElephantScene.timer.registerCallback(20.0, () => { this.currentBabyAnimation = 3 }); //standing
 
 
-        ElephantScene.timer.registerCallback(15.0, () => { this.currentMotherAnimation = 1 }); //head movement standing
-        ElephantScene.timer.registerCallback(18.0, () => { this.currentMotherAnimation = 2 }); //walking
+        ElephantScene.timer.registerCallback(15.0, () => { this.currentMotherAnimation = 2 }); //walking
         ElephantScene.timer.registerCallback(25.0, () => { this.currentMotherAnimation = 0 }); //standing
 
         ElephantScene.timer.registerCallback(30.0, () => { this.currentMotherAnimation = 2 }); //Walking
-        ElephantScene.timer.registerCallback(50.0, () => { this.currentMotherAnimation = 0 }); //Walking
+        ElephantScene.timer.registerCallback(50.0, () => { this.currentMotherAnimation = 0 }); //standing
 
-        //   ElephantScene.timer.registerCallback(15.0, () => { this.currentMotherAnimation = 2 }); //standing
-        // ElephantScene.timer.registerCallback(20.0, () => { this.currentMotherAnimation = 3 }); //standing
 
-        /*
-        //Elephant cub movement callback
-        ElephantScene.timer.registerCallback(25.0, () => { this.currentBabyAnimation = 1 }); //Playing
-        ElephantScene.timer.registerCallback(40.0, () => { this.currentBabyAnimation = 3 }); //Walking
-        ElephantScene.timer.registerCallback(48.0, () => { this.currentBabyAnimation = 1 }); //Playing
-
-*/
         //Setup Grass and other models Position Acoording To Terrain 
         let model = modelList.find(o => o.name === this.terrainModelName);
         let mesh = model.json.meshes[0];
@@ -555,25 +543,24 @@ class elephantScene extends Scene {
         this.myModelDraw.renderModels(this.terrainModel, this.terrainTextue, this.terrainModelMatrixArray, this.lightManager, false);
 
         //For tree1 model
-        this.myModelDraw.renderModels(this.tree1Model, this.whiteTexture, this.tree1ModelMatrixArray, this.lightManager, false);
+        this.myModelDraw.renderModels(this.tree1Model, this.whiteTexture, this.tree1ModelMatrixArray, this.lightManager, true);
 
         //For tree2 model
-        this.myModelDraw.renderModels(this.tree2Model, this.whiteTexture, this.tree2ModelMatrixArray, this.lightManager, false);
+        this.myModelDraw.renderModels(this.tree2Model, this.whiteTexture, this.tree2ModelMatrixArray, this.lightManager, true);
 
         //For tree3 model
-        this.myModelDraw.renderModels(this.tree3Model, this.whiteTexture, this.tree3ModelMatrixArray, this.lightManager, false);
+        this.myModelDraw.renderModels(this.tree3Model, this.whiteTexture, this.tree3ModelMatrixArray, this.lightManager, true);
 
         //Tree Logs
-        this.myModelDraw.renderModels(this.treeLog1Model, this.whiteTexture, this.treeLog1ModelMatrixArray, this.lightManager, false);
-        this.myModelDraw.renderModels(this.treeLog2Model, this.whiteTexture, this.treeLog2ModelMatrixArray, this.lightManager, false);
+        this.myModelDraw.renderModels(this.treeLog1Model, this.whiteTexture, this.treeLog1ModelMatrixArray, this.lightManager, true);
+        this.myModelDraw.renderModels(this.treeLog2Model, this.whiteTexture, this.treeLog2ModelMatrixArray, this.lightManager, true);
 
         //Tree Trunks
-        this.myModelDraw.renderModels(this.treeTrunk1Model, this.whiteTexture, this.treeTrunk1ModelMatrixArray, this.lightManager, false);
-        this.myModelDraw.renderModels(this.treeTrunk2Model, this.whiteTexture, this.treeTrunk2ModelMatrixArray, this.lightManager, false);
+        this.myModelDraw.renderModels(this.treeTrunk1Model, this.whiteTexture, this.treeTrunk1ModelMatrixArray, this.lightManager, true);
+        this.myModelDraw.renderModels(this.treeTrunk2Model, this.whiteTexture, this.treeTrunk2ModelMatrixArray, this.lightManager, true);
 
         //for stone1 model
-        this.myModelDraw.renderModels(this.stone1Model, this.terrainTextue, this.stone1ModelMatrixArray, this.lightManager);
-
+        this.myModelDraw.renderModels(this.stone1Model, this.terrainTextue, this.stone1ModelMatrixArray, this.lightManager, true);
 
         //Elephants
         ElephantScene.programCelShader.use();
@@ -659,9 +646,11 @@ class elephantScene extends Scene {
         ElephantScene.timer.increment();
 
         if (ElephantScene.timer.isEventStarted(ElephantSceneEventIDS.START_T) && ElephantScene.songStart == 0) {
-            songPlayer.currentTime = 50.0;
+            //   songPlayer.currentTime = 50.0;
             ElephantScene.songStart = 1;
             postProcessingSettings.enableFog = true;
+            postProcessingSettings.enableOutline = true;
+            postProcessingSettings.enableBloom = false;
         }
 
         // Fade IN This condition ensures that only change fade when start event is started and it not completed.

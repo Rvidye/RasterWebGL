@@ -16,7 +16,8 @@ const KangarooSceneEventIDS = {
     MOVE_KANGAROO_JOEY_1: 3,
     MOVE_KANGAROO_JOEY_2: 5,
     MOVE_KANGAROO_MOTHER_2: 6,
-    END_T: 7
+    MOVE_BIRD_1: 7,
+    END_T: 8
 };
 
 class kangarooScene extends Scene {
@@ -104,8 +105,30 @@ class kangarooScene extends Scene {
 
         this.kangarooMother = setupModel("kangarooMother", true);
         this.kangarooJoey = setupModel("kangarooJoey", true);
-        // Spline Path for Elephant can be done in constructor
 
+        this.birdModel = setupModel("bird", true);
+
+
+        const birdPositions_1 = [
+            [-97, 10, 176],
+            [-97, 15, 130],
+            [-88, 22, 100],
+            [-70, 35, 55],
+            [-70, 41, 11],
+            [-70, 45, -28],
+            [-70, 49, -67],
+            [-70, 53, -106],
+            [-70, 59, -161],
+        ];
+
+        this.birdPathSpline_1 = new BsplineInterpolator(birdPositions_1);
+        this.splineBirdAdjuster_1 = new SplineAdjuster(this.birdPathSpline_1);
+        this.splineBirdAdjuster_1.setRenderPath(true);
+        this.splineBirdAdjuster_1.setRenderPathPoints(true);
+
+
+        // Spline Path for Elephant can be done in constructor
+        this.currentBirdAnimation = 0;
         this.currentMotherAnimation = 2; //Running
         this.currentBabyAnimation = 3; //Running
 
@@ -189,7 +212,7 @@ class kangarooScene extends Scene {
 */
 
         //change Spline Adjuster mother/joey
-        this.splineAdjuster = this.splineJoeyAdjuster_2;
+        this.splineAdjuster = this.splineBirdAdjuster_1;
 
         //model Placer
         KangarooScene.modelPlacer = new ModelPlacer();
@@ -202,6 +225,8 @@ class kangarooScene extends Scene {
             //First Movement -> both moving
             [KangarooSceneEventIDS.MOVE_KANGAROO_MOTHER_1, [10.0, 10.0]],
             [KangarooSceneEventIDS.MOVE_KANGAROO_JOEY_1, [0.0, 10.0]],
+
+            [KangarooSceneEventIDS.MOVE_BIRD_1, [0.0, 35.0]],
 
             //Third movement movement -> joey moving, mother standing
             [KangarooSceneEventIDS.MOVE_KANGAROO_JOEY_2, [25.0, 10.0]],
@@ -242,7 +267,7 @@ class kangarooScene extends Scene {
             if (data[i + 1] <= 0.0001) {
 
                 //Grass Blades Position
-                for (let k = 0; k < 100.0; k++) {
+                for (let k = 0; k < 40.0; k++) {
                     j++;
 
                     let fAngle = Math.random() * 2 * Math.PI;
@@ -252,7 +277,15 @@ class kangarooScene extends Scene {
                     grassBladesPos.push(data[i + 2] * this.terrainScale * 2.0 + r * Math.sin(fAngle));
                 }
 
+                //Vegetation position
+                if (Math.random() < 0.1) {
+                    let tempMat = mat4.create();
+                    mat4.translate(tempMat, mat4.create(), [data[i] * this.terrainScale, data[i + 1] * this.terrainScale, data[i + 2] * this.terrainScale]);
+                    vegetationPosMatrix.push(tempMat);
+                }
+
             }
+
         }
         this.myGrass.GRASS_BLADES = j;
         let baseColor = new Float32Array([0.31, 0.48, 0.0]);
@@ -281,6 +314,11 @@ class kangarooScene extends Scene {
 
         //Atmospheric Scaterring
         this.myAtmScat.initAtmScattering();
+
+        //Vegetation
+        let leafTexture = loadTexture("textures/vegetation/leaf1.png", true);
+        this.myVegetation.initVegetation(leafTexture, vegetationPosMatrix);
+
     }
 
     renderShadow(shadowProgram) {
@@ -303,11 +341,12 @@ class kangarooScene extends Scene {
         this.myAtmScat.renderAtmScattering();
         //gl.depthMask(gl.TRUE);
 
-        this.myModelDraw.renderModels(this.terrainModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager);
-        this.myModelDraw.renderModels(this.objectsModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager);
-        this.myModelDraw.renderModels(this.maountainsModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager);
+        this.myModelDraw.renderModels(this.terrainModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager, false);
+        this.myModelDraw.renderModels(this.objectsModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager, true);
+        this.myModelDraw.renderModels(this.maountainsModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager, true);
 
-        // this.myModelDraw.renderModels(this.kangarooMother, this.whiteTexture, KangarooScene.modelPlacer.getTransformationMatrix(), this.lightManager);
+
+        //Kangaroo Joey and Mother
         KangarooScene.programCelShader.use();
         gl.uniformMatrix4fv(KangarooScene.programCelShader.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
         gl.uniformMatrix4fv(KangarooScene.programCelShader.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
@@ -323,27 +362,20 @@ class kangarooScene extends Scene {
             this.renderKangarooJoey(KangarooSceneEventIDS.MOVE_KANGAROO_JOEY_2, this.joeyPathSpline_2);
             this.renderKangarooMother(KangarooSceneEventIDS.MOVE_KANGAROO_MOTHER_2, this.motherPathSpline_2);
         }
-        /*
-        if (KangarooScene.timer.currentTime < 25.0) {
-            this.renderKangarooMother(KangarooSceneEventIDS.MOVE_KANGAROO_MOTHER_1, this.motherPathSpline_1);
-            this.renderKangarooJoey(KangarooSceneEventIDS.MOVE_KANGAROO_JOEY_1, this.joeyPathSpline_1);
-            //Extra Kangaroo
-            this.renderKangarooMother(KangarooSceneEventIDS.MOVE_KANGAROO_MOTHER_1, this.kangarooPathSpline_1);
-            this.renderKangarooMother(KangarooSceneEventIDS.MOVE_KANGAROO_MOTHER_1, this.kangarooPathSpline_2);
+
+        //Birds
+        if (KangarooScene.timer.currentTime < 35.0) {
+            this.renderBird(KangarooSceneEventIDS.MOVE_BIRD_1, this.birdPathSpline_1);
         }
-        else if (KangarooScene.timer.currentTime >= 25.0) {
-            this.renderKangarooMother(KangarooSceneEventIDS.MOVE_KANGAROO_MOTHER_1, this.motherPathSpline_1);
-            this.renderKangarooJoey(KangarooSceneEventIDS.MOVE_KANGAROO_JOEY_2, this.joeyPathSpline_2);
-            //Extra Kangaroo
-            this.renderKangarooMother(KangarooSceneEventIDS.MOVE_KANGAROO_MOTHER_1, this.kangarooPathSpline_1);
-            this.renderKangarooMother(KangarooSceneEventIDS.MOVE_KANGAROO_MOTHER_1, this.kangarooPathSpline_2);
-        }
-*/
+
+        //Vegetation
+        //   this.myVegetation.renderVegetation();
 
         //RenderGrass
         gl.depthMask(false);
         this.myGrass.renderGrass();
         gl.depthMask(true);
+
     }
 
     renderKangarooMother(eventID, pathSpline) {
@@ -367,7 +399,7 @@ class kangarooScene extends Scene {
     }
 
     renderKangarooJoey(eventID, pathSpline) {
-        //Kangaroo Mother
+        //Kangaroo Joey
         var t = KangarooScene.timer.getEventTime(eventID);
         var position = pathSpline.interpolateSpline(t - 0.01);
         var front = pathSpline.interpolateSpline(t);
@@ -381,9 +413,35 @@ class kangarooScene extends Scene {
         mat4.multiply(finalMatrix, translationMatrix, orientationMatrix);
         mat4.scale(finalMatrix, finalMatrix, vec3.fromValues(9.50, 9.50, 9.50));
         gl.uniformMatrix4fv(KangarooScene.programCelShader.getUniformLocation("mMat"), false, finalMatrix);
-        //renderModel(this.elephantMother, this.myModelDraw.modelProgram, true,true);
+
         uploadBoneMatrices(this.kangarooJoey, KangarooScene.programCelShader, this.currentBabyAnimation);
         renderModel(this.kangarooJoey, KangarooScene.programCelShader, true, true);
+    }
+
+    renderBird(eventID, pathSpline) {
+
+        //Kangaroo Joey
+        var t = KangarooScene.timer.getEventTime(eventID);
+        var position = pathSpline.interpolateSpline(t - 0.01);
+        var front = pathSpline.interpolateSpline(t);
+        // Translation matrix
+        let translationMatrix = mat4.create();
+        mat4.translate(translationMatrix, translationMatrix, position);
+        // Orientation matrix using targetat
+        let orientationMatrix = targetat(position, front, vec3.fromValues(0.0, 1.0, 0.0));
+        // Combining the matrices
+        let finalMatrix = mat4.create();
+        mat4.multiply(finalMatrix, translationMatrix, orientationMatrix);
+        mat4.scale(finalMatrix, finalMatrix, vec3.fromValues(0.1, 0.1, 0.1));
+        gl.uniformMatrix4fv(KangarooScene.programCelShader.getUniformLocation("mMat"), false, finalMatrix);
+        uploadBoneMatrices(this.birdModel, KangarooScene.programCelShader, this.currentBirdAnimation);
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this.whiteTexture);
+        gl.uniform1i(KangarooScene.programCelShader.getUniformLocation("samplerDiffuse"), 0);
+
+        renderModel(this.birdModel, KangarooScene.programCelShader, true, true);
+        //  this.myModelDraw.renderModels(this.birdModel, this.whiteTexture, this.finalMatrix, this.lightManager, true);
     }
 
 
@@ -392,13 +450,16 @@ class kangarooScene extends Scene {
         this.myGrass.updateGrass();
         updateModel(this.kangarooMother, this.currentMotherAnimation, GLOBAL.deltaTime);
         updateModel(this.kangarooJoey, this.currentBabyAnimation, GLOBAL.deltaTime);
+        updateModel(this.birdModel, this.currentBirdAnimation, GLOBAL.deltaTime);
+
         KangarooScene.sceneCamera.setT(KangarooScene.timer.getEventTime(KangarooSceneEventIDS.MOVE_T));
         // updateModel(KangarooScene.modelCat, 0, GLOBAL.deltaTime);
         KangarooScene.timer.increment();
         if (KangarooScene.timer.isEventStarted(KangarooSceneEventIDS.START_T) && KangarooScene.songStart == 0) {
-            songPlayer.currentTime = 125.0;
+            // songPlayer.currentTime = 125.0;
             KangarooScene.songStart = 1;
             postProcessingSettings.enableFog = false;
+            postProcessingSettings.enableOutline = true;
         }
         // Fade IN This condition ensures that only change fade when start event is started and it not completed.
         if (KangarooScene.timer.isEventStarted(KangarooSceneEventIDS.START_T) && !KangarooScene.timer.isEventComplete(KangarooSceneEventIDS.START_T)) {

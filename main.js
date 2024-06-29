@@ -12,8 +12,6 @@ var modelList = [
 	{ name: "point", files: ['models/lightmesh/point.obj'], flipTex: false },
 	//{ name: "cat", files: ['models/scene1/cat/cat.gltf', "models/scene1/cat/cat.bin"], flipTex: true },
 
-
-
 	{ name: "room1", files: ['models/scene1/room/room3.gltf', "models/scene1/room/room3.bin"], flipTex: true },
 	{ name: "book", files: ['models/scene1/book/book.gltf', "models/scene1/book/book.bin"], flipTex: true },
 	{ name: "AMC", files: ['models/scene1/intro/amc.glb'], flipTex: false },
@@ -50,7 +48,7 @@ var modelList = [
 
 	{ name: "kangarooMother", files: ['models/kangaroo/mother.gltf', 'models/kangaroo/mother.bin'], flipTex: true },
 	{ name: "kangarooJoey", files: ['models/kangaroo/joey.gltf', 'models/kangaroo/joey.bin'], flipTex: true },
-
+	{ name: "bird", files: ['models/KangarooScene/birds2/birds.gltf', 'models/KangarooScene/birds2/birds.bin'], flipTex: true },
 
 
 ]
@@ -186,11 +184,12 @@ function main() {
 
 	// scene setup
 	//addScene(new tutorial());
-	//addScene(new roomScene());
-	//	addScene(new elephantScene());
-	//addScene(new pageChangeScene());
+	addScene(new roomScene());
+	addScene(new elephantScene());
+	addScene(new pageChangeScene());
 	addScene(new kangarooScene());
-	//addScene(new endRoomScene());
+	addScene(new endRoomScene());
+	addScene(new credits());
 
 	fpsElem = document.getElementById('fps');
 
@@ -287,6 +286,9 @@ function initScenes() {
 }
 
 function resetScene() {
+	if (currentSceneIndex < scenes.length) {
+		scenes[currentSceneIndex].reset();
+	}
 }
 
 function handleUI() {
@@ -303,6 +305,16 @@ function handleUI() {
 		}
 		else {
 			songPlayer.pause();
+		}
+	}
+
+	if (ImGui.Button(mute ? "UnMute" : "Mute")) {
+		mute = !mute;
+		if (mute) {
+			songPlayer.muted = true;
+		}
+		else {
+			songPlayer.muted = false;
 		}
 	}
 
@@ -538,7 +550,6 @@ function update() {
 		currentScene.update();
 	}
 }
-
 
 function loadTexture(path, isTexFlipped) {
 	if (loadedTextures[path] == undefined) {

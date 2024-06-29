@@ -5,6 +5,7 @@ var GLOBAL = {
 };
 
 var isAnimating = false;
+var mute = false;
 
 var currentCamera = null;
 var isDebugCameraOn = true;
@@ -50,6 +51,7 @@ const quat = glMatrix.quat;
 const toRadian = glMatrix.glMatrix.toRadian;
 
 var globalFade = 1.0; // 0 means show scene , 1 means display scene
+var bloomRadius = 0.05;
 
 function getRandomInRange(min, max) {
 	return Math.random() * (max - min) + min;

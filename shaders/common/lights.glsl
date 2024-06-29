@@ -17,7 +17,7 @@ struct Light {
 const int LightType_Directional = 0;
 const int LightType_Point = 1;
 const int LightType_Spot = 2;
-const float toon_color_levels = 4.0;
+const float toon_color_levels = 5.0;
 const float toon_scale_factor = 1.0 / toon_color_levels;
 
 uniform Light u_Lights[10]; //More Lights Less performance ...
