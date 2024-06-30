@@ -4,12 +4,14 @@ var endScene = {
     programPhongShader: null,
     programCelShader: null,
     programSkyRender: null,
+    programQuad: null,
     modelBook: null,
     modelChild: null,
     modelMother: null,
     modelTest: null,
     modelRoom: null,
     modelNightSky: null,
+    modelPlane: null,
     modelEarth : null,
     modelPlacer: null,
     timer: null,
@@ -40,6 +42,7 @@ class endRoomScene extends Scene {
         endScene.programCelShader = new ShaderProgram(gl, ['shaders/model/model.vert', 'shaders/model/celShader.frag']);
         endScene.programLight = new ShaderProgram(gl, ['shaders/utilities/lightsrc.vert', 'shaders/utilities/lightsrc.frag']);
         endScene.programSkyRender = new ShaderProgram(gl, ['shaders/cubemap/spheremap.vert', 'shaders/model/texturedMesh.frag']);
+        endScene.programQuad = new ShaderProgram(gl, ['shaders/cubemap/simple.vert', 'shaders/fallingstar.frag']);
     }
 
     setupCamera() {
@@ -83,6 +86,7 @@ class endRoomScene extends Scene {
         endScene.modelMother = setupModel("mother", true);
         endScene.modelNightSky = setupModel("nightSky", false);
         endScene.modelEarth = setupModel("earth", false);
+        endScene.modelPlane = setupModel("plane", false);
         //console.log(endScene.modelTest);
 
         endScene.modelRoom.meshes[3].meshID = vec4.fromValues(0.0,0.0,0.0,0.0);
@@ -94,7 +98,7 @@ class endRoomScene extends Scene {
 
         endScene.timer = new timer([
             [endSceneEventIDS.START_T, [0.0, 1.0]],
-            [endSceneEventIDS.CAMERA1_T, [0.0, 23.0]],
+            [endSceneEventIDS.CAMERA1_T, [0.0, 22.0]],
             [endSceneEventIDS.BOOK_OPEN_T, [0.0, 6.0]],
             [endSceneEventIDS.END_T, [23.0, 1.0]]
         ]);
@@ -109,9 +113,9 @@ class endRoomScene extends Scene {
         this.lightManager.addLight(pointLight);
 
         endScene.modelPlacer = new ModelPlacer();
-        endScene.modelPlacer.position = vec3.fromValues(4.18000, 0.60000, 0.77000);
-        endScene.modelPlacer.rotation = vec3.fromValues(0.00, 1.50, 0.00);
-        endScene.modelPlacer.scale = vec3.fromValues(0.04000, 0.04000, 0.04000);
+        endScene.modelPlacer.position = vec3.fromValues(15.00000, 17.00000, 14.00000);
+        endScene.modelPlacer.rotation = vec3.fromValues(0.00, 3.1, 0.4);
+        endScene.modelPlacer.scale = vec3.fromValues(1.00000, 1.00000, 1.00000);
     }
 
     renderShadow(shadowProgram) {
@@ -131,7 +135,24 @@ class endRoomScene extends Scene {
         if (DEBUGMODE === CAMERA) {
             endScene.sceneCameraRig.render();
         }
+
         var transformationMatrix = mat4.create();
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        endScene.programQuad.use();
+        mat4.identity(transformationMatrix);
+        mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(15.00000, 17.00000, 14.00000));
+        mat4.rotateX(transformationMatrix, transformationMatrix, 0.00000);
+        mat4.rotateY(transformationMatrix, transformationMatrix, 0.00000);
+        mat4.rotateZ(transformationMatrix, transformationMatrix, -0.40000);
+        mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(1.00000, 1.00000, 1.00000));
+        gl.uniformMatrix4fv(endScene.programQuad.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
+        gl.uniformMatrix4fv(endScene.programQuad.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
+        gl.uniformMatrix4fv(endScene.programQuad.getUniformLocation("mMat"), false, endScene.modelPlacer.getTransformationMatrix());
+        gl.uniform1f(endScene.programQuad.getUniformLocation("uTime"), test);
+        //gl.uniform2fv(endScene.programQuad.getUniformLocation("uResolution"), [800,450]);
+        renderModel(endScene.modelPlane, endScene.programQuad, false,false);
+        gl.disable(gl.BLEND);
 
         endScene.programCelShader.use();
         gl.uniformMatrix4fv(endScene.programCelShader.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
@@ -169,11 +190,13 @@ class endRoomScene extends Scene {
 
         endScene.timer.increment();
         endScene.sceneCamera.setT(endScene.timer.getEventTime(endSceneEventIDS.CAMERA1_T));
-        test += 0.1 * GLOBAL.deltaTime;
+        if(endScene.timer.getT() > 22.0){
+            test += 0.05;
+        }
         //updateModel(endScene.modelMother,0,GLOBAL.deltaTime);
 
         if (endScene.timer.isEventStarted(endSceneEventIDS.START_T) && endScene.songStart == 0) {
-            songPlayer.currentTime = 161.0;
+            //songPlayer.currentTime = 161.0;
             endScene.songStart = 1;
         }
 
@@ -258,6 +281,6 @@ class endRoomScene extends Scene {
     }
 
     getSceneTime() {
-        return endScene.timer.getT()
+        return endScene.timer.getT();
     }
 }

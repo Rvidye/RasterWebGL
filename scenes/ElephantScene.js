@@ -240,7 +240,7 @@ class elephantScene extends Scene {
             [ElephantSceneEventIDS.MOVE_T, [1.0, 54.0]],
 
             //First Movement(both)
-            [ElephantSceneEventIDS.MOVE_ELEPHANT_MOTHER_1, [15.0, 10.0]],
+            [ElephantSceneEventIDS.MOVE_ELEPHANT_MOTHER_1, [13.0, 12.0]],
             [ElephantSceneEventIDS.MOVE_ELEPHANT_BABY_1, [0.0, 15.0]],
 
             //Second Movement(only baby)
@@ -264,7 +264,7 @@ class elephantScene extends Scene {
 
 
 
-        ElephantScene.timer.registerCallback(15.0, () => { this.currentMotherAnimation = 2 }); //walking
+        ElephantScene.timer.registerCallback(13.0, () => { this.currentMotherAnimation = 2 }); //walking
         ElephantScene.timer.registerCallback(25.0, () => { this.currentMotherAnimation = 0 }); //standing
 
         ElephantScene.timer.registerCallback(30.0, () => { this.currentMotherAnimation = 2 }); //Walking

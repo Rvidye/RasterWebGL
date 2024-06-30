@@ -5,6 +5,7 @@ var modelList = [
 	// { name: "test1", files: ['models/cube/AnimatedCube.gltf', 'models/cube/AnimatedCube.bin'], flipTex: true },
 	{ name: "test3", files: ['models/cesiumman/CesiumMan.gltf', 'models/cesiumman/CesiumMan_data.bin'], flipTex: true },
 	{ name: "cube", files: ['models/cube.glb'], flipTex: true },
+	{ name: "plane", files: ['models/plane.glb'], flipTex: true },
 	{ name: "arrow", files: ['models/lightmesh/arrow.obj'], flipTex: false },
 	{ name: "cone", files: ['models/lightmesh/cone.obj'], flipTex: false },
 	{ name: "point", files: ['models/lightmesh/point.obj'], flipTex: false },
@@ -42,7 +43,6 @@ var modelList = [
 	{ name: "kangarooMother", files: ['models/kangaroo/mother.gltf', 'models/kangaroo/mother.bin'], flipTex: true },
 	{ name: "kangarooJoey", files: ['models/kangaroo/joey.gltf', 'models/kangaroo/joey.bin'], flipTex: true },
 	{ name: "bird", files: ['models/KangarooScene/birds2/birds.gltf', 'models/KangarooScene/birds2/birds.bin'], flipTex: true },
-
 
 ]
 
@@ -177,12 +177,12 @@ function main() {
 
 	// scene setup
 	//addScene(new tutorial());
-	//addScene(new roomScene());
+	addScene(new roomScene());
 	addScene(new elephantScene());
-	//addScene(new pageChangeScene());
-	//addScene(new kangarooScene());
-	//addScene(new endRoomScene());
-	//addScene(new credits());
+	addScene(new pageChangeScene());
+	addScene(new kangarooScene());
+	addScene(new endRoomScene());
+	addScene(new credits());
 
 	fpsElem = document.getElementById('fps');
 
