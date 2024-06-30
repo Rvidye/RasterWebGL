@@ -174,11 +174,11 @@ function main() {
 	// scene setup
 	//addScene(new tutorial());
 	addScene(new roomScene());
-	addScene(new elephantScene());
-	addScene(new pageChangeScene());
-	addScene(new kangarooScene());
-	addScene(new endRoomScene());
-	addScene(new credits());
+	// addScene(new elephantScene());
+	// addScene(new pageChangeScene());
+	// addScene(new kangarooScene());
+	// addScene(new endRoomScene());
+	// addScene(new credits());
 
 	fpsElem = document.getElementById('fps');
 
