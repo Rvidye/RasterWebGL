@@ -343,8 +343,7 @@ class kangarooScene extends Scene {
 
         this.myModelDraw.renderModels(this.terrainModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager, false);
         this.myModelDraw.renderModels(this.objectsModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager, true);
-        this.myModelDraw.renderModels(this.maountainsModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager, true);
-
+        this.myModelDraw.renderModels(this.maountainsModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager,true);
 
         //Kangaroo Joey and Mother
         KangarooScene.programCelShader.use();
@@ -459,6 +458,7 @@ class kangarooScene extends Scene {
             // songPlayer.currentTime = 125.0;
             KangarooScene.songStart = 1;
             postProcessingSettings.enableFog = false;
+            postProcessingSettings.enableOutline = true;
             postProcessingSettings.enableOutline = true;
         }
         // Fade IN This condition ensures that only change fade when start event is started and it not completed.

@@ -560,7 +560,7 @@ class elephantScene extends Scene {
         this.myModelDraw.renderModels(this.treeTrunk2Model, this.whiteTexture, this.treeTrunk2ModelMatrixArray, this.lightManager, true);
 
         //for stone1 model
-        this.myModelDraw.renderModels(this.stone1Model, this.terrainTextue, this.stone1ModelMatrixArray, this.lightManager, true);
+        this.myModelDraw.renderModels(this.stone1Model, this.terrainTextue, this.stone1ModelMatrixArray, this.lightManager,true);
 
         //Elephants
         ElephantScene.programCelShader.use();
@@ -580,7 +580,6 @@ class elephantScene extends Scene {
             this.renderElephantMother(ElephantSceneEventIDS.MOVE_ELEPHANT_MOTHER_2, this.motherPathSpline_2);
 
         }
-
 
         gl.depthMask(false);
         this.myGrass.renderGrass();
@@ -646,7 +645,7 @@ class elephantScene extends Scene {
         ElephantScene.timer.increment();
 
         if (ElephantScene.timer.isEventStarted(ElephantSceneEventIDS.START_T) && ElephantScene.songStart == 0) {
-            //   songPlayer.currentTime = 50.0;
+            //songPlayer.currentTime = 50.0;
             ElephantScene.songStart = 1;
             postProcessingSettings.enableFog = true;
             postProcessingSettings.enableOutline = true;
