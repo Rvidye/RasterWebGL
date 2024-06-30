@@ -216,10 +216,10 @@ class pageChangeScene extends Scene {
             case 'KeyP':
                 break;
             case 'ArrowUp':
-                room2Scene.timer.addTime(0.4);
+                room2Scene.timer.addTime(0.1);
                 break;
             case 'ArrowDown':
-                room2Scene.timer.subtractTime(0.4);
+                room2Scene.timer.subtractTime(0.1);
                 break;
             case 'Tab':
                 break;

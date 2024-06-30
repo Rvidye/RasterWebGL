@@ -2,8 +2,6 @@
 
 var loadedTextures = {}
 var modelList = [
-
-
 	// { name: "test1", files: ['models/cube/AnimatedCube.gltf', 'models/cube/AnimatedCube.bin'], flipTex: true },
 	{ name: "test3", files: ['models/cesiumman/CesiumMan.gltf', 'models/cesiumman/CesiumMan_data.bin'], flipTex: true },
 	{ name: "cube", files: ['models/cube.glb'], flipTex: true },
@@ -11,17 +9,16 @@ var modelList = [
 	{ name: "cone", files: ['models/lightmesh/cone.obj'], flipTex: false },
 	{ name: "point", files: ['models/lightmesh/point.obj'], flipTex: false },
 	//{ name: "cat", files: ['models/scene1/cat/cat.gltf', "models/scene1/cat/cat.bin"], flipTex: true },
-
 	{ name: "room1", files: ['models/scene1/room/room3.gltf', "models/scene1/room/room3.bin"], flipTex: true },
 	{ name: "book", files: ['models/scene1/book/book.gltf', "models/scene1/book/book.bin"], flipTex: true },
 	{ name: "AMC", files: ['models/scene1/intro/amc.glb'], flipTex: false },
 	{ name: "RASTER", files: ['models/scene1/intro/raster.glb'], flipTex: false },
 	{ name: "nightSky", files: ['models/scene1/night/nightSky.gltf', "models/scene1/night/nightSky.bin"], flipTex: true },
 	{ name: "child", files: ['models/scene1/child/child.gltf', "models/scene1/child/child.bin"], flipTex: true },
+	{ name: "childwb", files: ['models/scene1/childwb/cwb.gltf', "models/scene1/childwb/cwb.bin"], flipTex: true },
 	{ name: "mother", files: ['models/scene1/mother/mother.gltf', 'models/scene1/mother/mother.bin'], flipTex: true },
 	{ name: "earth", files: ['models/earth/earth.gltf', 'models/earth/earth.bin'], flipTex: true },
 	//{ name: "test4", files: ['models/Avocado.glb'], flipTex: true },
-
 	//Elephant Scene Models
 	{ name: "terrain", files: ['models/ElephantScene/elp4_3.glb'], flipTex: true },
 	{ name: "tree1", files: ['models/ElephantScene/TreeSetup/bigTree.glb'], flipTex: true },
@@ -37,12 +34,10 @@ var modelList = [
 	//{ name: "elephantCub", files: ['models/ElephantScene/elephant1/baby.gltf', 'models/ElephantScene/elephant1/baby.bin'], flipTex: true },
 	{ name: "elephantMother", files: ['models/ElephantScene/elephant1/mother.gltf', 'models/ElephantScene/elephant1/mother.bin'], flipTex: true },
 	{ name: "elephantCub", files: ['models/ElephantScene/elephant1/baby.gltf', 'models/ElephantScene/elephant1/baby.bin'], flipTex: true },
-
 	//Kangaroo Scene Models
 	{ name: "kangarooTerrain", files: ['models/KangarooScene/terrain/terrain.gltf', 'models/KangarooScene/terrain/terrain.bin'], flipTex: true },
 	{ name: "kangarooSceneObjects", files: ['models/KangarooScene/objects/objects.gltf', 'models/KangarooScene/objects/objects.bin'], flipTex: true },
 	{ name: "kangarooSceneMountains", files: ['models/KangarooScene/mountains/mountains.gltf', 'models/KangarooScene/mountains/mountains.bin'], flipTex: true },
-
 	{ name: "kangarooMother", files: ['models/kangaroo/mother.gltf', 'models/kangaroo/mother.bin'], flipTex: true },
 	{ name: "kangarooJoey", files: ['models/kangaroo/joey.gltf', 'models/kangaroo/joey.bin'], flipTex: true },
 ]
@@ -502,8 +497,8 @@ function render() {
 		finalTexture = gBuffer.colorTexture;
 	}
 
-	if (postProcessingSettings.debugShaow) {
-		const light = scenes[currentSceneIndex].lightManager.getLight(2);
+	if (postProcessingSettings.debugShadow) {
+		const light = scenes[currentSceneIndex].lightManager.getLight(0);
 		const shadowMap = scenes[currentSceneIndex].lightManager.getShadowMapManager().getShadowMaps()[light.shadowIndex];
 		finalTexture = shadowMapRender.apply(shadowMap.texture);
 	}

@@ -79,7 +79,7 @@ class SplineAdjuster {
 
     keyboardFunc(key) {
         let refreshPos = false;
-        let speed = 1.0;
+        let speed = 0.1;
         switch (key) {
             case 'ArrowLeft':
                 break;
