@@ -50,10 +50,7 @@ class elephantScene extends Scene {
             [-1.9000000000007597, 75.19999999999953, -87.50000000000037],
             [-136.70000000000047, 46.899999999999594, -183.5999999999994],
             [-170.09999999999977, 25.099999999999778, -124.39999999999975],
-            [-117.49999999999974, 0.6000000000000001, -93.3999999999999],
-
-
-
+            [-117.49999999999974,15.499999999999963,-93.29999999999991],
         ];
 
         const frontKeyFrames = [
@@ -159,10 +156,10 @@ class elephantScene extends Scene {
 
         // Spline Path for Elephant can be done in constructor
         const motherPositions_1 = [
-            [-127, 0, 217],
-            [-126, 0, 163],
-            [-125, 0, 145],
-            [-127, 0, 120],
+            [-127,1.2,217],
+            [-126,0.9,163],
+            [-125,0.9,145],
+            [-127,0.9,120],
 
         ];
 
@@ -174,10 +171,10 @@ class elephantScene extends Scene {
 
         //First Baby Movement
         const babyPositions_1 = [
-            [170, 0, 136],
-            [56, 0, 122],
-            [-37, 0, 126],
-            [-110, 0, 92],
+            [170,0.1,136],
+            [56,0.1,122],
+            [-37, 0.1, 126],
+            [-110, 0.1, 92],
         ];
 
         this.babyPathSpline_1 = new BsplineInterpolator(babyPositions_1);
@@ -188,10 +185,10 @@ class elephantScene extends Scene {
 
         //Second Baby Movement -> only baby moves,mother standing
         const babyPositions_2 = [
-            [-110, 0, 92],
-            [-136, 0, 62],
-            [-150, 0, -1],
-            [-141, 0, -50],
+            [-110, 0.1, 92],
+            [-136, 0.1, 62],
+            [-150, 0.1, -1],
+            [-141, 0.1, -50],
         ];
 
 
@@ -205,10 +202,10 @@ class elephantScene extends Scene {
         //Third movement->both mother and baby moves
         // Spline Path for Elephant can be done in constructor
         const motherPositions_2 = [
-            [-127, 0, 120],
-            [-156, 0, 50],
-            [-164, 0, -1],
-            [-157, 0, -54],
+            [-127,0.4,120],
+            [-156, 0.8, 50],
+            [-164, 0.9, -1],
+            [-157, 0.9, -54],
         ];
 
         this.motherPathSpline_2 = new BsplineInterpolator(motherPositions_2);
@@ -218,10 +215,10 @@ class elephantScene extends Scene {
 
         //Third Baby Movement
         const babyPositions_3 = [
-            [-231, 0, -189],
-            [-201, 0, -176],
-            [-167, 0, -173],
-            [-99, 0, -164],
+            [-231, 0.1, -189],
+            [-201, 0.1, -176],
+            [-167, 0.1, -173],
+            [-99, 0.1, -164],
         ];
 
         this.babyPathSpline_3 = new BsplineInterpolator(babyPositions_3);
@@ -231,7 +228,7 @@ class elephantScene extends Scene {
         //this.splineAdjuster.setScalingFactor(0.01);
 
 
-        this.splineAdjuster = this.splineMotherAdjuster_1;
+        this.splineAdjuster = this.splineMotherAdjuster_2;
 
 
         //model Placer
@@ -570,15 +567,12 @@ class elephantScene extends Scene {
         this.lightManager.updateLights(ElephantScene.programCelShader.programObject);
 
         if (ElephantScene.timer.currentTime <= 30.0) {
-
             this.renderElephantBaby(ElephantSceneEventIDS.MOVE_ELEPHANT_BABY_1, this.babyPathSpline_1);
             this.renderElephantMother(ElephantSceneEventIDS.MOVE_ELEPHANT_MOTHER_1, this.motherPathSpline_1);
         }
         else if (ElephantScene.timer.currentTime <= 56.0) {
-
             this.renderElephantBaby(ElephantSceneEventIDS.MOVE_ELEPHANT_BABY_2, this.babyPathSpline_2);
             this.renderElephantMother(ElephantSceneEventIDS.MOVE_ELEPHANT_MOTHER_2, this.motherPathSpline_2);
-
         }
 
         gl.depthMask(false);
@@ -783,10 +777,10 @@ class elephantScene extends Scene {
             case 'KeyP':
                 break;
             case 'ArrowUp':
-                ElephantScene.timer.addTime(0.4);
+                ElephantScene.timer.addTime(0.1);
                 break;
             case 'ArrowDown':
-                ElephantScene.timer.subtractTime(0.4);
+                ElephantScene.timer.subtractTime(0.1);
                 break;
             case 'Tab':
                 break;

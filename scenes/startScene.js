@@ -188,7 +188,7 @@ class roomScene extends Scene {
         mat4.rotateY(transformationMatrix, transformationMatrix, 1.90000);
         mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00000);
         mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(0.04000, 0.04000, 0.04000));
-        gl.uniformMatrix4fv(startScene.programCelShader.getUniformLocation("mMat"), false, startScene.modelPlacer.getTransformationMatrix());
+        gl.uniformMatrix4fv(startScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
         uploadBoneMatrices(startScene.modelBook, startScene.programCelShader, 0);
         renderModel(startScene.modelBook, startScene.programCelShader, true);
 
@@ -291,10 +291,10 @@ class roomScene extends Scene {
             case 'KeyP':
                 break;
             case 'ArrowUp':
-                startScene.timer.addTime(0.4);
+                startScene.timer.addTime(0.1);
                 break;
             case 'ArrowDown':
-                startScene.timer.subtractTime(0.4);
+                startScene.timer.subtractTime(0.1);
                 break;
             case 'Tab':
                 break;
