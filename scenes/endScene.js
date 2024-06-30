@@ -83,9 +83,7 @@ class endRoomScene extends Scene {
         endScene.modelRoom = setupModel("room1", false)
         endScene.modelBook = setupModel("book", true);
         endScene.modelChild = setupModel("childwb", false);
-        endScene.modelMother = setupModel("mother", true);
         endScene.modelNightSky = setupModel("nightSky", false);
-        endScene.modelEarth = setupModel("earth", false);
         endScene.modelPlane = setupModel("plane", false);
         //console.log(endScene.modelTest);
 
@@ -115,7 +113,7 @@ class endRoomScene extends Scene {
         endScene.modelPlacer = new ModelPlacer();
         endScene.modelPlacer.position = vec3.fromValues(15.00000, 17.00000, 14.00000);
         endScene.modelPlacer.rotation = vec3.fromValues(0.00, 3.1, 0.4);
-        endScene.modelPlacer.scale = vec3.fromValues(1.00000, 1.00000, 1.00000);
+        endScene.modelPlacer.scale = vec3.fromValues(5.00000, 5.00000, 5.00000);
     }
 
     renderShadow(shadowProgram) {
@@ -141,14 +139,14 @@ class endRoomScene extends Scene {
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         endScene.programQuad.use();
         mat4.identity(transformationMatrix);
-        mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(15.00000, 17.00000, 14.00000));
+        mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(26.00000, 41.00000, 21.00000));
         mat4.rotateX(transformationMatrix, transformationMatrix, 0.00000);
-        mat4.rotateY(transformationMatrix, transformationMatrix, 0.00000);
-        mat4.rotateZ(transformationMatrix, transformationMatrix, -0.40000);
-        mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(1.00000, 1.00000, 1.00000));
+        mat4.rotateY(transformationMatrix, transformationMatrix, 3.10000);
+        mat4.rotateZ(transformationMatrix, transformationMatrix, 0.40000);
+        mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(5.00000, 5.00000, 5.00000));
         gl.uniformMatrix4fv(endScene.programQuad.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
         gl.uniformMatrix4fv(endScene.programQuad.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
-        gl.uniformMatrix4fv(endScene.programQuad.getUniformLocation("mMat"), false, endScene.modelPlacer.getTransformationMatrix());
+        gl.uniformMatrix4fv(endScene.programQuad.getUniformLocation("mMat"), false, transformationMatrix);
         gl.uniform1f(endScene.programQuad.getUniformLocation("uTime"), test);
         //gl.uniform2fv(endScene.programQuad.getUniformLocation("uResolution"), [800,450]);
         renderModel(endScene.modelPlane, endScene.programQuad, false,false);
@@ -190,13 +188,13 @@ class endRoomScene extends Scene {
 
         endScene.timer.increment();
         endScene.sceneCamera.setT(endScene.timer.getEventTime(endSceneEventIDS.CAMERA1_T));
-        if(endScene.timer.getT() > 22.0){
-            test += 0.05;
+        if(endScene.timer.getT() > 20.0){
+            test += 0.025;
         }
         //updateModel(endScene.modelMother,0,GLOBAL.deltaTime);
 
         if (endScene.timer.isEventStarted(endSceneEventIDS.START_T) && endScene.songStart == 0) {
-            //songPlayer.currentTime = 161.0;
+            songPlayer.currentTime = 161.0;
             endScene.songStart = 1;
         }
 

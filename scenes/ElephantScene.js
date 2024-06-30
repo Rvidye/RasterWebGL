@@ -510,14 +510,6 @@ class elephantScene extends Scene {
     renderShadow(shadowProgram) {
         // Not sure best way to do this and increases extra work on developer side but at this point fuck it ...
         // make sure to keep this and render function transformation in sync ...
-
-        //for Terrain
-        this.myModelDraw.renderShadow(shadowProgram, this.terrainModel, this.terrainModelMatrixArray);
-
-        //For tree1 model
-        this.myModelDraw.renderShadow(shadowProgram, this.tree1Model, this.tree1ModelMatrixArray);
-
-
     }
 
     render() {

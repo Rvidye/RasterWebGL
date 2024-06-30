@@ -21,6 +21,7 @@ var modelList = [
 	{ name: "mother", files: ['models/scene1/mother/mother.gltf', 'models/scene1/mother/mother.bin'], flipTex: true },
 	{ name: "earth", files: ['models/earth/earth.gltf', 'models/earth/earth.bin'], flipTex: true },
 	//{ name: "test4", files: ['models/Avocado.glb'], flipTex: true },
+
 	//Elephant Scene Models
 	{ name: "terrain", files: ['models/ElephantScene/elp4_3.glb'], flipTex: true },
 	{ name: "tree1", files: ['models/ElephantScene/TreeSetup/bigTree.glb'], flipTex: true },
@@ -364,7 +365,7 @@ function renderFrame(timeStamp) {
 	//console.log("Rendering frame with delta time:", GLOBAL.deltaTime);
 	render();
 	update();
-
+/*
 	ImGui_Impl.NewFrame();
 	ImGui.NewFrame();
 	handleUI();
@@ -377,6 +378,7 @@ function renderFrame(timeStamp) {
 	// Render ImGUI
 	ImGui.Render();
 	ImGui_Impl.RenderDrawData(ImGui.GetDrawData());
+*/
 	requestAnimationFrame(renderFrame);
 }
 

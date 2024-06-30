@@ -221,7 +221,7 @@ class roomScene extends Scene {
         renderModel(startScene.modelMother, startScene.programCelShader, true);
 
         //gl.uniformMatrix4fv(startScene.programCelShader.getUniformLocation("mMat"), false, startScene.modelPlacer.getTransformationMatrix());
-        lightRenderer.renderLights(this.lightManager);
+        //lightRenderer.renderLights(this.lightManager);
     }
 
     update() {
