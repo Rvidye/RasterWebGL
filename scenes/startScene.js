@@ -58,7 +58,7 @@ class roomScene extends Scene {
             [-0.5999999999999998,2.600000000000001,4.10000000000001],
             [0.3999999999999998,2.500000000000001,1.700000000000005],
             [1.5,2.0000000000000004,0.700000000000001],
-            [3.8000000000000016,1.2999999999999998,0.5999999999999971],
+            [4.899999999999999,1.2999999999999998,0.5999999999999971],
         ];
 
         const frontKeyFrames = [
@@ -71,7 +71,7 @@ class roomScene extends Scene {
             [0.6000000000000008, 2.3000000000000007, 3.8000000000000105],
             [1.3000000000000003,1.7000000000000002,1.1000000000000045],
             [3.0000000000000018,1.0999999999999996,0.600000000000001],
-            [4.300000000000002,0.6,0.6999999999999975],
+            [4.6000000000000005,0.6,0.5999999999999975],
         ];
 
         startScene.sceneCamera = new SceneCamera(positionKeyFrames, frontKeyFrames);
@@ -183,12 +183,12 @@ class roomScene extends Scene {
         renderModel(startScene.modelRoom, startScene.programCelShader, true, true);
 
         mat4.identity(transformationMatrix);
-        mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(4.18000, 0.60000, 0.77000));
+        mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(4.31000, 0.60000, 0.67000));
         mat4.rotateX(transformationMatrix, transformationMatrix, 0.00000);
-        mat4.rotateY(transformationMatrix, transformationMatrix, 1.50000);
+        mat4.rotateY(transformationMatrix, transformationMatrix, 1.90000);
         mat4.rotateZ(transformationMatrix, transformationMatrix, 0.00000);
         mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(0.04000, 0.04000, 0.04000));
-        gl.uniformMatrix4fv(startScene.programCelShader.getUniformLocation("mMat"), false, startScene.modelPlacer.getTransformationMatrix());
+        gl.uniformMatrix4fv(startScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
         uploadBoneMatrices(startScene.modelBook, startScene.programCelShader, 0);
         renderModel(startScene.modelBook, startScene.programCelShader, true);
 
@@ -221,7 +221,7 @@ class roomScene extends Scene {
         renderModel(startScene.modelMother, startScene.programCelShader, true);
 
         //gl.uniformMatrix4fv(startScene.programCelShader.getUniformLocation("mMat"), false, startScene.modelPlacer.getTransformationMatrix());
-        lightRenderer.renderLights(this.lightManager);
+        //lightRenderer.renderLights(this.lightManager);
     }
 
     update() {
@@ -291,10 +291,10 @@ class roomScene extends Scene {
             case 'KeyP':
                 break;
             case 'ArrowUp':
-                startScene.timer.addTime(0.4);
+                startScene.timer.addTime(0.1);
                 break;
             case 'ArrowDown':
-                startScene.timer.subtractTime(0.4);
+                startScene.timer.subtractTime(0.1);
                 break;
             case 'Tab':
                 break;

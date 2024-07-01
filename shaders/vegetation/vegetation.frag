@@ -14,9 +14,9 @@ void main(void) {
         discard;
 
     vec4 diffuseColor = texture(texObj, oTexCoords);
-    vec3 color = vec3(0.14f, 0.41f, 0.07f);
+    vec3 color = vec3(0.4f, 0.57f, 0.11f);
 
-    gColor = diffuseColor * vec4(0.059f, 0.251f, 0.008f, 1.0f);
+    gColor = diffuseColor * vec4(color, 1.0f);//vec4(0.059f, 0.251f, 0.008f, 1.0f);
 
     gEmission = vec4(0.0f);
     gNormal = vec4(0.0f);
