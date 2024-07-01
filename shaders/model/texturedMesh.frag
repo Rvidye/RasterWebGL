@@ -13,9 +13,9 @@ uniform sampler2D samplerDiffuse;
 
 #include<shaders/common/outputs.glsl>
 void main(void) {
-    vec3 baseColor = material.diffuse * texture(samplerDiffuse,v_tex).rgb;
-    gColor = vec4(baseColor, material.opacity);
-    gEmission = vec4(material.emissive, 1.0);
+    vec4 baseColor = texture(samplerDiffuse,v_tex);
+    gColor = baseColor;
+    gEmission = vec4(0.0);
     gNormal = vec4(0.0);
     gObjectID = vec4(0.0);
 }
