@@ -6,7 +6,8 @@ var KangarooScene = {
     sceneCameraRig: null,
     timer: null,
     songStart: 0,
-    programCelShader: null
+    programCelShader: null,
+    programSky : null
 };
 
 const KangarooSceneEventIDS = {
@@ -29,6 +30,7 @@ class kangarooScene extends Scene {
 
     setupProgram() {
         KangarooScene.programCelShader = new ShaderProgram(gl, ['shaders/model/model.vert', 'shaders/model/celShader.frag']);
+        KangarooScene.programSky = new ShaderProgram(gl, ['shaders/cubemap/spheremap.vert', 'shaders/night/night.frag']);
     }
 
     setupCamera() {
@@ -105,8 +107,8 @@ class kangarooScene extends Scene {
 
         this.kangarooMother = setupModel("kangarooMother", true);
         this.kangarooJoey = setupModel("kangarooJoey", true);
-
         this.birdModel = setupModel("bird", true);
+        this.sphere = setupModel("sphere",false);
 
 
         const birdPositions_1 = [
@@ -328,6 +330,14 @@ class kangarooScene extends Scene {
 
     render() {
 
+        gl.disable(gl.DEPTH_TEST);
+        KangarooScene.programSky.use();
+        gl.uniformMatrix4fv(KangarooScene.programSky.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
+        gl.uniformMatrix4fv(KangarooScene.programSky.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
+        gl.uniform1f(KangarooScene.programSky.getUniformLocation("time"), KangarooScene.timer.getT());
+        renderModel(this.sphere, KangarooScene.programSky, false, false);
+        gl.enable(gl.DEPTH_TEST);
+
         if (DEBUGMODE === CAMERA) {
             KangarooScene.sceneCameraRig.render();
         }
@@ -335,11 +345,6 @@ class kangarooScene extends Scene {
         if (DEBUGMODE === SPLINE) {
             this.splineAdjuster.render();
         }
-
-
-        //gl.depthMask(gl.FALSE);
-        this.myAtmScat.renderAtmScattering();
-        //gl.depthMask(gl.TRUE);
 
         this.myModelDraw.renderModels(this.terrainModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager);
         this.myModelDraw.renderModels(this.objectsModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager);
@@ -374,7 +379,6 @@ class kangarooScene extends Scene {
         gl.depthMask(false);
         this.myGrass.renderGrass();
         gl.depthMask(true);
-
     }
 
     renderKangarooMother(eventID, pathSpline) {

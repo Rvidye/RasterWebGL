@@ -9,6 +9,7 @@ var modelList = [
 	{ name: "arrow", files: ['models/lightmesh/arrow.obj'], flipTex: false },
 	{ name: "cone", files: ['models/lightmesh/cone.obj'], flipTex: false },
 	{ name: "point", files: ['models/lightmesh/point.obj'], flipTex: false },
+	{ name: "sphere", files: ['models/sphere.glb'], flipTex: false },
 	//{ name: "cat", files: ['models/scene1/cat/cat.gltf', "models/scene1/cat/cat.bin"], flipTex: true },
 
 	{ name: "room1", files: ['models/scene1/room/room3.gltf', "models/scene1/room/room3.bin"], flipTex: true },
@@ -44,7 +45,6 @@ var modelList = [
 	{ name: "kangarooMother", files: ['models/kangaroo/mother.gltf', 'models/kangaroo/mother.bin'], flipTex: true },
 	{ name: "kangarooJoey", files: ['models/kangaroo/joey.gltf', 'models/kangaroo/joey.bin'], flipTex: true },
 	{ name: "bird", files: ['models/KangarooScene/birds2/birds.gltf', 'models/KangarooScene/birds2/birds.bin'], flipTex: true },
-
 ]
 
 var scenes = [];
@@ -365,7 +365,7 @@ function renderFrame(timeStamp) {
 	//console.log("Rendering frame with delta time:", GLOBAL.deltaTime);
 	render();
 	update();
-/*
+
 	ImGui_Impl.NewFrame();
 	ImGui.NewFrame();
 	handleUI();
@@ -378,7 +378,6 @@ function renderFrame(timeStamp) {
 	// Render ImGUI
 	ImGui.Render();
 	ImGui_Impl.RenderDrawData(ImGui.GetDrawData());
-*/
 	requestAnimationFrame(renderFrame);
 }
 

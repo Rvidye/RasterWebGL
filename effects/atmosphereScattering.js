@@ -2,182 +2,71 @@
 class atmScattering {
 
     constructor() {
-        //  this.viewMatrix = viewMatrix;
-        // this.projMatrix = projMatrix;
-
         this.atmScatteringProgramObject = null;
-        this.fbo = null;
-        this.fboColorTexture = null;
-        this.projMatrix = null;
-
-        this.textureWidth = 1920;
-        this.textureHeight = 1080;
-
-        this.spProgramObject = null;
-
-        this.atmRadius = 1.0;
-
-        //data
         this.sphere = null;
-        this.vaoSquare = null;
-
-        //
-        this.time = 10.0;
-
-
-
+        this.e_I_sun = 20.0;
+        this.e_R_e = 6360.0;
+        this.e_R_a = 6420.0;
+        this.e_beta_R = [0.0058, 0.0135, 0.0331];
+        this.e_beta_M = 0.0210;
+        this.e_H_R = 7.994;
+        this.e_H_M = 1.200;
+        this.e_g = 0.888;
+        this.defViewSamples = 16;
+        this.defLightSamples = 8;
+        var tmpCam = new DebugCamera();
+        tmpCam.position = vec3.fromValues(0.0, 0.0, 0.0);
+		tmpCam.cameraYaw = 270.0;
+		tmpCam.cameraPitch = 20.0;
+        this.localViewMat = tmpCam.getViewMatrix();
     }
 
     setupProgram() {
-
-        this.atmScatteringProgramObject = new ShaderProgram(gl, ['shaders/atmosphericScattering/atm.vert', 'shaders/atmosphericScattering/atm.frag']);
-        this.spProgramObject = new ShaderProgram(gl, ['shaders/atmosphericScattering/sp.vert', 'shaders/atmosphericScattering/sp.frag']);
-
-        this.initFBO();
-        this.setupData();
-
+        this.atmScatteringProgramObject = new ShaderProgram(gl, ['shaders/atmosphericScattering/atmosphere.vert', 'shaders/atmosphericScattering/atmosphere.frag']);
+        this.sphere = setupModel("sphere", false);
     }
 
-
-    setupData() {
-
-        this.sphere = new Mesh();
-        makeSphere(this.sphere, this.atmRadius, 40, 40);
-
-
-
-        // Declare position and color array
-        var square_position = new Float32Array([
-            1.0, 1.0, 0.0,
-            - 1.0, 1.0, 0.0,
-            -1.0, -1.0, 0.0,
-            1.0, -1.0, 0.0
-        ]);
-
-        // VAO ->Vertex array Object
-        this.vaoSquare = gl.createVertexArray();
-        gl.bindVertexArray(this.vaoSquare);
-
-        // VBO for position vertex buffer object
-        var vbo = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-        gl.bufferData(gl.ARRAY_BUFFER, square_position, gl.STATIC_DRAW);
-        gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
-        gl.enableVertexAttribArray(0);
-        gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-        gl.bindVertexArray(null);
-
-
-    }
-
-
-    initFBO() {
-        this.fbo = gl.createFramebuffer();
-
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
-
-        this.fboColorTexture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, this.fboColorTexture);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, this.textureWidth, this.textureHeight, 0, gl.RGB, gl.UNSIGNED_BYTE, null);
-
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.fboColorTexture, 0);
-
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-
-    }
-
-
-    //
     initAtmScattering() {
-
         this.setupProgram();
-
     }
 
-    renderAtmScattering() {
+    // sunangle -90 degrees : sunrise, 0 degrees : sun overhead, 90 degrees : sunset
+    renderAtmScattering(model,sunAngle) {
+        var modelAtmos = mat4.create();
+        mat4.translate(modelAtmos, modelAtmos, [0.0, -6354.0 + currentCamera.position[1], 0.0]);
+        mat4.rotate(modelAtmos, modelAtmos, -134.0 * Math.PI / 180, [0.0, 1.0, 0.0]);
+        mat4.scale(modelAtmos, modelAtmos, [this.e_R_a, this.e_R_a, this.e_R_a]);
 
-        //First Pass
-        //Atmospheric Scattering on Screen Space square draw on fbo
-        gl.viewport(0, 0, this.textureWidth, this.textureHeight);
-
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
+        var view = mat4.create();
+        var mvMat = mat4.create();
+        mat4.multiply(mvMat,currentCamera.getViewMatrix(),modelAtmos);
+        mat4.multiply(view,this.localViewMat,mvMat);
         this.atmScatteringProgramObject.use();
-
-
-        gl.uniform1f(this.atmScatteringProgramObject.getUniformLocation("iTime"), this.time);
-        gl.uniform2f(this.atmScatteringProgramObject.getUniformLocation("iMouse"), 0.0, 0.0);
-
-
-        gl.bindVertexArray(this.vaoSquare);
-        gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
-
-
-        //Second Pass
-        //Mapping atmsophere scattering iamge texture on sphere
-        //   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, gBuffer.fbo);
-        gl.viewport(0, 0, 2048, 2048);
-
-        onMyResize();
-
-
-        // this.fboColorTexture = loadTexture("textures/nightSky.png", true);
-
-        //Transformations
-        // mat4.translate(modelMatrix, mat4.create(), [0.0, 0.0, 0.0]);
-        var modelMatrix = mat4.create();
-        mat4.translate(modelMatrix, modelMatrix, [0.0, -10.0, 0.0]);
-        mat4.rotateX(modelMatrix, modelMatrix, -Math.PI / 2.0);
-        mat4.scale(modelMatrix, modelMatrix, [500.0, 500.0, 500.0]);
-
-
-
-        this.spProgramObject.use();
-
-
-        gl.uniformMatrix4fv(this.spProgramObject.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
-        gl.uniformMatrix4fv(this.spProgramObject.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
-        gl.uniformMatrix4fv(this.spProgramObject.getUniformLocation("mMat"), false, modelMatrix);
-
-        //Bind Texture Create din first Pass
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, this.fboColorTexture);
-        gl.uniform1i(this.spProgramObject.getUniformLocation("texObj"), 0);
-
-        this.sphere.draw();
-        gl.bindTexture(gl.TEXTURE_2D, null);
-
+        gl.uniformMatrix4fv(this.atmScatteringProgramObject.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
+        gl.uniformMatrix4fv(this.atmScatteringProgramObject.getUniformLocation("vMat"), false, view);
+        gl.uniformMatrix4fv(this.atmScatteringProgramObject.getUniformLocation("mMat"), false, modelAtmos);
+        gl.uniformMatrix4fv(this.atmScatteringProgramObject.getUniformLocation("M"), false, mat4.scale(mat4.create(), mat4.create(), [this.e_R_a, this.e_R_a, this.e_R_a]));
+        gl.uniform3fv(this.atmScatteringProgramObject.getUniformLocation("viewPos"), [0.0, this.e_R_e, 30.0]);
+        gl.uniform3fv(this.atmScatteringProgramObject.getUniformLocation("sunPos"), [0.0, Math.sin(sunAngle), -Math.cos(sunAngle)]);
+        gl.uniform1i(this.atmScatteringProgramObject.getUniformLocation("viewSamples"), this.defViewSamples);
+        gl.uniform1i(this.atmScatteringProgramObject.getUniformLocation("lightSamples"), this.defLightSamples);
+        gl.uniform1f(this.atmScatteringProgramObject.getUniformLocation("I_sun"), this.e_I_sun);
+        gl.uniform1f(this.atmScatteringProgramObject.getUniformLocation("R_e"), this.e_R_e);
+        gl.uniform1f(this.atmScatteringProgramObject.getUniformLocation("R_a"), this.e_R_a);
+        gl.uniform3fv(this.atmScatteringProgramObject.getUniformLocation("beta_R"), this.e_beta_R);
+        gl.uniform1f(this.atmScatteringProgramObject.getUniformLocation("beta_M"), this.e_beta_M);
+        gl.uniform1f(this.atmScatteringProgramObject.getUniformLocation("H_R"), this.e_H_R);
+        gl.uniform1f(this.atmScatteringProgramObject.getUniformLocation("H_M"), this.e_H_M);
+        gl.uniform1f(this.atmScatteringProgramObject.getUniformLocation("g"), this.e_g);
+        renderModel(this.sphere, this.atmScatteringProgramObject, false, false);
     }
 
     updateAtmScattering() {
-
-        this.time += GLOBAL.deltaTime * 0.001;
-        /// this.time = 8.5;
-
-        // console.log(this.time);
     }
 
     uninitAtmScaterring() {
-
         this.atmScatteringProgramObject = null;
-        this.fbo = null;
-        this.fboColorTexture = null;
-        this.projMatrix = null;
-
-        this.spProgramObject = null;
-
-        //data
         this.sphere = null;
-        this.vaoSquare = null;
-
     }
-
 }
 

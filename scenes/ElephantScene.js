@@ -19,8 +19,11 @@ const ElephantSceneEventIDS = {
     MOVE_ELEPHANT_BABY_2: 4,
     MOVE_ELEPHANT_BABY_3: 5,
     MOVE_ELEPHANT_MOTHER_2: 6,
-    END_T: 7
+    END_T: 7,
+    SUN_T: 8
 };
+
+var sunAngle = 0.0;
 
 class elephantScene extends Scene {
 
@@ -233,6 +236,9 @@ class elephantScene extends Scene {
 
         //model Placer
         ElephantScene.modelPlacer = new ModelPlacer();
+        ElephantScene.modelPlacer.position = vec3.fromValues(0.0, -6260.0, 0.0);
+        ElephantScene.modelPlacer.rotation = vec3.fromValues(0.00, 0.00, 0.00);
+        ElephantScene.modelPlacer.scale = vec3.fromValues(6420.0, 6420.0, 6420.0);
 
         //Timer
         ElephantScene.timer = new timer([
@@ -250,7 +256,8 @@ class elephantScene extends Scene {
             // [ElephantSceneEventIDS.MOVE_ELEPHANT_BABY_3, [40.0, 8.0]],
             [ElephantSceneEventIDS.MOVE_ELEPHANT_MOTHER_2, [30.0, 20.0]],
 
-            [ElephantSceneEventIDS.END_T, [55.0, 1.0]]
+            [ElephantSceneEventIDS.END_T, [55.0, 1.0]],
+            [ElephantSceneEventIDS.SUN_T, [0.0, 50.0]],
         ]);
 
         // setup callbacks for 1 time events
@@ -514,6 +521,10 @@ class elephantScene extends Scene {
 
     render() {
 
+        gl.disable(gl.DEPTH_TEST);
+        this.myAtmScat.renderAtmScattering(ElephantScene.modelPlacer.getTransformationMatrix(),toRadian(sunAngle));
+        gl.enable(gl.DEPTH_TEST);
+
         if (DEBUGMODE === CAMERA) {
             ElephantScene.sceneCameraRig.render();
         }
@@ -522,9 +533,6 @@ class elephantScene extends Scene {
             this.splineAdjuster.render();
         }
 
-        // gl.depthMask(gl.FALSE);
-        this.myAtmScat.renderAtmScattering();
-        // gl.depthMask(gl.TRUE);
 
         // this.myVegetation.renderVegetation();
 
@@ -630,10 +638,12 @@ class elephantScene extends Scene {
         // updateModel(ElephantScene.modelCat, 0, GLOBAL.deltaTime);
         ElephantScene.timer.increment();
 
+        sunAngle = lerp(0.0,180.0,ElephantScene.timer.getEventTime(ElephantSceneEventIDS.SUN_T));
+
         if (ElephantScene.timer.isEventStarted(ElephantSceneEventIDS.START_T) && ElephantScene.songStart == 0) {
-            //songPlayer.currentTime = 50.0;
+            songPlayer.currentTime = 50.0;
             ElephantScene.songStart = 1;
-            postProcessingSettings.enableFog = true;
+            postProcessingSettings.enableFog = false;
             postProcessingSettings.enableOutline = true;
             postProcessingSettings.enableBloom = false;
         }
@@ -766,7 +776,11 @@ class elephantScene extends Scene {
         }
 
         switch (key) {
-            case 'KeyP':
+            case 'KeyN':
+                sunAngle += 1.0;
+                break;
+            case 'KeyM':
+                sunAngle -= 1.0;
                 break;
             case 'ArrowUp':
                 ElephantScene.timer.addTime(0.1);
