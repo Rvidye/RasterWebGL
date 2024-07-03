@@ -22,12 +22,14 @@ var modelList = [
 	{ name: "mother", files: ['models/scene1/mother/mother.gltf', 'models/scene1/mother/mother.bin'], flipTex: true },
 	{ name: "earth", files: ['models/earth/earth.gltf', 'models/earth/earth.bin'], flipTex: true },
 	//{ name: "test4", files: ['models/Avocado.glb'], flipTex: true },
-
 	//Elephant Scene Models
 	{ name: "terrain", files: ['models/ElephantScene/elp4_3.glb'], flipTex: true },
 	{ name: "tree1", files: ['models/ElephantScene/TreeSetup/bigTree.glb'], flipTex: true },
 	{ name: "tree2", files: ['models/ElephantScene/TreeSetup/mediumTree.glb'], flipTex: true },
 	{ name: "tree3", files: ['models/ElephantScene/TreeSetup/smallTree.glb'], flipTex: true },
+	{ name: "tree4", files: ['models/ElephantScene/trees/tree1.gltf', "models/ElephantScene/trees/tree1.bin"], flipTex: true },
+	{ name: "tree5", files: ['models/ElephantScene/trees/tree2.gltf', "models/ElephantScene/trees/tree2.bin"], flipTex: true },
+	{ name: "tree6", files: ['models/ElephantScene/trees/tree4.gltf', "models/ElephantScene/trees/tree4.bin"], flipTex: true },
 	{ name: "treeLog1", files: ['models/ElephantScene/TreeSetup/bigLog.glb'], flipTex: true },
 	{ name: "treeLog2", files: ['models/ElephantScene/TreeSetup/mediumLog.glb'], flipTex: true },
 	{ name: "treeTrunk1", files: ['models/ElephantScene/TreeSetup/bigTrunk.glb'], flipTex: true },
@@ -38,6 +40,7 @@ var modelList = [
 	//{ name: "elephantCub", files: ['models/ElephantScene/elephant1/baby.gltf', 'models/ElephantScene/elephant1/baby.bin'], flipTex: true },
 	{ name: "elephantMother", files: ['models/ElephantScene/elephant1/mother.gltf', 'models/ElephantScene/elephant1/mother.bin'], flipTex: true },
 	{ name: "elephantCub", files: ['models/ElephantScene/elephant1/baby.gltf', 'models/ElephantScene/elephant1/baby.bin'], flipTex: true },
+
 	//Kangaroo Scene Models
 	{ name: "kangarooTerrain", files: ['models/KangarooScene/terrain/terrain.gltf', 'models/KangarooScene/terrain/terrain.bin'], flipTex: true },
 	{ name: "kangarooSceneObjects", files: ['models/KangarooScene/objects/objects.gltf', 'models/KangarooScene/objects/objects.bin'], flipTex: true },
@@ -491,7 +494,7 @@ function render() {
 	}
 
 	if (postProcessingSettings.enableOutline) {
-		const outlineTex = outlines.apply(gBuffer.colorTexture, gBuffer.objectIdTexture, gBuffer.depthTexture);
+		const outlineTex = outlines.apply(gBuffer.normalsTexture, gBuffer.objectIdTexture, gBuffer.depthTexture);
 		textures.push(outlineTex);
 	}
 

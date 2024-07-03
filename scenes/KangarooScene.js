@@ -176,9 +176,9 @@ class kangarooScene extends Scene {
         //For Second Movment of Joey
         const joeyPositions_2 = [
             [-77, 0, 100],
-            [-74, 0, 64],
-            [-75, 0, 41],
-            [-77, 0, 18],
+            [-72.70000000000007,0,64],
+            [-72.70000000000013,0,41],
+            [-73.10000000000022,0,13.89999999999998],
         ];
 
         this.joeyPathSpline_2 = new BsplineInterpolator(joeyPositions_2);
@@ -218,7 +218,9 @@ class kangarooScene extends Scene {
 
         //model Placer
         KangarooScene.modelPlacer = new ModelPlacer();
-
+        KangarooScene.modelPlacer.position = vec3.fromValues(0.0, 0.0, 0.0);
+        KangarooScene.modelPlacer.rotation = vec3.fromValues(0.0, 0.0, 0.0);
+        KangarooScene.modelPlacer.scale = vec3.fromValues(1000.0, 1000.0, 1000.0);
         //Timer
         KangarooScene.timer = new timer([
             [KangarooSceneEventIDS.START_T, [0.0, 1.0]],
@@ -278,16 +280,13 @@ class kangarooScene extends Scene {
                     grassBladesPos.push(data[i + 1] * this.terrainScale * 2.0);
                     grassBladesPos.push(data[i + 2] * this.terrainScale * 2.0 + r * Math.sin(fAngle));
                 }
-
                 //Vegetation position
-                if (Math.random() < 0.1) {
-                    let tempMat = mat4.create();
-                    mat4.translate(tempMat, mat4.create(), [data[i] * this.terrainScale, data[i + 1] * this.terrainScale, data[i + 2] * this.terrainScale]);
-                    vegetationPosMatrix.push(tempMat);
-                }
-
+                // if (Math.random() < 0.1) {
+                //     let tempMat = mat4.create();
+                //     mat4.translate(tempMat, mat4.create(), [data[i] * this.terrainScale, data[i + 1] * this.terrainScale, data[i + 2] * this.terrainScale]);
+                //     vegetationPosMatrix.push(tempMat);
+                // }
             }
-
         }
         this.myGrass.GRASS_BLADES = j;
         let baseColor = new Float32Array([0.31, 0.48, 0.0]);
@@ -346,16 +345,28 @@ class kangarooScene extends Scene {
             this.splineAdjuster.render();
         }
 
-        this.myModelDraw.renderModels(this.terrainModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager);
-        this.myModelDraw.renderModels(this.objectsModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager);
-        this.myModelDraw.renderModels(this.maountainsModel, this.whiteTexture, this.terrainModelMatrixArray, this.lightManager);
-
+        var transformationMatrix = mat4.create();
+        mat4.translate(transformationMatrix, transformationMatrix, vec3.fromValues(0.0,0.0,0.0));
+        mat4.rotateX(transformationMatrix, transformationMatrix, 0.0);
+        mat4.rotateY(transformationMatrix, transformationMatrix, 0.0);
+        mat4.rotateZ(transformationMatrix, transformationMatrix, 0.0);
+        mat4.scale(transformationMatrix, transformationMatrix, vec3.fromValues(1.00, 1.00, 1.00));
+        mat4.multiply(transformationMatrix, transformationMatrix, this.terrainModelMatrixArray[0]);
         //Kangaroo Joey and Mother
         KangarooScene.programCelShader.use();
         gl.uniformMatrix4fv(KangarooScene.programCelShader.getUniformLocation("pMat"), false, currentCamera.getProjectionMatrix());
         gl.uniformMatrix4fv(KangarooScene.programCelShader.getUniformLocation("vMat"), false, currentCamera.getViewMatrix());
         gl.uniform3fv(KangarooScene.programCelShader.getUniformLocation("viewPos"), currentCamera.getPosition());
         this.lightManager.updateLights(KangarooScene.programCelShader.programObject);
+
+        gl.uniformMatrix4fv(KangarooScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
+        renderModel(this.terrainModel, KangarooScene.programCelShader, true, false);
+
+        gl.uniformMatrix4fv(KangarooScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
+        renderModel(this.objectsModel, KangarooScene.programCelShader, true, false);
+
+        gl.uniformMatrix4fv(KangarooScene.programCelShader.getUniformLocation("mMat"), false, transformationMatrix);
+        renderModel(this.maountainsModel, KangarooScene.programCelShader, true, false);
 
         if (KangarooScene.timer.currentTime < 25.0) {
             this.renderKangarooJoey(KangarooSceneEventIDS.MOVE_KANGAROO_JOEY_1, this.joeyPathSpline_1);
@@ -394,7 +405,7 @@ class kangarooScene extends Scene {
         // Combining the matrices
         let finalMatrix = mat4.create();
         mat4.multiply(finalMatrix, translationMatrix, orientationMatrix);
-        mat4.scale(finalMatrix, finalMatrix, vec3.fromValues(4.50, 4.50, 4.50));
+        mat4.scale(finalMatrix, finalMatrix, vec3.fromValues(5.50, 5.50, 5.50));
         gl.uniformMatrix4fv(KangarooScene.programCelShader.getUniformLocation("mMat"), false, finalMatrix);
         //renderModel(this.elephantMother, this.myModelDraw.modelProgram, true,true);
         uploadBoneMatrices(this.kangarooMother, KangarooScene.programCelShader, this.currentMotherAnimation);
@@ -414,7 +425,7 @@ class kangarooScene extends Scene {
         // Combining the matrices
         let finalMatrix = mat4.create();
         mat4.multiply(finalMatrix, translationMatrix, orientationMatrix);
-        mat4.scale(finalMatrix, finalMatrix, vec3.fromValues(9.50, 9.50, 9.50));
+        mat4.scale(finalMatrix, finalMatrix, vec3.fromValues(7.50, 7.50, 7.50));
         gl.uniformMatrix4fv(KangarooScene.programCelShader.getUniformLocation("mMat"), false, finalMatrix);
 
         uploadBoneMatrices(this.kangarooJoey, KangarooScene.programCelShader, this.currentBabyAnimation);
@@ -444,7 +455,6 @@ class kangarooScene extends Scene {
         gl.uniform1i(KangarooScene.programCelShader.getUniformLocation("samplerDiffuse"), 0);
 
         renderModel(this.birdModel, KangarooScene.programCelShader, true, true);
-        //  this.myModelDraw.renderModels(this.birdModel, this.whiteTexture, this.finalMatrix, this.lightManager, true);
     }
 
 
@@ -459,7 +469,7 @@ class kangarooScene extends Scene {
         // updateModel(KangarooScene.modelCat, 0, GLOBAL.deltaTime);
         KangarooScene.timer.increment();
         if (KangarooScene.timer.isEventStarted(KangarooSceneEventIDS.START_T) && KangarooScene.songStart == 0) {
-            songPlayer.currentTime = 125.0;
+            //songPlayer.currentTime = 125.0;
             KangarooScene.songStart = 1;
             postProcessingSettings.enableFog = false;
             postProcessingSettings.enableOutline = true;
