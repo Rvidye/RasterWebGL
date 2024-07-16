@@ -3,7 +3,7 @@
 
 ## Description
 
-This is a simple yet powerful WebGL demo engine designed to help developers create stunning 3D graphics with ease. It includes a variety of useful features, ready-made effects, and a straightforward API to enhance user experience.
+This is a simple yet powerful WebGL demo framework designed to help developers create stunning 3D graphics with ease. It includes a variety of useful features, ready-made effects, and a straightforward API.
 
 ## Features
 
@@ -11,9 +11,9 @@ This is a simple yet powerful WebGL demo engine designed to help developers crea
 - **BSpline Interpolator**: Smooth interpolations using Eigen.
 - **Camera**: Includes both First Person and Spline-Based camera systems.
 - **Light Manager**: Efficient light management.
-- **Shadows**: Realistic shadow rendering.
+- **Shadows**: Shadows rendering (PCF).
 - **Timers**: Handy timing functions.
-- **Deferred Shading**: Advanced shading technique.
+- **Deferred Shading**: GBuffer and separate Light pass.
 - **Post Process Pipeline**: Customizable post-processing effects.
 - **Scene Descriptor Class**: Easily manage and describe scenes.
 - **UI**: Integrated UI using ImGUI.
