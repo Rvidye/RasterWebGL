@@ -3,7 +3,11 @@
 
 ## Description
 
-This is a simple yet powerful WebGL demo framework designed to help developers create stunning 3D graphics with ease. It includes a variety of useful features, ready-made effects, and a straightforward API.
+This is a simple yet powerful WebGL demo framework designed to help developers create stunning 3D graphics with ease. It includes various useful features, ready-made effects, and a straightforward API.
+
+## Credits
+Thanks for all the help and insight. It could not have been possible without you.
+[Ganesh Patil](https://github.com/gpatil987654)
 
 ## Features
 
