@@ -32,9 +32,9 @@ class dmodel {
         }
     }
 
-    updateAnimations(index, deltaTime) {
+    updateAnimations(index, deltaTime, multiplier = 1) {
         if (index < this.animator.length) {
-            this.animator[index].update(deltaTime);
+            this.animator[index].update(deltaTime, multiplier);
             this.animator[index].calculateTransforms();
         } else {
             console.error("Invalid Animation Index : ${index}");
@@ -85,8 +85,8 @@ class BaseAnimation {
         this.currentTime = t * this.duration;
     }
 
-    update(deltaTime) {
-        this.currentTime += this.ticksPerSecond * deltaTime;
+    update(deltaTime, multiplier = 1) {
+        this.currentTime += this.ticksPerSecond * deltaTime * multiplier;
         this.currentTime = this.currentTime % this.duration;
     }
 
@@ -659,11 +659,11 @@ function uploadBoneMatrices(model, program, index) {
     gl.uniformMatrix4fv(gl.getUniformLocation(program.programObject, "bMat"), false, new Float32Array(flattenedMatrices));
 }
 
-function updateModel(model, i, delta) {
+function updateModel(model, i, delta, multiplier = 1) {
     if (model === undefined) {
         return;
     }
-    model.updateAnimations(i, delta);
+    model.updateAnimations(i, delta, multiplier);
 }
 
 function renderModel(model, program, useMaterial, drawOutline = false, instanceCount = 1, instanceBuffer = undefined) {

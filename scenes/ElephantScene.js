@@ -19,8 +19,11 @@ const ElephantSceneEventIDS = {
     MOVE_ELEPHANT_BABY_2: 4,
     MOVE_ELEPHANT_BABY_3: 5,
     MOVE_ELEPHANT_MOTHER_2: 6,
-    END_T: 7
+    END_T: 7,
+    SUN_T: 8
 };
+
+var sunAngle = 0.0;
 
 class elephantScene extends Scene {
 
@@ -46,7 +49,7 @@ class elephantScene extends Scene {
             [-181.3999999999993, 21.299999999999578, 90.89999999999971],
             [-161.3999999999996, 24.699999999999513, 47.69999999999957],
             [-92.60000000000073, 27.49999999999961, 53.19999999999935],
-            [27.199999999999164, 95.79999999999949, 17.6999999999993],
+            [27.199999999999164,68.20000000000105,17.6999999999993],
             [-1.9000000000007597, 75.19999999999953, -87.50000000000037],
             [-136.70000000000047, 46.899999999999594, -183.5999999999994],
             [-170.09999999999977, 25.099999999999778, -124.39999999999975],
@@ -79,9 +82,7 @@ class elephantScene extends Scene {
         ElephantScene.sceneCameraRig.setScalingFactor(0.1);
     }
 
-
     init() {
-
         //Lighting Setup
         this.lightManager = new LightManager();
         const directionalLight = new Light(0, [1.0, 1.0, 1.0], 1.0, [0, 400, 400], [0.0, -1.0, -1.0], 0.0, 0.0, 0.0, false);
@@ -116,13 +117,13 @@ class elephantScene extends Scene {
 
         this.whiteTexture = null;
         //Tree1
-        this.tree1Model = setupModel("tree1", false);
+        this.tree1Model = setupModel("tree4", false);
         this.tree1ModelMatrixArray = [];
         //Tree2
-        this.tree2Model = setupModel("tree2", false);
+        this.tree2Model = setupModel("tree5", false);
         this.tree2ModelMatrixArray = [];
         //Tree3
-        this.tree3Model = setupModel("tree3", false);
+        this.tree3Model = setupModel("tree6", false);
         this.tree3ModelMatrixArray = [];
 
         //Tree Logs
@@ -160,7 +161,6 @@ class elephantScene extends Scene {
             [-126,0.9,163],
             [-125,0.9,145],
             [-127,0.9,120],
-
         ];
 
         this.motherPathSpline_1 = new BsplineInterpolator(motherPositions_1);
@@ -191,13 +191,11 @@ class elephantScene extends Scene {
             [-141, 0.1, -50],
         ];
 
-
         this.babyPathSpline_2 = new BsplineInterpolator(babyPositions_2);
         this.splineBabyAdjuster_2 = new SplineAdjuster(this.babyPathSpline_2);
         this.splineBabyAdjuster_2.setRenderPath(true);
         this.splineBabyAdjuster_2.setRenderPathPoints(true);
         //this.splineAdjuster.setScalingFactor(0.01);
-
 
         //Third movement->both mother and baby moves
         // Spline Path for Elephant can be done in constructor
@@ -227,12 +225,13 @@ class elephantScene extends Scene {
         this.splineBabyAdjuster_3.setRenderPathPoints(true);
         //this.splineAdjuster.setScalingFactor(0.01);
 
-
         this.splineAdjuster = this.splineMotherAdjuster_2;
-
 
         //model Placer
         ElephantScene.modelPlacer = new ModelPlacer();
+        ElephantScene.modelPlacer.position = vec3.fromValues(0.0, -6260.0, 0.0);
+        ElephantScene.modelPlacer.rotation = vec3.fromValues(0.00, 0.00, 0.00);
+        ElephantScene.modelPlacer.scale = vec3.fromValues(6420.0, 6420.0, 6420.0);
 
         //Timer
         ElephantScene.timer = new timer([
@@ -250,7 +249,8 @@ class elephantScene extends Scene {
             // [ElephantSceneEventIDS.MOVE_ELEPHANT_BABY_3, [40.0, 8.0]],
             [ElephantSceneEventIDS.MOVE_ELEPHANT_MOTHER_2, [30.0, 20.0]],
 
-            [ElephantSceneEventIDS.END_T, [55.0, 1.0]]
+            [ElephantSceneEventIDS.END_T, [55.0, 1.0]],
+            [ElephantSceneEventIDS.SUN_T, [0.0, 50.0]],
         ]);
 
         // setup callbacks for 1 time events
@@ -280,140 +280,157 @@ class elephantScene extends Scene {
 
         const grassBladesPos = [];
         let vegetationPosMatrix = [];
+        this.treePositions = [];
 
         for (let i = 0; i < data.length; i += 3) {
-
             if ((Math.abs(data[i]) > Math.random() * 0.05 + 0.19 || Math.abs(data[i + 2]) > Math.random() * 0.05 + 0.15) && data[i + 1] == 0.0) {
-
                 //Grass Blades Position
                 for (let k = 0; k < 200.0; k++) {
                     j++;
-
                     let fAngle = Math.random() * 2 * Math.PI;
                     let r = Math.random() * 20.0 + 0.5;
                     grassBladesPos.push(data[i] * this.terrainScale * 2.0 + r * Math.cos(fAngle));
                     grassBladesPos.push(data[i + 1] * this.terrainScale * 2.0);
                     grassBladesPos.push(data[i + 2] * this.terrainScale * 2.0 + r * Math.sin(fAngle));
                 }
-
-                //Vegetation position
-                if (Math.random() < 0.1) {
-                    let tempMat = mat4.create();
-                    mat4.translate(tempMat, mat4.create(), [data[i] * this.terrainScale, data[i + 1] * this.terrainScale, data[i + 2] * this.terrainScale]);
-                    vegetationPosMatrix.push(tempMat);
-                }
-
-
+                // //Vegetation position
+                // if (Math.random() < 0.1) {
+                //     let tempMat = mat4.create();
+                //     mat4.translate(tempMat, mat4.create(), [data[i] * this.terrainScale, data[i + 1] * this.terrainScale, data[i + 2] * this.terrainScale]);
+                //     vegetationPosMatrix.push(tempMat);
+                // }
             }
             /*
             //Tree models
             //For Models Setting modelMatrices
             if ((Math.abs(data[i]) > Math.random() * 0.01 + 0.19 || Math.abs(data[i + 2]) > Math.random() * 0.01 + 0.15)) {
 
-                let randomFact = 0.0;
+                let randomFact = data[i + 1] > 1.0 ? 0.1 : 0.03;
                 let randomLogFact = 0.005;
                 let randomTrunkFact = 0.005;
 
-
-                if (data[i + 1] > 1.0) {
-                    randomFact = 0.1;
-                }
-                else {
-                    randomFact = 0.03;
-                }
-
                 //Big Tree
                 if (Math.random() < randomFact) {
-
-                    let tempMat = mat4.create();
-                    mat4.translate(tempMat, mat4.create(), [data[i] * this.terrainScale, data[i + 1] * this.terrainScale, data[i + 2] * this.terrainScale]);
-                    mat4.rotateY(tempMat, tempMat, Math.random() * 2 * Math.PI);
-                    let scaleFactor = Math.random() * 2.5 + 2.0;
-                    mat4.scale(tempMat, tempMat, [scaleFactor, scaleFactor, scaleFactor]);
-                    this.tree1ModelMatrixArray.push(tempMat);
-
+                    let x = data[i] * this.terrainScale;
+                    let y = data[i + 1] * this.terrainScale;
+                    let z = data[i + 2] * this.terrainScale;
+                    if (!this.isTooClose(x, y, z)) {
+                        let tempMat = mat4.create();
+                        mat4.translate(tempMat, mat4.create(), [data[i] * this.terrainScale, data[i + 1] * this.terrainScale, data[i + 2] * this.terrainScale]);
+                        mat4.rotateY(tempMat, tempMat, Math.random() * 2 * Math.PI);
+                        let scaleFactor = Math.random() * 2.5 + 3.0;
+                        mat4.scale(tempMat, tempMat, [scaleFactor, scaleFactor, scaleFactor]);
+                        this.tree1ModelMatrixArray.push(tempMat);
+                        this.treePositions.push([x, y, z]);
+                    }
                 }
                 else if (Math.random() < randomFact) {
                     //Medium Tree
+                    let x = data[i] * this.terrainScale;
+                    let y = data[i + 1] * this.terrainScale;
+                    let z = data[i + 2] * this.terrainScale;
+                    if (!this.isTooClose(x, y, z)) {
                     let tempMat = mat4.create();
                     mat4.translate(tempMat, mat4.create(), [data[i] * this.terrainScale, data[i + 1] * this.terrainScale, data[i + 2] * this.terrainScale]);
                     mat4.rotateY(tempMat, tempMat, Math.random() * 2 * Math.PI);
-                    let scaleFactor = Math.random() * 2.5 + 2.0;
+                    let scaleFactor = Math.random() * 2.5 + 3.0;
                     mat4.scale(tempMat, tempMat, [scaleFactor, scaleFactor, scaleFactor]);
                     this.tree2ModelMatrixArray.push(tempMat);
-
-
+                    this.treePositions.push([x, y, z]);
+                    }
                 } else if (Math.random() < randomFact) {
                     //Small Tree
+                    let x = data[i] * this.terrainScale;
+                    let y = data[i + 1] * this.terrainScale;
+                    let z = data[i + 2] * this.terrainScale;
+                    if (!this.isTooClose(x, y, z)) {
                     let tempMat = mat4.create();
                     mat4.translate(tempMat, mat4.create(), [data[i] * this.terrainScale, data[i + 1] * this.terrainScale, data[i + 2] * this.terrainScale]);
                     mat4.rotateY(tempMat, tempMat, Math.random() * 2 * Math.PI);
-                    let scaleFactor = Math.random() * 2.5 + 2.0;
+                    let scaleFactor = Math.random() * 2.5 + 2.5;
                     mat4.scale(tempMat, tempMat, [scaleFactor, scaleFactor, scaleFactor]);
                     this.tree3ModelMatrixArray.push(tempMat);
-
-                } else if (Math.random() < randomLogFact) {
-                    //Big Log
-
-                    let tempMat = mat4.create();
-                    mat4.translate(tempMat, mat4.create(), [data[i] * this.terrainScale, data[i + 1] * this.terrainScale, data[i + 2] * this.terrainScale]);
-                    mat4.rotateY(tempMat, tempMat, Math.random() * 2 * Math.PI);
-                    let scaleFactor = Math.random() * 2.5 + 2.0;
-                    mat4.scale(tempMat, tempMat, [scaleFactor, scaleFactor, scaleFactor]);
-                    this.treeLog1ModelMatrixArray.push(tempMat);
-
-                } else if (Math.random() < randomLogFact) {
-                    //Medium Log
-                    let tempMat = mat4.create();
-                    mat4.translate(tempMat, mat4.create(), [data[i] * this.terrainScale, data[i + 1] * this.terrainScale, data[i + 2] * this.terrainScale]);
-                    mat4.rotateY(tempMat, tempMat, Math.random() * 2 * Math.PI);
-                    let scaleFactor = Math.random() * 2.5 + 2.0;
-                    mat4.scale(tempMat, tempMat, [scaleFactor, scaleFactor, scaleFactor]);
-                    this.treeLog2ModelMatrixArray.push(tempMat);
-                }
-                else if (Math.random() < randomTrunkFact) {
-                    //Big Trunk
-
-                    let tempMat = mat4.create();
-                    mat4.translate(tempMat, mat4.create(), [data[i] * this.terrainScale, data[i + 1] * this.terrainScale, data[i + 2] * this.terrainScale]);
-                    mat4.rotateY(tempMat, tempMat, Math.random() * 2 * Math.PI);
-                    let scaleFactor = Math.random() * 2.5 + 2.0;
-                    mat4.scale(tempMat, tempMat, [scaleFactor, scaleFactor, scaleFactor]);
-                    this.treeTrunk1ModelMatrixArray.push(tempMat);
-
-                } else if (Math.random() < randomTrunkFact) {
-                    //Medium Trunk
-                    let tempMat = mat4.create();
-                    mat4.translate(tempMat, mat4.create(), [data[i] * this.terrainScale, data[i + 1] * this.terrainScale, data[i + 2] * this.terrainScale]);
-                    mat4.rotateY(tempMat, tempMat, Math.random() * 2 * Math.PI);
-                    let scaleFactor = Math.random() * 2.5 + 2.0;
-                    mat4.scale(tempMat, tempMat, [scaleFactor, scaleFactor, scaleFactor]);
-                    this.treeTrunk2ModelMatrixArray.push(tempMat);
-                }
-
-
+                    this.treePositions.push([x, y, z]);
+                    }
+                } //else if (Math.random() < randomLogFact) {
+                //     //Big Log
+                //     //Small Tree
+                //     let x = data[i] * this.terrainScale;
+                //     let y = data[i + 1] * this.terrainScale;
+                //     let z = data[i + 2] * this.terrainScale;
+                //     if (!this.isTooClose(x, y, z)) {
+                //     let tempMat = mat4.create();
+                //     mat4.translate(tempMat, mat4.create(), [data[i] * this.terrainScale, data[i + 1] * this.terrainScale, data[i + 2] * this.terrainScale]);
+                //     mat4.rotateY(tempMat, tempMat, Math.random() * 2 * Math.PI);
+                //     let scaleFactor = Math.random() * 2.5 + 2.0;
+                //     mat4.scale(tempMat, tempMat, [scaleFactor, scaleFactor, scaleFactor]);
+                //     this.treeLog1ModelMatrixArray.push(tempMat);
+                //     this.treePositions.push([x, y, z]);
+                //     }
+                // } else if (Math.random() < randomLogFact) {
+                //     //Medium Log
+                //     let x = data[i] * this.terrainScale;
+                //     let y = data[i + 1] * this.terrainScale;
+                //     let z = data[i + 2] * this.terrainScale;
+                //     if (!this.isTooClose(x, y, z)) {
+                //     let tempMat = mat4.create();
+                //     mat4.translate(tempMat, mat4.create(), [data[i] * this.terrainScale, data[i + 1] * this.terrainScale, data[i + 2] * this.terrainScale]);
+                //     mat4.rotateY(tempMat, tempMat, Math.random() * 2 * Math.PI);
+                //     let scaleFactor = Math.random() * 2.5 + 2.0;
+                //     mat4.scale(tempMat, tempMat, [scaleFactor, scaleFactor, scaleFactor]);
+                //     this.treeLog2ModelMatrixArray.push(tempMat);
+                //     this.treePositions.push([x, y, z]);
+                //     }
+                // }
+                // else if (Math.random() < randomTrunkFact) {
+                //     //Big Trunk
+                //     let x = data[i] * this.terrainScale;
+                //     let y = data[i + 1] * this.terrainScale;
+                //     let z = data[i + 2] * this.terrainScale;
+                //     if (!this.isTooClose(x, y, z)) {
+                //     let tempMat = mat4.create();
+                //     mat4.translate(tempMat, mat4.create(), [data[i] * this.terrainScale, data[i + 1] * this.terrainScale, data[i + 2] * this.terrainScale]);
+                //     mat4.rotateY(tempMat, tempMat, Math.random() * 2 * Math.PI);
+                //     let scaleFactor = Math.random() * 2.5 + 2.0;
+                //     mat4.scale(tempMat, tempMat, [scaleFactor, scaleFactor, scaleFactor]);
+                //     this.treeTrunk1ModelMatrixArray.push(tempMat);
+                //     this.treePositions.push([x, y, z]);
+                //     }
+                // } else if (Math.random() < randomTrunkFact) {
+                //     //Medium Trunk
+                //     let x = data[i] * this.terrainScale;
+                //     let y = data[i + 1] * this.terrainScale;
+                //     let z = data[i + 2] * this.terrainScale;
+                //     if (!this.isTooClose(x, y, z)) {
+                //     let tempMat = mat4.create();
+                //     mat4.translate(tempMat, mat4.create(), [data[i] * this.terrainScale, data[i + 1] * this.terrainScale, data[i + 2] * this.terrainScale]);
+                //     mat4.rotateY(tempMat, tempMat, Math.random() * 2 * Math.PI);
+                //     let scaleFactor = Math.random() * 2.5 + 2.0;
+                //     mat4.scale(tempMat, tempMat, [scaleFactor, scaleFactor, scaleFactor]);
+                //     this.treeTrunk2ModelMatrixArray.push(tempMat);
+                //     this.treePositions.push([x, y, z]);
+                //     }
+                // }
             }
-            
-                        //Under Water Rocks
-                        if (Math.random() < 0.002 && data[i + 1] < 0.0) {
-                            let tempMat = mat4.create();
-                            mat4.translate(tempMat, mat4.create(), [data[i] * this.terrainScale, data[i + 1] * this.terrainScale, data[i + 2] * this.terrainScale]);
-                            mat4.rotateX(tempMat, tempMat, Math.PI / 2.0);
-                            let scaleFactor = Math.random() * 0.1 + 0.05;
-                            mat4.scale(tempMat, tempMat, [scaleFactor, scaleFactor, scaleFactor]);
-                            this.stone1ModelMatrixArray.push(tempMat);
-                        }
-            
-                        if (Math.random() < 0.01 && data[i + 1] >= 0.0) {
-                            let tempMat = mat4.create();
-                            mat4.translate(tempMat, mat4.create(), [data[i] * this.terrainScale, data[i + 1] * this.terrainScale, data[i + 2] * this.terrainScale]);
-                            mat4.rotateX(tempMat, tempMat, Math.PI / 2.0);
-                            let scaleFactor = Math.random() * 0.2 + 0.1;
-                            mat4.scale(tempMat, tempMat, [scaleFactor, scaleFactor, scaleFactor]);
-                            this.stone1ModelMatrixArray.push(tempMat);
-                        }
+            //Under Water Rocks
+            // if (Math.random() < 0.002 && data[i + 1] < 0.0) {
+            //     let tempMat = mat4.create();
+            //     mat4.translate(tempMat, mat4.create(), [data[i] * this.terrainScale, data[i + 1] * this.terrainScale, data[i + 2] * this.terrainScale]);
+            //     mat4.rotateX(tempMat, tempMat, Math.PI / 2.0);
+            //     let scaleFactor = Math.random() * 0.1 + 0.05;
+            //     mat4.scale(tempMat, tempMat, [scaleFactor, scaleFactor, scaleFactor]);
+            //     this.stone1ModelMatrixArray.push(tempMat);
+            // }
+    
+            // if (Math.random() < 0.01 && data[i + 1] >= 0.0) {
+            //     let tempMat = mat4.create();
+            //     mat4.translate(tempMat, mat4.create(), [data[i] * this.terrainScale, data[i + 1] * this.terrainScale, data[i + 2] * this.terrainScale]);
+            //     mat4.rotateX(tempMat, tempMat, Math.PI / 2.0);
+            //     let scaleFactor = Math.random() * 0.2 + 0.1;
+            //     mat4.scale(tempMat, tempMat, [scaleFactor, scaleFactor, scaleFactor]);
+            //     this.stone1ModelMatrixArray.push(tempMat);
+            // }
             */
-
         }
 
         /*
@@ -433,28 +450,30 @@ class elephantScene extends Scene {
         //this.writeArrayToFile(this.treeLog1ModelMatrixArray, 'log1');
         //this.writeArrayToFile(this.treeLog2ModelMatrixArray, 'log2');
 
-
-
-
-
         this.tree1ModelMatrixArray = tree1ModelMatrixArray_data;
+        // this.tree1ModelMatrixArray.forEach(mat => {
+        //     mat4.scale(mat, mat, [2.0, 2.0, 2.0]);
+        // });
         this.tree2ModelMatrixArray = tree2ModelMatrixArray_data;
+        // this.tree2ModelMatrixArray.forEach(mat => {
+        //     mat4.scale(mat, mat, [2.0, 2.0, 2.0]);
+        // });
         this.tree3ModelMatrixArray = tree3ModelMatrixArray_data;
+        // this.tree3ModelMatrixArray.forEach(mat => {
+        //     mat4.scale(mat, mat, [2.0, 2.0, 2.0]);
+        // });
         this.treeTrunk1ModelMatrixArray = treeTrunk1ModelMatrixArray_data;
         this.treeTrunk2ModelMatrixArray = treeTrunk2ModelMatrixArray_data;
-
 
         this.treeLog1ModelMatrixArray = treeLog1ModelMatrixArray_data;
         this.treeLog2ModelMatrixArray = treeLog2ModelMatrixArray_data;
 
         this.stone1ModelMatrixArray = stone1ModelMatrixArray_data;
 
-
         this.myGrass.GRASS_BLADES = j;
         let baseColor = new Float32Array([0.06, 0.29, 0.02]);
         let tipColor = new Float32Array([0.07, 1.0, 0.0]);
         this.myGrass.initGrass(grassBladesPos, baseColor, tipColor);
-
 
         //Terrain modelMatrix
         var modelMatrix = mat4.create();
@@ -475,12 +494,10 @@ class elephantScene extends Scene {
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, whitePixel);
         gl.bindTexture(gl.TEXTURE_2D, null);
 
-
         //Vegetation Initialisation
         //init Vegetation texture and modelMatrix Array
         let leafTexture = loadTexture("textures/vegetation/leaf1.png", true);
         this.myVegetation.initVegetation(leafTexture, vegetationPosMatrix);
-
 
         //models
         this.myModelDraw.initDrawModels();
@@ -490,7 +507,6 @@ class elephantScene extends Scene {
 
         //Atmospheric Scaterring
         this.myAtmScat.initAtmScattering();
-
     }
 
     writeArrayToFile(myArray, fileName) {
@@ -514,6 +530,10 @@ class elephantScene extends Scene {
 
     render() {
 
+        gl.disable(gl.DEPTH_TEST);
+        this.myAtmScat.renderAtmScattering(ElephantScene.modelPlacer.getTransformationMatrix(),toRadian(sunAngle));
+        gl.enable(gl.DEPTH_TEST);
+
         if (DEBUGMODE === CAMERA) {
             ElephantScene.sceneCameraRig.render();
         }
@@ -522,9 +542,6 @@ class elephantScene extends Scene {
             this.splineAdjuster.render();
         }
 
-        // gl.depthMask(gl.FALSE);
-        this.myAtmScat.renderAtmScattering();
-        // gl.depthMask(gl.TRUE);
 
         // this.myVegetation.renderVegetation();
 
@@ -623,17 +640,19 @@ class elephantScene extends Scene {
         this.myVegetation.updateVegetation();
         this.myPondWater.updatePondWater();
 
-        updateModel(this.elephantMotherAnim, this.currentMotherAnimation, GLOBAL.deltaTime);
+        updateModel(this.elephantMotherAnim, this.currentMotherAnimation, GLOBAL.deltaTime,2.5);
         updateModel(this.elephantCubAnim, this.currentBabyAnimation, GLOBAL.deltaTime);
 
         ElephantScene.sceneCamera.setT(ElephantScene.timer.getEventTime(ElephantSceneEventIDS.MOVE_T));
         // updateModel(ElephantScene.modelCat, 0, GLOBAL.deltaTime);
         ElephantScene.timer.increment();
 
+        sunAngle = lerp(0.0,180.0,ElephantScene.timer.getEventTime(ElephantSceneEventIDS.SUN_T));
+
         if (ElephantScene.timer.isEventStarted(ElephantSceneEventIDS.START_T) && ElephantScene.songStart == 0) {
             //songPlayer.currentTime = 50.0;
             ElephantScene.songStart = 1;
-            postProcessingSettings.enableFog = true;
+            postProcessingSettings.enableFog = false;
             postProcessingSettings.enableOutline = true;
             postProcessingSettings.enableBloom = false;
         }
@@ -766,7 +785,11 @@ class elephantScene extends Scene {
         }
 
         switch (key) {
-            case 'KeyP':
+            case 'KeyN':
+                sunAngle += 1.0;
+                break;
+            case 'KeyM':
+                sunAngle -= 1.0;
                 break;
             case 'ArrowUp':
                 ElephantScene.timer.addTime(0.1);
@@ -793,4 +816,21 @@ class elephantScene extends Scene {
         return ElephantScene.timer.getT();
 
     }
+
+    isTooClose(x, y, z) {
+        for (let pos of this.treePositions) {
+            let dx = pos[0] - x;
+            let dy = pos[1] - y;
+            let dz = pos[2] - z;
+            if (Math.sqrt(dx * dx + dy * dy + dz * dz) < 20.0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    placeTrees(){
+
+    }
+
 }

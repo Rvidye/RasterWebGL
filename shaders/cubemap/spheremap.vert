@@ -10,10 +10,12 @@ uniform mat4 mMat;
 uniform mat4 nMat; // node matrix
 
 out vec2 v_tex;
+out vec3 v_pos;
 
 void main(void) {
 	mat4 view = mat4(mat3(vMat));
     vec4 pos = pMat * view * vPos;
     gl_Position = pos.xyww;
 	v_tex = vTex;
+    v_pos = vPos.xyz;
 }

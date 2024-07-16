@@ -9,6 +9,7 @@ var modelList = [
 	{ name: "arrow", files: ['models/lightmesh/arrow.obj'], flipTex: false },
 	{ name: "cone", files: ['models/lightmesh/cone.obj'], flipTex: false },
 	{ name: "point", files: ['models/lightmesh/point.obj'], flipTex: false },
+	{ name: "sphere", files: ['models/sphere.glb'], flipTex: false },
 	//{ name: "cat", files: ['models/scene1/cat/cat.gltf', "models/scene1/cat/cat.bin"], flipTex: true },
 
 	{ name: "room1", files: ['models/scene1/room/room3.gltf', "models/scene1/room/room3.bin"], flipTex: true },
@@ -21,12 +22,14 @@ var modelList = [
 	{ name: "mother", files: ['models/scene1/mother/mother.gltf', 'models/scene1/mother/mother.bin'], flipTex: true },
 	{ name: "earth", files: ['models/earth/earth.gltf', 'models/earth/earth.bin'], flipTex: true },
 	//{ name: "test4", files: ['models/Avocado.glb'], flipTex: true },
-
 	//Elephant Scene Models
 	{ name: "terrain", files: ['models/ElephantScene/elp4_3.glb'], flipTex: true },
 	{ name: "tree1", files: ['models/ElephantScene/TreeSetup/bigTree.glb'], flipTex: true },
 	{ name: "tree2", files: ['models/ElephantScene/TreeSetup/mediumTree.glb'], flipTex: true },
 	{ name: "tree3", files: ['models/ElephantScene/TreeSetup/smallTree.glb'], flipTex: true },
+	{ name: "tree4", files: ['models/ElephantScene/trees/tree1.gltf', "models/ElephantScene/trees/tree1.bin"], flipTex: true },
+	{ name: "tree5", files: ['models/ElephantScene/trees/tree2.gltf', "models/ElephantScene/trees/tree2.bin"], flipTex: true },
+	{ name: "tree6", files: ['models/ElephantScene/trees/tree4.gltf', "models/ElephantScene/trees/tree4.bin"], flipTex: true },
 	{ name: "treeLog1", files: ['models/ElephantScene/TreeSetup/bigLog.glb'], flipTex: true },
 	{ name: "treeLog2", files: ['models/ElephantScene/TreeSetup/mediumLog.glb'], flipTex: true },
 	{ name: "treeTrunk1", files: ['models/ElephantScene/TreeSetup/bigTrunk.glb'], flipTex: true },
@@ -44,7 +47,6 @@ var modelList = [
 	{ name: "kangarooMother", files: ['models/kangaroo/mother.gltf', 'models/kangaroo/mother.bin'], flipTex: true },
 	{ name: "kangarooJoey", files: ['models/kangaroo/joey.gltf', 'models/kangaroo/joey.bin'], flipTex: true },
 	{ name: "bird", files: ['models/KangarooScene/birds2/birds.gltf', 'models/KangarooScene/birds2/birds.bin'], flipTex: true },
-
 ]
 
 var scenes = [];
@@ -492,7 +494,7 @@ function render() {
 	}
 
 	if (postProcessingSettings.enableOutline) {
-		const outlineTex = outlines.apply(gBuffer.colorTexture, gBuffer.objectIdTexture, gBuffer.depthTexture);
+		const outlineTex = outlines.apply(gBuffer.normalsTexture, gBuffer.objectIdTexture, gBuffer.depthTexture);
 		textures.push(outlineTex);
 	}
 

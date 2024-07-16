@@ -25,7 +25,8 @@ const endSceneEventIDS = {
     START_T: 0,
     CAMERA1_T: 1,
     BOOK_OPEN_T: 2,
-    END_T: 3
+    FALLING_START_T:3,
+    END_T: 4
 };
 
 var test = 0.0;
@@ -50,8 +51,8 @@ class endRoomScene extends Scene {
         const positionKeyFrames = [
             [4.300000000000001,1.0999999999999996,2.6999999999999984],
             [3.7000000000000015,2.0000000000000004,1.4000000000000012],
-            [1.8000000000000003,2.400000000000001,1.4000000000000048],
-            [2.1000000000000005,2.500000000000001,5.20000000000001],
+            [1.8000000000000003,2.400000000000001,1.0000000000000044],
+            [1.6,2.600000000000001,3.600000000000014],
             [5.099999999999998,2.600000000000001,4.100000000000017],
             [7.599999999999989,3.1000000000000014,3.400000000000021],
             [8.199999999999987,3.600000000000002,3.500000000000021]
@@ -59,9 +60,9 @@ class endRoomScene extends Scene {
 
         const frontKeyFrames = [
             [3.9000000000000026,2.7755575615628914e-17,2.699999999999999],
-            [4.100000000000002,1.2999999999999998,1.6000000000000014],
-            [2.4000000000000012,1.7000000000000002,1.1000000000000045],
-            [2.200000000000001,2.3000000000000007,4.000000000000014],
+            [4.100000000000002,0.7999999999999998,2.300000000000002],
+            [2.4000000000000012,1.7000000000000002,1.3000000000000047],
+            [3.300000000000002,1.7000000000000002,2.3000000000000127],
             [7.0999999999999925,3.200000000000001,3.4000000000000172],
             [8.999999999999986,3.5000000000000013,2.70000000000002],
             [9.199999999999985,5.799999999999995,4.40000000000002]
@@ -98,6 +99,7 @@ class endRoomScene extends Scene {
             [endSceneEventIDS.START_T, [0.0, 1.0]],
             [endSceneEventIDS.CAMERA1_T, [0.0, 22.0]],
             [endSceneEventIDS.BOOK_OPEN_T, [0.0, 6.0]],
+            [endSceneEventIDS.FALLING_START_T, [21.0, 2.0]],
             [endSceneEventIDS.END_T, [23.0, 1.0]]
         ]);
 
@@ -188,13 +190,10 @@ class endRoomScene extends Scene {
 
         endScene.timer.increment();
         endScene.sceneCamera.setT(endScene.timer.getEventTime(endSceneEventIDS.CAMERA1_T));
-        if(endScene.timer.getT() > 20.0){
-            test += 0.025;
-        }
         //updateModel(endScene.modelMother,0,GLOBAL.deltaTime);
-
+        test = lerp(31.0, 40.0, endScene.timer.getEventTime(endSceneEventIDS.FALLING_START_T));
         if (endScene.timer.isEventStarted(endSceneEventIDS.START_T) && endScene.songStart == 0) {
-            songPlayer.currentTime = 161.0;
+            //songPlayer.currentTime = 161.0;
             endScene.songStart = 1;
         }
 

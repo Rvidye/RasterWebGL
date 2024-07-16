@@ -31,7 +31,7 @@ void main(void) {
 
     vec4 fragColor = vec4(col,alpha);
     gColor = fragColor;
-    gEmission = vec4(0.0);
+    gEmission = fragColor;
     gNormal = vec4(0.0);
     gObjectID = vec4(0.0);
 }
